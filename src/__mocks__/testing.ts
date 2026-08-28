@@ -1,11 +1,11 @@
 /**
- * Fakes for the contract checks in this folder.
+ * Fakes shared by the checks in `src/__test__/`.
  *
  * Two of them matter: `refusingLlm` makes "no model call was needed" observable by
  * failing loudly if one happens, and `agreeingScript` lets one script drive both
  * pipelines, so a parity check compares implementations rather than scripts.
  */
-import type { LlmClient, LlmRequest } from './llm.ts';
+import type { LlmClient, LlmRequest } from '../core/llm.ts';
 
 export type TaskName = 'triage' | 'classify' | 'draft' | 'verify';
 

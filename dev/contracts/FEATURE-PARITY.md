@@ -1,11 +1,11 @@
 # CONTRACT: FEATURE-PARITY
 
-**Status:** active · **Enforced by:** `core/parity.contract.test.ts`
+**Status:** active · **Enforced by:** `src/__test__/parity.contract.test.ts`
 
 ## Scope
 
-The two implementations in `core/pipelines.ts` (`baseline`, `advanced`), the policy they
-share in `core/policy.ts`, and every harness that scores them — `eval/`, `sim/`.
+The two implementations in `src/core/pipelines.ts` (`baseline`, `advanced`), the policy they
+share in `src/core/policy.ts`, and every harness that scores them — `src/eval/`, `src/sim/`.
 
 ## The agreement
 
@@ -16,7 +16,7 @@ share in `core/policy.ts`, and every harness that scores them — `eval/`, `sim/
 3. Both honour the human-approval gate: `human_review` always requires approval,
    `auto_send` never claims one it does not have.
 4. Both are measured on the **same cases**, driven from one table, never from two.
-5. A rule that applies to both lives in shared code (`core/policy.ts`). A rule that
+5. A rule that applies to both lives in shared code (`src/core/policy.ts`). A rule that
    exists only inside one pipeline is a parity break even when its behaviour matches.
 6. Any difference in resources is **stated**, not hidden — today: one model call for the
    baseline, three for advanced.
@@ -44,7 +44,7 @@ spends more is a different claim from one that decides better.
 
 ## Enforcement
 
-- **Test:** `core/parity.contract.test.ts` — runs one case table through both pipelines
+- **Test:** `src/__test__/parity.contract.test.ts` — runs one case table through both pipelines
   and asserts, per case, the same decision shape (`decisionFields`), the same route, the
   expected reason code on both sides, and `honoursApprovalGate` on every decision. It
   also asserts both declare exactly `REQUIRED_FEATURES`, and pins the stated resource
@@ -53,13 +53,13 @@ spends more is a different claim from one that decides better.
   measuring a missing feature.
 - Rules 5 and 7 are **judgment**: structure and code quality are checked by the audit
   prompt below, not by the test.
-- When `eval/` lands, it drives both pipelines from the same case list. A harness that
+- When `src/eval/` lands, it drives both pipelines from the same case list. A harness that
   scores only one of them, or scores them on different inputs, breaks rule 4.
 
 ## Audit prompt (paste into a fresh agent session)
 
 > Here is the **FEATURE-PARITY** contract: `dev/contracts/FEATURE-PARITY.md`. Read these
-> files: `core/pipelines.ts`, `core/policy.ts`, `core/decision.ts`, `eval/`, `sim/`.
+> files: `src/core/pipelines.ts`, `src/core/policy.ts`, `src/core/decision.ts`, `src/eval/`, `src/sim/`.
 > For each numbered rule, decide whether it is currently honoured — in particular whether
 > any capability, threshold or bug fix exists on one side only, and whether the baseline
 > reads like code someone was trying to make good.

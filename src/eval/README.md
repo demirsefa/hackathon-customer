@@ -1,6 +1,6 @@
-# eval/
+# src/eval/
 
-Runs the 28 evaluation cases against `core/` directly and prints the results
+Runs the 28 evaluation cases against `src/core/` directly and prints the results
 table. No HTTP, no queue timing, no scenario playback — one message in, one
 decision out, scored against ground truth.
 

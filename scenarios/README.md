@@ -1,6 +1,6 @@
 # scenarios/
 
-Timed message streams for `sim/`.
+Timed message streams for `src/sim/`.
 
 - `normal-day.json` — arrival volume the operator can absorb.
 - `overload.json` — arrival volume that exceeds capacity, which is where

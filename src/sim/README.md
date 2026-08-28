@@ -1,6 +1,6 @@
-# sim/
+# src/sim/
 
-Timestamped scenario player. Feeds a scenario's messages through `core/` in
+Timestamped scenario player. Feeds a scenario's messages through `src/core/` in
 arrival order, advances a simulated clock, and models the operator working the
 queue top-down.
 

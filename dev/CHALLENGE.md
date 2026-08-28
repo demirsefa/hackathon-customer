@@ -245,20 +245,20 @@ at night.
 
 ## 12. Where each requirement lives
 
-| Requirement                      | Where it is answered                                    |
-| -------------------------------- | ------------------------------------------------------- |
-| User, bottleneck, value          | `README.md`                                             |
-| Improvement changelog            | `README.md`                                             |
-| Hot take and main failure mode   | `README.md`                                             |
-| Reproduction guide               | `README.md`                                             |
-| Prior work declared              | `README.md` Sources, enforced by a contract check       |
-| Decision logic                   | `core/` — pure, no I/O, no clock, no network            |
-| Human approval gate              | `core/decision.ts`, surfaced by `service/`              |
-| Per-case scoring, 28 cases       | `eval/`, against `core/` directly                       |
-| Primary metric                   | `sim/`, playing `scenarios/` against the operator model |
-| Committed data and recorded runs | `fixtures/`, `scenarios/`, `trajectories/`              |
-| Credentials kept out             | `yarn security` on every commit                         |
-| Rules that must not drift        | `dev/contracts/`                                        |
+| Requirement                      | Where it is answered                                        |
+| -------------------------------- | ----------------------------------------------------------- |
+| User, bottleneck, value          | `README.md`                                                 |
+| Improvement changelog            | `README.md`                                                 |
+| Hot take and main failure mode   | `README.md`                                                 |
+| Reproduction guide               | `README.md`                                                 |
+| Prior work declared              | `README.md` Sources, enforced by a contract check           |
+| Decision logic                   | `src/core/` — pure, no I/O, no clock, no network            |
+| Human approval gate              | `src/core/decision.ts`, surfaced by `src/service/`          |
+| Per-case scoring, 28 cases       | `src/eval/`, against `src/core/` directly                   |
+| Primary metric                   | `src/sim/`, playing `scenarios/` against the operator model |
+| Committed data and recorded runs | `fixtures/`, `scenarios/`, `trajectories/`                  |
+| Credentials kept out             | `yarn security` on every commit                             |
+| Rules that must not drift        | `dev/contracts/`                                            |
 
 ## Goal order
 

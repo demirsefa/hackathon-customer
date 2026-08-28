@@ -15,13 +15,36 @@ decide. Changing a rule means changing its contract, deliberately and out loud.
 
 New rule? Index it in `dev/contracts/`, never fork it into a second file.
 
-## Layout
+## Folder structure
 
-- `core/` — pure decision logic. No I/O, no clock, no network. Both pipelines are built from it.
-- `service/` — HTTP surface and in-memory queue. Nothing reaches a customer without the approval gate.
-- `eval/` — scores the evaluation cases against `core/` directly.
-- `sim/` — scenario player; produces the primary metric.
-- `fixtures/`, `scenarios/`, `trajectories/` — committed data and recorded runs.
+All source lives under `src/`. Tests and fakes are **not** scattered next to the code
+they cover: there is exactly one `__test__/` and exactly one `__mocks__/`, both at the
+top of `src/`. A second copy of either, anywhere, is a mistake.
+
+```text
+src/
+  core/        pure decision logic. No I/O, no clock, no network. Both pipelines are built from it.
+  service/     HTTP surface and in-memory queue. Nothing reaches a customer without the approval gate.
+  eval/        scores the evaluation cases against `src/core/` directly.
+  sim/         scenario player; produces the primary metric.
+  __test__/    every `*.test.ts` in the project, contract checks included.
+  __mocks__/   the fakes those tests share — scripted and refusing LLM clients.
+
+fixtures/      ┃
+scenarios/     ┃ committed data and recorded runs. Not source; stays outside `src/`.
+trajectories/  ┃
+scripts/       standalone tooling that has to run before anything is installed.
+dev/           the brief, the contracts, the code guidance.
+```
+
+Where new work goes:
+
+- A module belongs to one of the four areas under `src/`. Adding a fifth area means
+  saying why the existing four do not fit.
+- Its test goes to `src/__test__/<name>.test.ts`, importing across with `../core/…`.
+  Contract checks keep the `<name>.contract.test.ts` suffix so they read as law.
+- A fake used by more than one test goes to `src/__mocks__/`. A one-off stub stays
+  inside the test that needs it.
 
 ## Commands
 

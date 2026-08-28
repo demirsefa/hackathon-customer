@@ -8,11 +8,11 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { decisionFields, honoursApprovalGate, type Decision } from './decision.ts';
-import type { InboundMessage } from './message.ts';
-import { advanced, baseline, REQUIRED_FEATURES } from './pipelines.ts';
-import { createRecordStore } from './records.ts';
-import { agreeingScript, scriptedLlm, type TaskName } from './testing.ts';
+import { decisionFields, honoursApprovalGate, type Decision } from '../core/decision.ts';
+import type { InboundMessage } from '../core/message.ts';
+import { advanced, baseline, REQUIRED_FEATURES } from '../core/pipelines.ts';
+import { createRecordStore } from '../core/records.ts';
+import { agreeingScript, scriptedLlm, type TaskName } from '../__mocks__/testing.ts';
 
 const records = createRecordStore({
   senders: [{ senderId: 'S-ALICE', displayName: 'Alice' }],

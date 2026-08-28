@@ -9,9 +9,9 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "eval": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning eval/index.ts",
-    "sim": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning sim/index.ts",
-    "serve": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning service/index.ts",
+    "eval": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/eval/index.ts",
+    "sim": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/sim/index.ts",
+    "serve": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/service/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

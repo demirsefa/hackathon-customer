@@ -19,9 +19,9 @@ Guidance that is _not_ law lives in [`dev/GUIDES.md`](../GUIDES.md).
 
 ## Index
 
-| Contract                                 | Scope                                                              | Enforced by                    |
-| ---------------------------------------- | ------------------------------------------------------------------ | ------------------------------ |
-| [`FEATURE-PARITY.md`](FEATURE-PARITY.md) | The baseline and the advanced pipeline expose the same feature set | `core/parity.contract.test.ts` |
+| Contract                                 | Scope                                                              | Enforced by                            |
+| ---------------------------------------- | ------------------------------------------------------------------ | -------------------------------------- |
+| [`FEATURE-PARITY.md`](FEATURE-PARITY.md) | The baseline and the advanced pipeline expose the same feature set | `src/__test__/parity.contract.test.ts` |
 
 ## Sources
 
