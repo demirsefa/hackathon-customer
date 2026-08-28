@@ -1,0 +1,11 @@
+/**
+ * Entry point for the runtime path: an HTTP surface over `core/`, backed by an
+ * in-memory queue. Nothing reaches a customer without either an automatic-send
+ * decision from `core/` or an explicit approval call from the operator.
+ *
+ *   yarn serve
+ */
+import { hello } from '../core/hello.ts';
+
+console.log(hello('service'));
+console.log('listening: no (HTTP surface not implemented yet)');
