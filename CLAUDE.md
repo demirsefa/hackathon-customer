@@ -18,8 +18,8 @@ New rule? Index it in `dev/contracts/`, never fork it into a second file.
 ## Folder structure
 
 All source lives under `src/`. Tests and fakes are **not** scattered next to the code
-they cover: there is exactly one `__test__/` and exactly one `__mocks__/`, both at the
-top of `src/`. A second copy of either, anywhere, is a mistake.
+they cover: there is exactly one `__test__/`, at the top of `src/`, and the fakes those
+tests share live in it. A second copy anywhere is a mistake.
 
 ```text
 src/
@@ -27,8 +27,10 @@ src/
   service/     HTTP surface and in-memory queue. Nothing reaches a customer without the approval gate.
   eval/        scores the evaluation cases against `src/core/` directly.
   sim/         scenario player; produces the primary metric.
-  __test__/    every `*.test.ts` in the project, contract checks included.
-  __mocks__/   the fakes those tests share — scripted and refusing LLM clients.
+  __test__/    every `*.test.ts` in the project.
+    unit/      one module or one line at a time.
+    contract/  the checks that enforce `dev/contracts/`.
+    fakes.ts   the fakes those tests share — scripted and refusing LLM clients.
 
 fixtures/      ┃
 scenarios/     ┃ committed data and recorded runs. Not source; stays outside `src/`.
@@ -41,10 +43,11 @@ Where new work goes:
 
 - A module belongs to one of the four areas under `src/`. Adding a fifth area means
   saying why the existing four do not fit.
-- Its test goes to `src/__test__/<name>.test.ts`, importing across with `../core/…`.
-  Contract checks keep the `<name>.contract.test.ts` suffix so they read as law.
-- A fake used by more than one test goes to `src/__mocks__/`. A one-off stub stays
-  inside the test that needs it.
+- Its test goes to `src/__test__/unit/<name>.test.ts`, importing across with
+  `../../core/…`. A check that enforces a contract goes to `src/__test__/contract/`
+  and keeps the `<name>.contract.test.ts` suffix so it reads as law.
+- A fake used by more than one test goes to `src/__test__/fakes.ts`. A one-off stub
+  stays inside the test that needs it.
 
 ## Commands
 

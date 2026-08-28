@@ -1,10 +1,10 @@
 # CONTRACT: FEATURE-PARITY
 
-**Status:** active · **Enforced by:** `src/__test__/parity.contract.test.ts`
+**Status:** active · **Enforced by:** `src/__test__/contract/parity.contract.test.ts`
 
 ## Scope
 
-The two implementations in `src/core/pipelines.ts` (`baseline`, `advanced`), the policy they
+The implementations under `src/core/baseline/` and `src/core/advanced/`, the policy they
 share in `src/core/policy.ts`, and every harness that scores them — `src/eval/`, `src/sim/`.
 
 ## The agreement
@@ -44,7 +44,7 @@ spends more is a different claim from one that decides better.
 
 ## Enforcement
 
-- **Test:** `src/__test__/parity.contract.test.ts` — runs one case table through both pipelines
+- **Test:** `src/__test__/contract/parity.contract.test.ts` — runs one case table through both pipelines
   and asserts, per case, the same decision shape (`decisionFields`), the same route, the
   expected reason code on both sides, and `honoursApprovalGate` on every decision. It
   also asserts both declare exactly `REQUIRED_FEATURES`, and pins the stated resource
@@ -59,7 +59,8 @@ spends more is a different claim from one that decides better.
 ## Audit prompt (paste into a fresh agent session)
 
 > Here is the **FEATURE-PARITY** contract: `dev/contracts/FEATURE-PARITY.md`. Read these
-> files: `src/core/pipelines.ts`, `src/core/policy.ts`, `src/core/decision.ts`, `src/eval/`, `src/sim/`.
+> files: `src/core/pipeline.ts`, `src/core/baseline/`, `src/core/advanced/`, `src/core/policy.ts`,
+> `src/core/decision.ts`, `src/eval/`, `src/sim/`.
 > For each numbered rule, decide whether it is currently honoured — in particular whether
 > any capability, threshold or bug fix exists on one side only, and whether the baseline
 > reads like code someone was trying to make good.

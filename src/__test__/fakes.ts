@@ -1,5 +1,5 @@
 /**
- * Fakes shared by the checks in `src/__test__/`.
+ * Fakes shared by the checks in this folder.
  *
  * Two of them matter: `refusingLlm` makes "no model call was needed" observable by
  * failing loudly if one happens, and `agreeingScript` lets one script drive both

@@ -4,12 +4,12 @@
  * about something they do not own.
  */ import { describe, expect, it } from 'vitest';
 
-import { resolveAuthority } from '../core/authority.ts';
-import { honoursApprovalGate } from '../core/decision.ts';
-import type { InboundMessage } from '../core/message.ts';
-import { createRecordStore } from '../core/records.ts';
-import { PIPELINES, type Pipeline } from '../core/pipelines.ts';
-import { agreeingScript, refusingLlm, scriptedLlm } from '../__mocks__/testing.ts';
+import { resolveAuthority } from '../../core/authority.ts';
+import { honoursApprovalGate } from '../../core/decision.ts';
+import type { InboundMessage } from '../../core/message.ts';
+import { createRecordStore } from '../../core/records.ts';
+import { PIPELINES, type Pipeline } from '../../core/pipeline.ts';
+import { agreeingScript, refusingLlm, scriptedLlm } from '../fakes.ts';
 
 const records = createRecordStore({
   senders: [

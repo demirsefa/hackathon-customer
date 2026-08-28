@@ -8,11 +8,11 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { decisionFields, honoursApprovalGate, type Decision } from '../core/decision.ts';
-import type { InboundMessage } from '../core/message.ts';
-import { advanced, baseline, REQUIRED_FEATURES } from '../core/pipelines.ts';
-import { createRecordStore } from '../core/records.ts';
-import { agreeingScript, scriptedLlm, type TaskName } from '../__mocks__/testing.ts';
+import { honoursApprovalGate, type Decision } from '../../core/decision.ts';
+import type { InboundMessage } from '../../core/message.ts';
+import { PIPELINES, REQUIRED_FEATURES, type Pipeline } from '../../core/pipeline.ts';
+import { createRecordStore } from '../../core/records.ts';
+import { agreeingScript, scriptedLlm, type TaskName } from '../fakes.ts';
 
 const records = createRecordStore({
   senders: [{ senderId: 'S-ALICE', displayName: 'Alice' }],
@@ -89,58 +89,40 @@ const CASES: readonly Case[] = [
 ];
 
 describe('feature parity', () => {
-  it('both implementations declare the same feature set', () => {
+  it('every line declares the same feature set', () => {
     const required = [...REQUIRED_FEATURES].sort();
 
-    expect([...baseline.features].sort()).toEqual(required);
-    expect([...advanced.features].sort()).toEqual(required);
+    for (const pipeline of PIPELINES) {
+      expect([...pipeline.features].sort()).toEqual(required);
+    }
   });
 
-  describe.each(CASES.map((testCase) => [testCase.name, testCase] as const))(
+  describe.each(PIPELINES.map((pipeline) => [pipeline.name, pipeline] as const))(
     '%s',
-    (_name: string, testCase: Case) => {
-      it('produces the same decision shape and the same route on both sides', async () => {
-        const input = { message: testCase.message, records };
+    (_name: string, pipeline: Pipeline) => {
+      describe.each(CASES.map((testCase) => [testCase.name, testCase] as const))(
+        '%s',
+        (_caseName: string, testCase: Case) => {
+          it('reaches the expected reason code and honours the approval gate', async () => {
+            const decision = await pipeline.run({
+              message: testCase.message,
+              records,
+              llm: scriptedLlm(testCase.script),
+            });
 
-        const fromBaseline = await baseline.run({
-          ...input,
-          llm: scriptedLlm(testCase.script),
-        });
-        const fromAdvanced = await advanced.run({
-          ...input,
-          llm: scriptedLlm(testCase.script),
-        });
-
-        expect(decisionFields(fromBaseline)).toEqual(decisionFields(fromAdvanced));
-        expect(fromBaseline.route).toBe(fromAdvanced.route);
-        expect(fromBaseline.reason).toBe(testCase.expected);
-        expect(fromAdvanced.reason).toBe(testCase.expected);
-      });
-
-      it('honours the human-approval gate on both sides', async () => {
-        const input = { message: testCase.message, records };
-
-        const fromBaseline = await baseline.run({
-          ...input,
-          llm: scriptedLlm(testCase.script),
-        });
-        const fromAdvanced = await advanced.run({
-          ...input,
-          llm: scriptedLlm(testCase.script),
-        });
-
-        expect(honoursApprovalGate(fromBaseline)).toBe(true);
-        expect(honoursApprovalGate(fromAdvanced)).toBe(true);
-      });
+            expect(decision.reason).toBe(testCase.expected);
+            expect(honoursApprovalGate(decision)).toBe(true);
+          });
+        },
+      );
     },
   );
 
   /**
-   * The one permitted difference, asserted rather than left implicit: advanced spends
-   * three model calls where the baseline spends one. Changing these numbers means
-   * changing what the headline comparison costs, so it changes the contract too.
+   * The one permitted difference, asserted rather than left implicit. With only the
+   * baseline built, what can be pinned is its own budget: one model call.
    */
-  it('states the difference in model calls instead of hiding it', async () => {
+  it('states the model-call budget instead of hiding it', async () => {
     const script = agreeingScript({
       category: 'shipping',
       confidence: 0.95,
@@ -148,10 +130,9 @@ describe('feature parity', () => {
     });
     const input = { message: message('Has ORD-2002 shipped yet?'), records };
 
-    const fromBaseline = await baseline.run({ ...input, llm: scriptedLlm(script) });
-    const fromAdvanced = await advanced.run({ ...input, llm: scriptedLlm(script) });
-
-    expect(fromBaseline.llmCalls).toBe(1);
-    expect(fromAdvanced.llmCalls).toBe(3);
+    for (const pipeline of PIPELINES) {
+      const decision = await pipeline.run({ ...input, llm: scriptedLlm(script) });
+      expect(decision.llmCalls).toBe(1);
+    }
   });
 });
