@@ -1,14 +1,20 @@
 /**
- * The baseline line. Anchored in dev/CHALLENGE.md §8.
+ * The baseline line, exactly as dev/CHALLENGE.md §8 describes it.
  *
- * Deliberately the reasonable simple approach, not a strawman: one model call, then
- * the risk decision at a single point. Its weaknesses are the thing being measured,
- * and each one is a choice a competent person would plausibly make.
+ * One model call, then the risk decision at a single point: is the category the
+ * model returned on the risky list? Nothing else. It is handed the record layer
+ * like every line and never opens it — authority and ownership are read out of the
+ * text, by the model, or not at all. That is the gap the primary metric measures,
+ * and it is observable here rather than argued for in a README.
+ *
+ * It is not a strawman. The model's output is parsed rather than assumed, the
+ * sensitive list is fixed in code rather than left to the model's judgement, the
+ * approval gate is the same one every line uses, and every decision carries a reason
+ * code. This is the solution a competent person actually writes first.
  */
-import { gateOnAuthority, permittedOrderIds, resolveAuthority } from '../authority.ts';
 import { autoSend, humanReview, type Decision } from '../decision.ts';
 import type { Pipeline } from '../pipeline.ts';
-import { CONFIDENCE_THRESHOLD, isSensitive, validateDraft } from '../policy.ts';
+import { isSensitive } from '../policy.ts';
 import { buildTriagePrompt, parseTriageOutput } from './triage.ts';
 
 export const baseline: Pipeline = {
@@ -23,42 +29,30 @@ export const baseline: Pipeline = {
     'reason-code-on-every-decision',
   ],
 
-  async run({ message, records, llm }): Promise<Decision> {
-    const outcome = resolveAuthority(message, records);
-    const held = gateOnAuthority(message.messageId, outcome);
-    if (held !== null) return held;
+  async run({ message, llm }): Promise<Decision> {
+    const messageId = message.messageId;
 
     const response = await llm.complete({
       prompt: buildTriagePrompt(message.text, message.threadSummary),
     });
+
     const output = parseTriageOutput(response.text);
     if (output === null) {
-      return humanReview({
-        messageId: message.messageId,
-        reason: 'model_output_unusable',
-        llmCalls: 1,
-      });
+      return humanReview({ messageId, reason: 'model_output_unusable', llmCalls: 1 });
     }
 
-    const messageId = message.messageId;
-    const { category, confidence, draft } = output;
+    const { category, urgency, draft } = output;
 
-    const verdict = validateDraft(draft, permittedOrderIds(outcome));
-    if (!verdict.ok) {
+    if (isSensitive(category)) {
+      // The only signal available for the read-first order is the model's own
+      // urgency, so that is what the queue is sorted by.
       return humanReview({
         messageId,
-        reason: 'draft_policy_violation',
+        reason: 'sensitive_category',
+        priority: urgency,
         draft,
         llmCalls: 1,
       });
-    }
-
-    if (isSensitive(category)) {
-      return humanReview({ messageId, reason: 'sensitive_category', draft, llmCalls: 1 });
-    }
-
-    if (confidence < CONFIDENCE_THRESHOLD) {
-      return humanReview({ messageId, reason: 'low_confidence', draft, llmCalls: 1 });
     }
 
     return autoSend({ messageId, draft, llmCalls: 1 });
