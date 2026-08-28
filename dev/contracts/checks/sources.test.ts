@@ -102,6 +102,40 @@ function exists(path: string): boolean {
   }
 }
 
+/**
+ * The root README is where an outsider — a judge, a reviewer, whoever clones this —
+ * looks first, so every upstream declared anywhere in the tree has to be named there
+ * too. The folder tables carry the detail; the README carries the fact.
+ */
+const README = 'README.md';
+const ATTRIBUTION_HEADING = /^##+ .*(prior work|attribution|sources)/i;
+
+function attributionSection(): string {
+  const lines = readFileSync(join(ROOT, README), 'utf8').split('\n');
+  const start = lines.findIndex((line) => ATTRIBUTION_HEADING.test(line));
+  if (start === -1) return '';
+
+  const rest = lines.slice(start + 1);
+  const end = rest.findIndex((line) => line.startsWith('## '));
+  return (end === -1 ? rest : rest.slice(0, end)).join('\n');
+}
+
+/** Upstreams are compared at repository level: host plus owner plus repo. */
+function upstreamOrigins(): readonly string[] {
+  const origins = new Set<string>();
+
+  for (const row of ROWS) {
+    for (const match of row.cells.join(' ').matchAll(/https?:\/\/[^\s<>)|]+/g)) {
+      const url = new URL(match[0]);
+      const [owner, repo] = url.pathname.split('/').filter(Boolean);
+      if (owner === undefined || repo === undefined) continue;
+      origins.add(`${url.host}/${owner}/${repo}`);
+    }
+  }
+
+  return [...origins];
+}
+
 describe('external sources are recorded', () => {
   it('finds at least one declared source', () => {
     // A repository built partly from outside material with no table at all is the
@@ -149,5 +183,14 @@ describe('external sources are recorded', () => {
     );
 
     expect(undeclared).toEqual([]);
+  });
+
+  it('names every upstream in the root README', () => {
+    const section = attributionSection();
+    expect(section, `${README} has no prior-work or sources section`).not.toBe('');
+
+    const missing = upstreamOrigins().filter((origin) => !section.includes(origin));
+
+    expect(missing).toEqual([]);
   });
 });
