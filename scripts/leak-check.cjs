@@ -69,19 +69,27 @@ const PATTERNS = [
   {
     id: 'inline-secret',
     why: 'secret assigned inline',
-    re: /[A-Z0-9_]*(?:KEY|TOKEN|SECRET)\s*[:=]\s*\S/,
+    // Two refinements, both about the shape of the value rather than any file it
+    // might appear in. A value opening with < or $ is a placeholder or a variable
+    // reference, not the secret. And a credential worth protecting is never two
+    // characters long, so requiring a plausible run of secret-alphabet characters
+    // drops shell and regex fragments that merely mention a variable name.
+    re: /[A-Z0-9_]*(?:KEY|TOKEN|SECRET)\s*[:=]\s*(?!['"]?[<$])['"]?[A-Za-z0-9+/=_.-]{6,}/,
   },
 ];
 
 /**
- * Deliberately tiny. The environment template exists to show which variables
- * have to be set, so it necessarily contains lines that look like assignments
- * to a secret. Its values are placeholders, not credentials — which is why the
- * key-shaped patterns are still enforced there.
+ * Deliberately empty, and worth keeping that way.
  *
- * Nothing else belongs here until it is proven harmless.
+ * Every exemption here is a file this gate has agreed not to look at, and the
+ * list itself is a public hint about where something interesting lives. The
+ * environment template used to need an entry; tightening the assignment pattern
+ * to ignore placeholder values removed the need, which is the better fix.
+ *
+ * Nothing belongs here until it is proven harmless and cannot be handled by
+ * making a pattern more precise.
  */
-const ALLOWED = new Map([['.env.example', new Set(['inline-secret'])]]);
+const ALLOWED = new Map();
 
 const NO_EXEMPTIONS = new Set();
 
