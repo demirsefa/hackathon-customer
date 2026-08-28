@@ -19,7 +19,12 @@ export type ReasonCode =
   | 'model_output_unusable'
   | 'routine_reply';
 
-/** Read-first order for the operator: higher is reached earlier under overload. */
+/**
+ * Read-first order for the operator: higher is reached earlier under overload.
+ *
+ * Derived from the reason, because the reason is what the record layer established.
+ * A line with nothing better may pass its own score instead — see `humanReview`.
+ */
 const PRIORITY: Readonly<Record<ReasonCode, number>> = {
   authority_mismatch: 95,
   draft_policy_violation: 90,
@@ -43,17 +48,31 @@ export type Decision = {
   readonly llmCalls: number;
 };
 
+function clampPriority(value: number): number {
+  return Math.min(100, Math.max(0, value));
+}
+
 export function humanReview(input: {
   readonly messageId: string;
   readonly reason: Exclude<ReasonCode, 'routine_reply'>;
   readonly draft?: string | null;
+  /**
+   * The line's own read-first score, clamped to 0-100. A line that has nothing but
+   * the model's urgency passes it here; one that held the message on a fact it
+   * established omits it and takes the score of the reason instead. Which of the two
+   * a line does is part of what the primary metric compares.
+   */
+  readonly priority?: number;
   readonly llmCalls: number;
 }): Decision {
   return {
     messageId: input.messageId,
     route: 'human_review',
     reason: input.reason,
-    priority: PRIORITY[input.reason],
+    priority:
+      input.priority === undefined
+        ? PRIORITY[input.reason]
+        : clampPriority(input.priority),
     draft: input.draft ?? null,
     requiresApproval: true,
     llmCalls: input.llmCalls,

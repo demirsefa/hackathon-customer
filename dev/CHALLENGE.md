@@ -135,17 +135,22 @@ a feature. That is the whole reason parity is a contract and not a preference.
 
 Deliberately the reasonable simple approach, not a strawman.
 
+Built: `src/core/baseline/`.
+
 ```
 message in
   ↓
-ONE LLM call: category + urgency + draft + reason
+ONE LLM call: category + urgency + draft
   ↓
+did it come back in the shape that was asked for?
+  ├─ no  → human queue (model_output_unusable)
+  └─ yes ↓
 is the category on the risky list?
-  ├─ yes → human queue (priority = the model's urgency)
-  └─ no  → auto-send
+  ├─ yes → human queue (sensitive_category, priority = the model's urgency)
+  └─ no  → auto-send (routine_reply)
 
 [separate loop]
-pending case: elapsed > threshold && operator has not looked → interim message,
+pending case: elapsed >= threshold && operator has not looked → interim message,
 stays in the queue
 ```
 
@@ -153,13 +158,18 @@ Its weaknesses are the point of the comparison, and each one is a real design
 choice a person would plausibly make:
 
 - The risk decision sits at a single point and depends on the model's category.
-- Authority and ownership are read out of the text.
+- Authority and ownership are read out of the text. The record layer is handed to it,
+  like it is to every line, and never opened.
 - Category and draft come from the same call, so the model bends the category to
   fit the draft it already wants to write.
 - No draft validation.
 - No concept of uncertainty: it always decides.
 
 ## 9. Advanced
+
+**Not built yet.** `src/core/advanced/index.ts` is a placeholder; what stands there is
+the material it will be assembled from — `src/core/authority.ts`, `src/core/policy.ts`,
+and the three prompt files beside it.
 
 ```
 message in
@@ -169,23 +179,25 @@ message in
    - record reference: does it cite an order number?
    - sender: account age, prior message count
   ↓
-2. AUTHORITY CHECK (without reading the text)
-   order.owner != message.senderId → mismatch
+2. AUTHORITY CHECK (without reading the text) — src/core/authority.ts
+   sender unknown to the record layer      → human queue (unknown_sender)
+   reference that resolves to nothing      → human queue (unresolved_reference)
+   order.owner != message.senderId         → human queue (authority_mismatch)
   ↓
 3. CLASSIFICATION (separate pass, no draft pressure)
    category + confidence
   ↓
 4. GATE
-   risky (any of the three signals) OR confidence < threshold
-   → flag with a reason, human queue, STOP
+   risky category OR confidence < CONFIDENCE_THRESHOLD
+   → human queue with a reason (sensitive_category | low_confidence), STOP
   ↓
 5. DRAFT (safe cases only)
   ↓
-6. POLICY VALIDATION
+6. POLICY VALIDATION — src/core/policy.ts validateDraft()
    fails → feed back, rewrite (max 2)
-   still fails → human queue
+   still fails → human queue (draft_policy_violation)
   ↓
-auto-send
+auto-send (routine_reply)
 ```
 
 The gate runs before any model call, which is what makes "this decision cost zero

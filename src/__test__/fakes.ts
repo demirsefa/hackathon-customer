@@ -1,5 +1,5 @@
 /**
- * Fakes shared by the checks in `src/__test__/`.
+ * Fakes shared by the checks in this folder.
  *
  * Two of them matter: `refusingLlm` makes "no model call was needed" observable by
  * failing loudly if one happens, and `agreeingScript` lets one script drive both
@@ -65,18 +65,24 @@ export function refusingLlm(): RecordingLlm {
 }
 
 /**
- * One model opinion, expressed in every shape both pipelines ask for, so the only
- * difference left between them is their own design.
+ * One model opinion, expressed in every shape any line asks for, so the only
+ * difference left between two lines is their own design.
+ *
+ * The two scores are not the same thing and are not derived from each other:
+ * `urgency` is what the baseline asks for — how loud the message sounds, on the
+ * 0-100 scale a decision's priority uses — and `confidence` is the model's own
+ * certainty, which only the advanced line has a use for.
  */
 export function agreeingScript(input: {
   readonly category: string;
+  readonly urgency: number;
   readonly confidence: number;
   readonly draft: string;
 }): Record<TaskName, string> {
-  const { category, confidence, draft } = input;
+  const { category, urgency, confidence, draft } = input;
 
   return {
-    triage: JSON.stringify({ category, confidence, draft }),
+    triage: JSON.stringify({ category, urgency, draft }),
     classify: JSON.stringify({ category, confidence }),
     draft: JSON.stringify({ draft }),
     verify: JSON.stringify({ ok: true, confidence }),

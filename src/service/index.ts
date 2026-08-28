@@ -5,7 +5,5 @@
  *
  *   yarn serve
  */
-import { hello } from '../core/hello.ts';
 
-console.log(hello('service'));
 console.log('listening: no (HTTP surface not implemented yet)');
