@@ -1,0 +1,16 @@
+# Git hooks. Installed automatically by the "prepare" script on yarn install.
+#
+# The split is deliberate: validation is fast enough to run on every commit,
+# while the test suite runs before the work leaves the machine.
+
+pre-commit:
+  parallel: false
+  commands:
+    validation:
+      run: yarn validation
+
+pre-push:
+  parallel: false
+  commands:
+    test:
+      run: yarn test

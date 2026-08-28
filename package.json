@@ -19,7 +19,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "yarn typecheck && yarn lint && yarn format:check && yarn test"
+    "validation": "tsc --noEmit && eslint . && prettier --check .",
+    "check": "yarn validation && yarn test",
+    "prepare": "lefthook install || true"
   },
   "packageManager": "yarn@4.18.0+sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e",
   "dependencies": {
@@ -30,6 +32,7 @@
     "@types/node": "^26.4.0",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
+    "lefthook": "^2.1.10",
     "prettier": "^3.9.6",
     "typescript": "^5.9.0",
     "typescript-eslint": "^8.68.0",

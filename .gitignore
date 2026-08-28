@@ -16,6 +16,10 @@ dist/
 .env
 .env.local
 
+# Editors
+.idea/
+.vscode/
+
 # Logs & OS noise
 *.log
 npm-debug.log*
