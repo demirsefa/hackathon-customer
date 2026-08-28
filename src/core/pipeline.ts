@@ -13,16 +13,22 @@ import type { InboundMessage } from './message.ts';
 import type { RecordStore } from './records.ts';
 
 /**
- * The feature set every line must expose. The measured difference between two lines
- * is only meaningful if this list is satisfied on both sides.
+ * The feature set every line must expose — the seven capabilities of
+ * dev/CHALLENGE.md §7, in its order.
+ *
+ * These are **features**: what the operator gets. They are deliberately not
+ * mechanisms — a record-backed authority gate, a separate classification pass, a
+ * confidence threshold are ways of reaching a feature, and demanding them of every
+ * line would make the two lines identical by contract. The measured difference is
+ * exactly the mechanism each line chooses; parity belongs one level above it.
  */
 export const REQUIRED_FEATURES = [
-  'authority-gate-before-model',
-  'unresolved-reference-held',
-  'draft-policy-validation',
-  'sensitive-category-hold',
-  'confidence-threshold',
-  'human-approval-gate',
+  'assigns-category',
+  'assigns-urgency',
+  'produces-draft',
+  'risky-never-auto-sent',
+  'queued-case-carries-reason',
+  'interim-message-on-threshold',
   'reason-code-on-every-decision',
 ] as const;
 

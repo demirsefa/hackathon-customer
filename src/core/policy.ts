@@ -19,6 +19,26 @@ export const SENSITIVE_CATEGORIES: readonly string[] = [
 
 export const CONFIDENCE_THRESHOLD = 0.7;
 
+/**
+ * How long a queued case may sit unseen before the sender is told it was received.
+ * Long enough that the operator working normally reaches it first; short enough that
+ * a customer is never left in silence on a busy morning.
+ */
+export const INTERIM_AFTER_MINUTES = 30;
+
+/**
+ * Whether a queued case has waited long enough, unseen, to deserve an interim
+ * message. The clock is an argument because `core/` never reads one, and
+ * `operatorHasSeen` is what keeps this from talking over her: once she has opened
+ * the case, the answer is hers to send, not ours.
+ */
+export function needsInterim(input: {
+  readonly elapsedMinutes: number;
+  readonly operatorHasSeen: boolean;
+}): boolean {
+  return !input.operatorHasSeen && input.elapsedMinutes >= INTERIM_AFTER_MINUTES;
+}
+
 export type DraftVerdict =
   { readonly ok: true } | { readonly ok: false; readonly reference: string };
 

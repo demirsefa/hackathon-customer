@@ -14,12 +14,12 @@ import { buildTriagePrompt, parseTriageOutput } from './triage.ts';
 export const baseline: Pipeline = {
   name: 'baseline',
   features: [
-    'authority-gate-before-model',
-    'unresolved-reference-held',
-    'draft-policy-validation',
-    'sensitive-category-hold',
-    'confidence-threshold',
-    'human-approval-gate',
+    'assigns-category',
+    'assigns-urgency',
+    'produces-draft',
+    'risky-never-auto-sent',
+    'queued-case-carries-reason',
+    'interim-message-on-threshold',
     'reason-code-on-every-decision',
   ],
 
