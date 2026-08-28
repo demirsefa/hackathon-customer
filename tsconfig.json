@@ -24,6 +24,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["core", "service", "eval", "sim", "dev/contracts/checks"],
+  "include": ["core", "service", "eval", "sim"],
   "exclude": ["node_modules", "fixtures", "scenarios", "trajectories"]
 }

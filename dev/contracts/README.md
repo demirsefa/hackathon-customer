@@ -19,10 +19,9 @@ Guidance that is _not_ law lives in [`dev/GUIDES.md`](../GUIDES.md).
 
 ## Index
 
-| Contract                                                               | Scope                                                                            | Enforced by                            |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------- |
-| [`EXTERNAL-SOURCES-ARE-RECORDED.md`](EXTERNAL-SOURCES-ARE-RECORDED.md) | Anything that came into this repository from outside is written down, with a pin | `dev/contracts/checks/sources.test.ts` |
-| [`FEATURE-PARITY.md`](FEATURE-PARITY.md)                               | The baseline and the advanced pipeline expose the same feature set               | `core/parity.contract.test.ts`         |
+| Contract                                 | Scope                                                              | Enforced by                    |
+| ---------------------------------------- | ------------------------------------------------------------------ | ------------------------------ |
+| [`FEATURE-PARITY.md`](FEATURE-PARITY.md) | The baseline and the advanced pipeline expose the same feature set | `core/parity.contract.test.ts` |
 
 ## Sources
 
