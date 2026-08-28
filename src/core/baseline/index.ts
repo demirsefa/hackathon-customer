@@ -6,9 +6,9 @@
  * and each one is a choice a competent person would plausibly make.
  */
 import { gateOnAuthority, permittedOrderIds, resolveAuthority } from '../authority.ts';
-import { humanReview, type Decision } from '../decision.ts';
+import { autoSend, humanReview, type Decision } from '../decision.ts';
 import type { Pipeline } from '../pipeline.ts';
-import { finalize } from '../policy.ts';
+import { CONFIDENCE_THRESHOLD, isSensitive, validateDraft } from '../policy.ts';
 import { buildTriagePrompt, parseTriageOutput } from './triage.ts';
 
 export const baseline: Pipeline = {
@@ -40,13 +40,27 @@ export const baseline: Pipeline = {
       });
     }
 
-    return finalize({
-      messageId: message.messageId,
-      category: output.category,
-      confidence: output.confidence,
-      draft: output.draft,
-      permittedOrderIds: permittedOrderIds(outcome),
-      llmCalls: 1,
-    });
+    const messageId = message.messageId;
+    const { category, confidence, draft } = output;
+
+    const verdict = validateDraft(draft, permittedOrderIds(outcome));
+    if (!verdict.ok) {
+      return humanReview({
+        messageId,
+        reason: 'draft_policy_violation',
+        draft,
+        llmCalls: 1,
+      });
+    }
+
+    if (isSensitive(category)) {
+      return humanReview({ messageId, reason: 'sensitive_category', draft, llmCalls: 1 });
+    }
+
+    if (confidence < CONFIDENCE_THRESHOLD) {
+      return humanReview({ messageId, reason: 'low_confidence', draft, llmCalls: 1 });
+    }
+
+    return autoSend({ messageId, draft, llmCalls: 1 });
   },
 };
