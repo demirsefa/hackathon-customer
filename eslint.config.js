@@ -9,6 +9,25 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    // Standalone CommonJS tooling that has to run before anything is installed,
+    // so its globals are declared here rather than pulled from a package.
+    files: ['scripts/**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        console: 'readonly',
+        module: 'writable',
+        process: 'readonly',
+        require: 'readonly',
+        __dirname: 'readonly',
+      },
+    },
+    rules: {
+      // CommonJS is the point of these files, not an oversight.
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
     rules: {
       // The triage pipeline is judged on its decisions, so unused bindings are
       // usually a sign that a signal was computed and then silently dropped.

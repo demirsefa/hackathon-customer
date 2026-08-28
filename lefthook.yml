@@ -8,6 +8,8 @@ pre-commit:
   commands:
     validation:
       run: yarn validation
+    security:
+      run: yarn security
 
 pre-push:
   parallel: false
