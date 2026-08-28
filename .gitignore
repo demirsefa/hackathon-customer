@@ -1,6 +1,13 @@
 # Dependencies
 node_modules/
 
+# Yarn 4 (Berry) — the version is pinned via "packageManager" in package.json,
+# so only the lockfile needs to be tracked.
+.yarn/*
+!.yarn/patches
+.pnp.*
+.yarn/install-state.gz
+
 # Build output
 dist/
 *.tsbuildinfo

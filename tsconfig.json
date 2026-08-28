@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["es2023"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+
+    // Node runs the .ts sources directly via type stripping, so nothing is ever
+    // emitted and relative imports carry their real ".ts" extension.
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+
+    // Type stripping cannot erase enums or parameter properties. Fail at
+    // typecheck time instead of at runtime.
+    "isolatedModules": true,
+    "erasableSyntaxOnly": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["core", "service", "eval", "sim"],
+  "exclude": ["node_modules", "fixtures", "scenarios", "trajectories"]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "support-triage-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Support desk triage: decide what the human reads first, and hold back what must not be answered automatically.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "eval": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning eval/index.ts",
+    "sim": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning sim/index.ts",
+    "serve": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning service/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "yarn typecheck && yarn lint && yarn format:check && yarn test"
+  },
+  "packageManager": "yarn@4.18.0+sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.121.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.4.0",
+    "eslint": "^10.9.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.11"
+  }
+}

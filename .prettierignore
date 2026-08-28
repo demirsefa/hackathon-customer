@@ -1,0 +1,7 @@
+node_modules/
+.yarn/
+dist/
+coverage/
+yarn.lock
+fixtures/llm-cache.json
+trajectories/
