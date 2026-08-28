@@ -13,7 +13,8 @@ Read before writing code in this repository.
 A contract check going red is not a broken test to repair — read the contract, then
 decide. Changing a rule means changing its contract, deliberately and out loud.
 
-New rule? Index it in `dev/contracts/`, never fork it into a second file.
+A new contract is the user's call. When you think a rule is needed, say so and we
+write it together — never open a contract file on your own.
 
 ## Folder structure
 
