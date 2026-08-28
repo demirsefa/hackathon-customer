@@ -8,6 +8,7 @@ Read before writing code in this repository.
 | ----------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **Project law**   | [`dev/contracts/README.md`](dev/contracts/README.md) | Contracts. Every rule is anchored in one place and enforced by a check that goes red. Scan the index at the start of a session.   |
 | **Code guidance** | [`dev/GUIDES.md`](dev/GUIDES.md)                     | Code principles + TypeScript + React, quoted from `demirsefa/flowpad-anchor`. Guidance, not law; upstream is the source of truth. |
+| **The brief**     | [`dev/CHALLENGE.md`](dev/CHALLENGE.md)               | What the competition asks, what we chose to build, how it is measured, and what is out of scope. Read before proposing new work.  |
 
 A contract check going red is not a broken test to repair — read the contract, then
 decide. Changing a rule means changing its contract, deliberately and out loud.

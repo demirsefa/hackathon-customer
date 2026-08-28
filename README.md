@@ -13,14 +13,24 @@ hold back anything that must not be answered automatically.
 cp .env.example .env   # only needed for live runs
 ```
 
-## Prior work and attribution
+## Sources
 
-The working conventions in this repository — the contract-document format and
-the local validation-gate approach — are adapted from work that existed before
-this competition: <https://github.com/demirsefa/flowpad-anchor>.
+Everything below existed before this competition, in
+<https://github.com/demirsefa/flowpad-anchor>, and is used here with its origin
+recorded file by file. The same pins are repeated next to the material itself, in
+[`dev/GUIDES.md`](dev/GUIDES.md) and [`dev/contracts/README.md`](dev/contracts/README.md).
 
-Everything else — the triage pipeline, the evaluation set, the scenarios and
-the results reported here — was written during the hackathon.
+| What is used here                                         | Upstream file                                                                           | Pinned at                                      |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Code principles, quoted in `dev/GUIDES.md`                | <https://github.com/demirsefa/flowpad-anchor/blob/main/principles/CODE-PRINCIPLES.md>   | `demirsefa/flowpad-anchor@66e9efc`, 2026-08-28 |
+| TypeScript guide, quoted in `dev/GUIDES.md`               | <https://github.com/demirsefa/flowpad-anchor/blob/main/guides/typescript.md>            | `demirsefa/flowpad-anchor@66e9efc`, 2026-08-28 |
+| React guide, quoted in `dev/GUIDES.md`                    | <https://github.com/demirsefa/flowpad-anchor/blob/main/guides/react.md>                 | `demirsefa/flowpad-anchor@66e9efc`, 2026-08-28 |
+| Contract structure — anchored plus enforced (§3)          | <https://github.com/demirsefa/flowpad-anchor/blob/main/protocol/AGENT-INIT.md>          | `demirsefa/flowpad-anchor@66e9efc`, 2026-08-28 |
+| Contract template, copied to `dev/contracts/_TEMPLATE.md` | <https://github.com/demirsefa/flowpad-anchor/blob/main/protocol/contracts/_TEMPLATE.md> | `demirsefa/flowpad-anchor@66e9efc`, 2026-08-28 |
+| Contract index, adapted in `dev/contracts/README.md`      | <https://github.com/demirsefa/flowpad-anchor/blob/main/protocol/contracts/README.md>    | `demirsefa/flowpad-anchor@66e9efc`, 2026-08-28 |
+
+Everything else — the triage pipeline, the evaluation set, the scenarios and the
+results reported here — was written during the hackathon.
 
 ## Checks
 
