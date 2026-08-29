@@ -12,6 +12,7 @@ message.ts     the envelope, and the order references pulled out of untrusted te
 records.ts     the record layer — the only source of ownership and identity.
 authority.ts   the gate over that layer. Waiting for the advanced line.
 policy.ts      the law both lines are written against.
+cases.ts       the evaluation set parsed and validated. The file read stays outside.
 llm.ts         the client interface and the primitives a response is parsed with.
 pipeline.ts    what a line is, REQUIRED_FEATURES, and which lines exist.
 baseline/      one model call, then the risky-category check. CHALLENGE §8.
