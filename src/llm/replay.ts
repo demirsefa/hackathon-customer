@@ -104,6 +104,27 @@ function missMessage(input: {
   ].join('\n');
 }
 
+/**
+ * A miss, raised as its own type so a harness can tell "this request was never
+ * recorded" from "this line has a bug".
+ *
+ * `src/eval/` needs that distinction to be structural rather than a substring match
+ * on the message: a run that reports a missing recording as a broken pipeline sends
+ * somebody looking for a defect that is not there, and one that reports a broken
+ * pipeline as a missing recording hides a real one behind a re-record instruction.
+ * The message is unchanged — only its type is now nameable.
+ */
+export class ReplayMiss extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ReplayMiss';
+  }
+}
+
+export function isReplayMiss(error: unknown): error is ReplayMiss {
+  return error instanceof ReplayMiss;
+}
+
 export function replayClient(input: {
   readonly cache: LlmCache;
   readonly params?: LlmParams;
@@ -118,7 +139,7 @@ export function replayClient(input: {
       const key = cacheKey({ prompt: request.prompt, params });
       const entry = input.cache[key];
       if (entry === undefined) {
-        throw new Error(missMessage({ key, params, prompt: request.prompt }));
+        throw new ReplayMiss(missMessage({ key, params, prompt: request.prompt }));
       }
       return { text: entry.text };
     },
