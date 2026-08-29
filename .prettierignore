@@ -5,3 +5,6 @@ coverage/
 yarn.lock
 fixtures/llm-cache.json
 trajectories/
+
+# Worktrees created for background tasks are copies of this repo.
+.claude/
