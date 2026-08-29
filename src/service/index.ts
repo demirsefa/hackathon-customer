@@ -5,5 +5,9 @@
  *
  *   yarn serve
  */
+import { loadEnvFile } from '../cli/env.ts';
+
+const env = loadEnvFile();
+if (env.warning !== null) console.warn(env.warning);
 
 console.log('listening: no (HTTP surface not implemented yet)');

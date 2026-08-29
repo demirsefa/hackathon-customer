@@ -9,11 +9,11 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "eval": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/eval/index.ts",
-    "sim": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/sim/index.ts",
-    "serve": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning src/service/index.ts",
+    "eval": "node --disable-warning=ExperimentalWarning src/eval/index.ts",
+    "sim": "node --disable-warning=ExperimentalWarning src/sim/index.ts",
+    "serve": "node --disable-warning=ExperimentalWarning src/service/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --dir src",
     "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -28,7 +28,8 @@
   },
   "packageManager": "yarn@4.18.0+sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.121.0"
+    "@anthropic-ai/sdk": "^0.121.0",
+    "@inquirer/prompts": "^8.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

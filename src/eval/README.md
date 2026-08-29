@@ -6,7 +6,7 @@ decision out, scored against ground truth.
 
 ```bash
 yarn eval              # replays fixtures/llm-cache.json, no API key needed
-yarn eval --live       # real API calls, requires a key
+yarn eval --live       # real API calls, requires a key, records what they answered
 ```
 
 The default run must be deterministic and reproducible on a clean machine

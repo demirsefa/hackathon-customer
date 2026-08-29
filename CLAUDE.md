@@ -25,6 +25,8 @@ tests share live in it. A second copy anywhere is a mistake.
 ```text
 src/
   core/        pure decision logic. No I/O, no clock, no network. Both pipelines are built from it.
+  llm/         the model clients that implement `core/llm.ts` — replay, live, record. See its README.
+  cli/         what every entry point shares about the terminal: loading `.env`, and the menu.
   service/     HTTP surface and in-memory queue. Nothing reaches a customer without the approval gate.
   eval/        scores the evaluation cases against `src/core/` directly.
   sim/         scenario player; produces the primary metric.
@@ -42,8 +44,9 @@ dev/           the brief, the contracts, the code guidance.
 
 Where new work goes:
 
-- A module belongs to one of the four areas under `src/`. Adding a fifth area means
-  saying why the existing four do not fit.
+- A module belongs to one of the areas under `src/`. Adding a new one means saying why
+  the existing ones do not fit, in that folder's README — `src/llm/README.md` is the
+  worked example.
 - Its test goes to `src/__test__/unit/<name>.test.ts`, importing across with
   `../../core/…`. A check that enforces a contract goes to `src/__test__/contract/`
   and keeps the `<name>.contract.test.ts` suffix so it reads as law.
