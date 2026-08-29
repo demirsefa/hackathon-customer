@@ -29,19 +29,24 @@ session.ts    mode in, client out. The one decision `eval/` and `sim/` share.
 
 | Setting      | Value                                           |
 | ------------ | ----------------------------------------------- |
-| Model        | `claude-opus-5`                                 |
+| Model        | `claude-sonnet-5`                               |
 | `max_tokens` | `16000`                                         |
 | Effort       | `medium`                                        |
 | Thinking     | adaptive (this model's default; not overridden) |
 
-There is no `temperature`. Claude Opus 5 removed the sampling parameters — sending
+`ANTHROPIC_MODEL` overrides the model and nothing else. It is safe to offer because a
+replay miss throws: another model hashes to another cache key, so the setting can
+refuse to produce a number but never quietly move one. Left unset — as it is on a
+clean clone — the pinned value is what the committed cache was recorded with.
+
+There is no `temperature`. Claude 5 removed the sampling parameters — sending
 `temperature: 0` returns a 400 — and it would not have bought what it looks like it
 buys: even at zero the API never promised the same bytes twice. Reproducibility here
 comes from the recorded cache instead, which is a stronger guarantee than a sampling
 setting: the replayed run does not call the model at all.
 
 Server-side refusal fallbacks are deliberately **not** enabled. A fallback would let a
-different model answer a request that this project reports as `claude-opus-5`, which is
+different model answer a request that this project reports as `claude-sonnet-5`, which is
 the one thing a pinned model id exists to rule out. A refusal is raised instead.
 
 ## The cache key
