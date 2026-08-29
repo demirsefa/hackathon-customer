@@ -13,6 +13,13 @@ hold back anything that must not be answered automatically.
 cp .env.example .env   # only needed for live runs
 ```
 
+## Branches
+
+One branch: `main`. Nothing is developed on a side branch, so the history reads
+top to bottom in the order the work actually happened, one commit per step. A
+reviewer checking a claim against the code can walk `git log` from the bottom
+without reconstructing a graph first.
+
 ## Sources
 
 Everything below existed before this competition, in
