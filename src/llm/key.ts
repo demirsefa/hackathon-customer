@@ -22,19 +22,46 @@ export type LlmParams = {
 };
 
 /**
- * The exact configuration every recorded and every live call uses, written out in
- * full so it can be quoted verbatim in the README and dev/CHALLENGE.md.
+ * The configuration every recorded and every live call uses unless something says
+ * otherwise, written out in full so it can be quoted verbatim in the README and
+ * dev/CHALLENGE.md. This is the model the committed cache was recorded with, so a
+ * clean clone with no `.env` replays exactly the run the numbers came from.
  *
- * There is no `temperature`. Claude Opus 5 removed the sampling parameters — sending
+ * Sonnet rather than Opus because a one-person desk triaging sixty emails a morning
+ * would not reach for the largest model, and `cost per case` is one of the reported
+ * numbers. The claim being tested does not need a weak model to survive — CHALLENGE
+ * §6 is that ownership is absent from the text, which no model size recovers.
+ *
+ * There is no `temperature`. Claude 5 removed the sampling parameters — sending
  * `temperature: 0` returns a 400 — so the reproducibility this project needs comes
  * from the replay cache, which is stronger than a sampling setting ever was: even at
  * temperature zero the API never promised the same bytes twice.
  */
 export const PINNED_PARAMS: LlmParams = {
-  model: 'claude-opus-5',
+  model: 'claude-sonnet-5',
   maxTokens: 16000,
   effort: 'medium',
 };
+
+/**
+ * The pinned configuration with an environment override applied.
+ *
+ * Overriding the model is safe here only because a replay miss throws: a different
+ * model hashes to a different key, the cache has nothing under it, and the run stops
+ * with the model printed in the error. The setting cannot quietly move a published
+ * number — it can only refuse to produce one. An absent or blank value keeps the
+ * pinned model, so the documented commands behave the same on a machine with no
+ * `.env` at all.
+ */
+export function resolveParams(overrides: {
+  readonly model?: string | undefined;
+}): LlmParams {
+  const model = overrides.model?.trim();
+
+  return model === undefined || model.length === 0
+    ? PINNED_PARAMS
+    : { ...PINNED_PARAMS, model };
+}
 
 type Json =
   string | number | boolean | null | readonly Json[] | { readonly [k: string]: Json };

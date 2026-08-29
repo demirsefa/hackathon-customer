@@ -5,7 +5,13 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { cacheKey, canonicalJson, PINNED_PARAMS, type LlmParams } from '../../llm/key.ts';
+import {
+  cacheKey,
+  canonicalJson,
+  PINNED_PARAMS,
+  resolveParams,
+  type LlmParams,
+} from '../../llm/key.ts';
 
 const prompt = 'TASK: triage\nMESSAGE:\nWhere is ORD-2002?';
 
@@ -42,13 +48,39 @@ describe('cacheKey', () => {
   });
 
   it.each([
-    ['the model', { ...PINNED_PARAMS, model: 'claude-sonnet-5' }],
+    ['the model', { ...PINNED_PARAMS, model: 'claude-opus-5' }],
     ['max tokens', { ...PINNED_PARAMS, maxTokens: 8000 }],
     ['the effort', { ...PINNED_PARAMS, effort: 'high' as const }],
   ])('moves when %s changes', (_name: string, params: LlmParams) => {
     expect(cacheKey({ prompt, params })).not.toBe(
       cacheKey({ prompt, params: PINNED_PARAMS }),
     );
+  });
+});
+
+describe('resolveParams', () => {
+  it('keeps the pinned configuration when nothing overrides it', () => {
+    expect(resolveParams({ model: undefined })).toEqual(PINNED_PARAMS);
+  });
+
+  it('treats a blank value as no value, so an empty setting changes nothing', () => {
+    expect(resolveParams({ model: '   ' })).toEqual(PINNED_PARAMS);
+  });
+
+  it('applies the override to the model and to nothing else', () => {
+    const resolved = resolveParams({ model: ' claude-opus-5 ' });
+
+    expect(resolved.model).toBe('claude-opus-5');
+    expect(resolved.maxTokens).toBe(PINNED_PARAMS.maxTokens);
+    expect(resolved.effort).toBe(PINNED_PARAMS.effort);
+  });
+
+  // The override is only safe because it cannot move a number quietly: a replay of
+  // the committed cache misses on the new key and stops with the model printed.
+  it('lands on a different cache key, which is what makes the override loud', () => {
+    expect(
+      cacheKey({ prompt, params: resolveParams({ model: 'claude-opus-5' }) }),
+    ).not.toBe(cacheKey({ prompt, params: PINNED_PARAMS }));
   });
 });
 

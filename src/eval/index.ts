@@ -19,6 +19,7 @@
  * argument, so this line is the whole of this program's exposure to a credential.
  */
 import { loadEnvFile } from '../cli/env.ts';
+import { resolveParams } from '../llm/key.ts';
 import { openLlmSession } from '../llm/session.ts';
 
 const env = loadEnvFile();
@@ -30,7 +31,11 @@ const live = process.argv.slice(2).includes('--live');
 // see the same note in `src/sim/index.ts`.
 const session = ((): ReturnType<typeof openLlmSession> => {
   try {
-    return openLlmSession({ live, apiKey: process.env.ANTHROPIC_API_KEY });
+    return openLlmSession({
+      live,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      params: resolveParams({ model: process.env.ANTHROPIC_MODEL }),
+    });
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);

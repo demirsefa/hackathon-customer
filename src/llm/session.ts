@@ -43,7 +43,7 @@ export function openLlmSession(input: {
 
     return {
       llm: replayClient({ cache, params }),
-      label: `replay — ${recorded} recorded response(s) in ${CACHE_LABEL}`,
+      label: `replay (${params.model}) — ${recorded} recorded response(s) in ${CACHE_LABEL}`,
       save: () => {},
     };
   }

@@ -20,6 +20,7 @@
  */
 import { askMode, askScenario, isCancelled, isInteractive, USAGE } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
+import { resolveParams } from '../llm/key.ts';
 import { openLlmSession } from '../llm/session.ts';
 
 const env = loadEnvFile();
@@ -63,7 +64,11 @@ const chosen = await (async (): Promise<{ scenario: string; live: boolean }> => 
 // read what to do next, not read our filenames.
 const session = ((): ReturnType<typeof openLlmSession> => {
   try {
-    return openLlmSession({ live: chosen.live, apiKey });
+    return openLlmSession({
+      live: chosen.live,
+      apiKey,
+      params: resolveParams({ model: process.env.ANTHROPIC_MODEL }),
+    });
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
