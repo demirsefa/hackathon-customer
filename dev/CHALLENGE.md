@@ -208,14 +208,19 @@ model calls" an observable fact rather than a claim.
 **Primary metric: critical case coverage.** When the operator's capacity is full,
 how many of the messages she genuinely needed to see did she actually reach?
 
-| Metric                             | Baseline | Advanced | Change |
-| ---------------------------------- | -------- | -------- | ------ |
-| **Critical coverage (normal day)** |          |          |        |
-| **Critical coverage (overload)**   |          |          |        |
-| False positives (legitimate held)  |          |          |        |
-| Reply quality (out of 5, by hand)  |          |          |        |
-| Human time per case                |          |          |        |
-| Cost per case                      |          |          |        |
+Her day holds 420 working minutes, so at 10 minutes a case she reaches **42**. The
+morning brings 60–80. The queue therefore never empties: overload is not a scenario
+we contrive, it is the normal condition, and what the metric measures is the _order_
+of the queue rather than its length.
+
+| Metric                             | Baseline | Advanced | Change  |
+| ---------------------------------- | -------- | -------- | ------- |
+| **Critical coverage (normal day)** | pending  | pending  | pending |
+| **Critical coverage (overload)**   | pending  | pending  | pending |
+| False positives (legitimate held)  | pending  | pending  | pending |
+| Reply quality (out of 5, by hand)  | pending  | pending  | pending |
+| Human time per case                | pending  | pending  | pending |
+| Cost per case                      | pending  | pending  | pending |
 
 ### Evaluation set — 28 cases
 
@@ -239,8 +244,24 @@ Does not make decisions. Takes whatever is at the top of the queue. Identical fo
 baseline and advanced; only the queue's length and order differ.
 
 ```json
-{ "minutesPerCase": 3, "workStart": 540, "workEnd": 1080, "breaks": [[720, 760]] }
+{
+  "id": "merve",
+  "minutesPerCase": 10,
+  "shift": { "start": "09:00", "end": "17:00" },
+  "breaks": [["12:00", "13:00"]],
+  "workdays": [1, 2, 3, 4, 5],
+  "timezone": "Europe/Istanbul"
+}
 ```
+
+`workdays` is ISO: 1 = Monday … 7 = Sunday. `timezone` is required rather than
+defaulted, because "09:00" otherwise means whatever the machine producing the number
+thinks it means and the run stops being reproducible. A case that arrives on Friday
+evening waits until Monday 09:00, and the weekend spends none of its budget.
+
+Modelled in `src/core/operator.ts` as pure functions over an instant passed in:
+`isWorking`, `nextWorkingMinute`, `workingMinutesBetween`. Time-to-open is counted in
+working minutes, never wall-clock ones.
 
 ## 11. Out of scope
 
