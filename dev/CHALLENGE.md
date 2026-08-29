@@ -278,20 +278,100 @@ at night.
 
 ## 12. Where each requirement lives
 
-| Requirement                      | Where it is answered                                        |
-| -------------------------------- | ----------------------------------------------------------- |
-| User, bottleneck, value          | `README.md`                                                 |
-| Improvement changelog            | `README.md`                                                 |
-| Hot take and main failure mode   | `README.md`                                                 |
-| Reproduction guide               | `README.md`                                                 |
-| Prior work declared              | `README.md` Sources, enforced by a contract check           |
-| Decision logic                   | `src/core/` — pure, no I/O, no clock, no network            |
-| Human approval gate              | `src/core/decision.ts`, surfaced by `src/service/`          |
-| Per-case scoring, 28 cases       | `src/eval/`, against `src/core/` directly                   |
-| Primary metric                   | `src/sim/`, playing `scenarios/` against the operator model |
-| Committed data and recorded runs | `fixtures/`, `scenarios/`, `trajectories/`                  |
-| Credentials kept out             | `yarn security` on every commit                             |
-| Rules that must not drift        | `dev/contracts/`                                            |
+| Requirement                                    | Where it is answered                                        |
+| ---------------------------------------------- | ----------------------------------------------------------- |
+| User, bottleneck, value                        | `README.md`                                                 |
+| Improvement changelog                          | `README.md`                                                 |
+| Hot take and main failure mode                 | `README.md`                                                 |
+| Reproduction guide                             | `README.md`                                                 |
+| Prior work declared                            | `README.md` Sources, enforced by a contract check           |
+| Decision logic                                 | `src/core/` — pure, no I/O, no clock, no network            |
+| Human approval gate                            | `src/core/decision.ts`, surfaced by `src/service/`          |
+| Per-case scoring, 28 cases                     | `src/eval/`, against `src/core/` directly                   |
+| Primary metric                                 | `src/sim/`, playing `scenarios/` against the operator model |
+| Committed data and recorded runs               | `fixtures/`, `scenarios/`, `trajectories/`                  |
+| Credentials kept out                           | `yarn security` on every commit                             |
+| Rules that must not drift                      | `dev/contracts/`                                            |
+| Deliverables complete, claims tied to evidence | `dev/contracts/SUBMISSION.md`                               |
+
+## 13. The last seven hours
+
+Code freeze is Sunday 20:00. Submission closes Monday 02:59. The seven hours between
+them are not extra build time — they are assembly time, and they are planned here
+because at 23:00 on the last night nobody plans well.
+
+### What the freeze freezes
+
+Closed at 20:00: `src/`, `fixtures/`, `scenarios/`. Open: README prose, the video,
+exporting `trajectories/` (running the code is not changing it), the submission form.
+
+One exception. If the clean-clone rehearsal below finds something that **blocks
+reproduction** — a command that does not exist, a missing file, a step that only works
+on this machine — it is fixed, in one commit, whose message starts `post-freeze: repro
+blocker`. Everything else the rehearsal turns up is written into the README as a known
+limit and left alone. A defect that is documented costs a fraction of what a
+last-minute change to frozen code costs.
+
+### The plan
+
+| Time (Istanbul) | Work                                                                          |
+| --------------- | ----------------------------------------------------------------------------- |
+| 20:00–20:20     | `yarn check` and `yarn security` green, tag the freeze, note the commit       |
+| 20:20–21:10     | Clean-clone rehearsal (below)                                                 |
+| 21:10–21:40     | Export the trajectories, one per line                                         |
+| 21:40–22:20     | README close-out: results numbers, changelog evidence, failure mode, hot take |
+| 22:20–22:50     | Write the video script and read it aloud against a timer                      |
+| 22:50–00:20     | Record, two or three takes                                                    |
+| 00:20–01:20     | Edit, upload unlisted, put the link in `## Video`                             |
+| 01:20–01:50     | Submit                                                                        |
+| 01:50–02:59     | Buffer. No work.                                                              |
+
+### The clean-clone rehearsal
+
+Reproducibility is 15 points and the second tie-break, and this is precisely what a
+judge does. Clone into an empty directory and follow the README **literally**, not
+from memory:
+
+```bash
+git clone <repo> && cd <repo>
+yarn install
+yarn eval
+yarn sim overload
+```
+
+What it produces, all of which the Reproduction guide then states: the node and yarn
+versions, the real duration of each command, the real cost (zero on the replay path —
+if `yarn eval` asks for an API key, the repro is broken), and the output a judge should
+expect to see.
+
+### The video, five minutes
+
+| Time      | Content                                                                        |
+| --------- | ------------------------------------------------------------------------------ |
+| 0:00–0:40 | The problem: 60–80 messages, 42 reachable, and no way to order them by reading |
+| 0:40–1:20 | The baseline, and one case it structurally cannot catch                        |
+| 1:20–3:00 | One real run end to end — **the approval gate on screen**, not described       |
+| 3:00–3:50 | The comparison table, critical coverage under overload                         |
+| 3:50–4:30 | The change that contributed most, and one experiment that was removed          |
+| 4:30–5:00 | The hot take                                                                   |
+
+The two things most often left out are the removed experiment and the human checkpoint.
+Both are rubric rows.
+
+### Submitting
+
+Not in one shot at the deadline. Submit as soon as the four deliverables exist, around
+01:20, and treat everything after that as revision. A submitted entry that could be
+better beats a better entry that missed the form.
+
+Two things to settle **before** Sunday evening, because both take longer than they look:
+
+- **Access.** Ground rule 10 asks that judges can run the project. A private repository
+  has to be made public or shared before the form is filled, and that is a deliberate
+  decision — the security scanners run on every commit precisely so this one is safe.
+- **Whether the platform allows editing a submission.** If it does, submit early and
+  revise. If it does not, one submission at 01:20 with a hard stop. This is not
+  documented on the public page; it needs a login or a question to the organisers.
 
 ## Goal order
 

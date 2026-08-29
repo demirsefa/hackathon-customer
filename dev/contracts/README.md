@@ -19,9 +19,10 @@ Guidance that is _not_ law lives in [`dev/GUIDES.md`](../GUIDES.md).
 
 ## Index
 
-| Contract                                 | Scope                                                              | Enforced by                                     |
-| ---------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------- |
-| [`FEATURE-PARITY.md`](FEATURE-PARITY.md) | The baseline and the advanced pipeline expose the same feature set | `src/__test__/contract/parity.contract.test.ts` |
+| Contract                                 | Scope                                                                                       | Enforced by                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| [`FEATURE-PARITY.md`](FEATURE-PARITY.md) | The baseline and the advanced pipeline expose the same feature set                          | `src/__test__/contract/parity.contract.test.ts`     |
+| [`SUBMISSION.md`](SUBMISSION.md)         | What a judge receives: the four deliverables, the evidence behind every claim, the commands | `src/__test__/contract/submission.contract.test.ts` |
 
 ## Sources
 
