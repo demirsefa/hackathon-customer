@@ -2,8 +2,8 @@
  * The live client. Used to record `fixtures/llm-cache.json`, and behind `--live`.
  *
  * It takes the API key as an argument and never reads the environment. The one place
- * `ANTHROPIC_API_KEY` is touched is an entry point — `src/eval/`, `src/sim/`,
- * `src/service/` — so there is exactly one line per program to audit, and no module
+ * `ANTHROPIC_API_KEY` is touched is an entry point — `src/eval/` and `src/sim/` — so
+ * there is exactly one line per program to audit, and no module
  * deeper in the tree can quietly acquire a credential. The key is never logged, never
  * put in an error message, and never written to the cache.
  *

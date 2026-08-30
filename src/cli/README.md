@@ -1,6 +1,6 @@
 # src/cli/
 
-What the three entry points — `src/eval/`, `src/sim/`, `src/service/` — share about
+What the two entry points — `src/eval/` and `src/sim/` — share about
 talking to a terminal. Nothing here decides anything about a support message; it is
 the shell around the programs that do.
 

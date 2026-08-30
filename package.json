@@ -11,7 +11,6 @@
   "scripts": {
     "eval": "node --disable-warning=ExperimentalWarning src/eval/index.ts",
     "sim": "node --disable-warning=ExperimentalWarning src/sim/index.ts",
-    "serve": "node --disable-warning=ExperimentalWarning src/service/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --dir src",
     "test:watch": "vitest",

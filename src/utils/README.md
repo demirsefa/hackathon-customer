@@ -16,7 +16,7 @@ It cannot live in `src/core/`. Core is where it is decided _what happens to a me
 was written wrong. Nor can it live inside one of the three parsers, for the reason
 `src/llm/README.md` gives about its own port: whichever of `cases.ts`, `scenario.ts` and
 `operator.ts` owned the helpers would become a sideways dependency of the other two.
-And it is not `cli/`, `eval/`, `sim/`, `service/` or `llm/`, because every one of those
+And it is not `cli/`, `eval/`, `sim/` or `llm/`, because every one of those
 is an I/O area and this reaches for nothing.
 
 So it sits here, on its own, with the one promise that lets `core/` import it.

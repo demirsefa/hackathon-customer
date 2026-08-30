@@ -292,7 +292,6 @@ const ATTEMPTS: readonly Attempt[] = await Promise.all([
   attempt('yarn sim overload --replay', 'src/sim/index.ts', ['overload', '--replay']),
   attempt('yarn sim --help', 'src/sim/index.ts', ['--help']),
   attempt('yarn sim nosuch --replay', 'src/sim/index.ts', ['nosuch', '--replay']),
-  attempt('yarn serve', 'src/service/index.ts', []),
 ]);
 
 describe('rule 2 · a documented command finishes with nobody at the keyboard', () => {

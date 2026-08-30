@@ -55,7 +55,6 @@ for the install and under one for the run.
 | `yarn eval --live`             | the same run against the real model, recording it  | yes         |
 | `yarn sim overload --replay`   | plays the overload scenario — the primary metric   | no          |
 | `yarn sim normal-day --replay` | the same, on an ordinary day's volume              | no          |
-| `yarn serve`                   | the HTTP surface and the approval queue            | no          |
 
 Every command runs **both lines** over the same input and reports them side by side —
 `dev/contracts/FEATURE-PARITY.md` rule 4 asks that they never be scored on separate runs.
@@ -66,6 +65,17 @@ usage line. Typed bare at a terminal they ask which mode to run; piped or in CI 
 replay, so an unattended run never waits on a question nobody is there to answer. The
 rule, and why the flagged form is the documented one, is in
 [`src/cli/README.md`](src/cli/README.md).
+
+**There is no server here, and the approval gate is not an endpoint.** It is a
+decision: `human_review` always carries an approval requirement and `auto_send` never
+claims one it does not have — `dev/contracts/FEATURE-PARITY.md` rule 3, held over both
+lines by `src/__test__/contract/parity.contract.test.ts`. Nothing reaches a customer
+without it. What it does to a run is on screen in the commands above:
+`yarn sim overload --replay` reports how many of the 90 arrivals were held for the
+operator rather than answered automatically, and `yarn eval --replay --log` names the
+route case by case. An HTTP surface with a queue the operator clicks through was
+planned and cut; it is in `dev/CHALLENGE.md` §11 with the rest of what this submission
+does not build.
 
 A key is only ever needed for `--live`:
 

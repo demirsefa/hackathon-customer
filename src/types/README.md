@@ -14,7 +14,7 @@ what a newcomer needs first and they were the hardest thing to assemble a view o
 It cannot live in `src/core/`. Core is where it is decided _what happens to a message_
 (`src/core/README.md`), and a declaration decides nothing. Nor is it `src/utils/`,
 which is code that runs — small pure helpers with behaviour to test; there is nothing
-here to call. And it is not `cli/`, `eval/`, `sim/`, `service/` or `llm/`, because
+here to call. And it is not `cli/`, `eval/`, `sim/` or `llm/`, because
 every one of those is an I/O area and this reaches for nothing at all.
 
 ## The promise

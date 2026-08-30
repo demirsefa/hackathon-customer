@@ -398,26 +398,28 @@ at night.
 - Doctor CLI, stress testing, anomaly detection, operational signals
 - UI, apart from a single observation page
 - Auth, a database, real email integration
+- An HTTP surface and a queue the operator clicks through. The gate is a decision in
+  `src/core/decision.ts`; a server would only have displayed it.
 
 **After Sunday 20:00 there is exactly one answer to a new idea: no.**
 
 ## 12. Where each requirement lives
 
-| Requirement                                    | Where it is answered                                        |
-| ---------------------------------------------- | ----------------------------------------------------------- |
-| User, bottleneck, value                        | `README.md`                                                 |
-| Improvement changelog                          | `README.md`                                                 |
-| Hot take and main failure mode                 | `README.md`                                                 |
-| Reproduction guide                             | `README.md`                                                 |
-| Prior work declared                            | `README.md` Sources, enforced by a contract check           |
-| Decision logic                                 | `src/core/` — pure, no I/O, no clock, no network            |
-| Human approval gate                            | `src/core/decision.ts`, surfaced by `src/service/`          |
-| Per-case scoring, 28 cases                     | `src/eval/`, against `src/core/` directly                   |
-| Primary metric                                 | `src/sim/`, playing `scenarios/` against the operator model |
-| Committed data and recorded runs               | `fixtures/`, `scenarios/`, `trajectories/`                  |
-| Credentials kept out                           | `yarn security` on every commit                             |
-| Rules that must not drift                      | `dev/contracts/`                                            |
-| Deliverables complete, claims tied to evidence | `dev/contracts/SUBMISSION.md`                               |
+| Requirement                                    | Where it is answered                                         |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| User, bottleneck, value                        | `README.md`                                                  |
+| Improvement changelog                          | `README.md`                                                  |
+| Hot take and main failure mode                 | `README.md`                                                  |
+| Reproduction guide                             | `README.md`                                                  |
+| Prior work declared                            | `README.md` Sources, enforced by a contract check            |
+| Decision logic                                 | `src/core/` — pure, no I/O, no clock, no network             |
+| Human approval gate                            | `src/core/decision.ts`, visible in the `eval` and `sim` runs |
+| Per-case scoring, 28 cases                     | `src/eval/`, against `src/core/` directly                    |
+| Primary metric                                 | `src/sim/`, playing `scenarios/` against the operator model  |
+| Committed data and recorded runs               | `fixtures/`, `scenarios/`, `trajectories/`                   |
+| Credentials kept out                           | `yarn security` on every commit                              |
+| Rules that must not drift                      | `dev/contracts/`                                             |
+| Deliverables complete, claims tied to evidence | `dev/contracts/SUBMISSION.md`                                |
 
 ## 13. The last seven hours
 

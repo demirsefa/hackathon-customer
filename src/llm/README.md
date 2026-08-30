@@ -11,8 +11,8 @@ network, no filesystem, no clock. A client that opens an HTTPS connection and re
 committed JSON file cannot live there without breaking that promise, and the promise
 is doing real work — it is what makes both pipelines testable with a scripted fake and
 what makes "this decision cost zero model calls" checkable. It cannot go inside
-`src/eval/`, `src/sim/` or `src/service/` either, because all three need the same
-client and whichever one owned it would become a dependency of the other two. So the
+`src/eval/` or `src/sim/` either, because both need the same client and whichever one
+owned it would become a dependency of the other. So the
 port stays pure in `core/`, and the body that performs the I/O sits beside it here.
 
 ## The files

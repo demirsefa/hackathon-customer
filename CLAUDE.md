@@ -27,7 +27,6 @@ src/
   core/        pure decision logic. No I/O, no clock, no network. Both pipelines are built from it.
   llm/         the model clients that implement `core/llm.ts` — replay, live, record. See its README.
   cli/         what every entry point shares about the terminal: loading `.env`, and the menu.
-  service/     HTTP surface and in-memory queue. Nothing reaches a customer without the approval gate.
   eval/        scores the evaluation cases against `src/core/` directly.
   sim/         scenario player; produces the primary metric.
   __test__/    every `*.test.ts` in the project.
