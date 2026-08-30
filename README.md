@@ -380,7 +380,7 @@ run in cents rather than dollars. Nothing in this guide needs it.
 
 ## Video
 
-A walkthrough of the bottleneck, the two lines and the overload run.
+Four minutes fifty seconds, walking through the bottleneck, the two lines and the overload run.
 
 **One correction, stated rather than edited out.** The recording was made in a single
 take. At one point the command on screen is `yarn sim normal-day --replay` while the
