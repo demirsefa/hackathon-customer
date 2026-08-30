@@ -23,38 +23,57 @@
 import {
   askMode,
   askScenario,
+  checkArguments,
   isCancelled,
   isInteractive,
   resolveMode,
-  USAGE,
+  SIM_COMMAND,
+  SIM_USAGE,
+  wantsHelp,
 } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
 import { resolveParams } from '../llm/key.ts';
 import { CACHE_FILE, readCacheIfPresent } from '../llm/replay.ts';
 import { openLlmSession } from '../llm/session.ts';
 
+const args = process.argv.slice(2);
+
+// Answered before anything else happens: somebody asking what the command takes has
+// not started a run, and should not be given one.
+if (wantsHelp(args)) {
+  console.log(SIM_USAGE);
+  process.exit(0);
+}
+
 const env = loadEnvFile();
 if (env.warning !== null) console.warn(env.warning);
 
-const args = process.argv.slice(2);
+// Spelling first. `yarn sim overlaod --replay` used to print `scenario: overlaod`,
+// play nothing and exit 0, which reads as a run that worked.
+const complaint = checkArguments({ args, command: SIM_COMMAND });
+if (complaint !== null) {
+  console.error(complaint);
+  process.exit(1);
+}
+
 // Found by shape rather than by position, so the flags may sit on either side of it.
-const named = args.find((arg) => !arg.startsWith('--'));
+const named = args.find((arg) => !arg.startsWith('-'));
 
 // The mode question is asked only where the scenario question already is, so a named
 // scenario runs on the flag it was given, or on replay when it was given none.
 const mode = resolveMode({ args, canAsk: named === undefined && isInteractive() });
 
-// Contradicting flags first: that is a mistake about this command whether or not the
+// Contradicting flags next: that is a mistake about this command whether or not the
 // scenario is there, and it should be read before anything about a missing argument.
 if (mode.mode === null) {
-  console.error(mode.error);
+  console.error(`${mode.error}\n${SIM_USAGE}`);
   process.exit(1);
 }
 
 // Nobody to ask, and nothing to run: the usage line, exactly as before the menu
 // existed. An unattended run has to fail here rather than wait for an answer.
 if (named === undefined && !isInteractive()) {
-  console.error(USAGE);
+  console.error(SIM_USAGE);
   process.exit(1);
 }
 

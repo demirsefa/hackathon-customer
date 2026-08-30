@@ -6,12 +6,17 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  EVAL_COMMAND,
+  EVAL_USAGE,
   MODE_CONFLICT,
   SCENARIOS,
-  USAGE,
+  SIM_COMMAND,
+  SIM_USAGE,
+  checkArguments,
   isCancelled,
   isInteractive,
   resolveMode,
+  wantsHelp,
 } from '../../cli/ask.ts';
 
 describe('isInteractive', () => {
@@ -92,14 +97,71 @@ describe('resolveMode', () => {
   });
 });
 
-describe('USAGE', () => {
+describe('SIM_USAGE', () => {
   it('is built from the scenarios, so the two cannot drift apart', () => {
-    for (const scenario of SCENARIOS) expect(USAGE).toContain(scenario);
+    for (const scenario of SCENARIOS) expect(SIM_USAGE).toContain(scenario);
   });
 
   it('still names the flags, because the menu never replaces the argument form', () => {
-    expect(USAGE).toContain('yarn sim <scenario>');
-    expect(USAGE).toContain('--live');
-    expect(USAGE).toContain('--replay');
+    expect(SIM_USAGE).toContain('yarn sim <scenario>');
+    expect(SIM_USAGE).toContain('--live');
+    expect(SIM_USAGE).toContain('--replay');
+  });
+});
+
+describe('checkArguments', () => {
+  const sim = (...args: string[]): string | null =>
+    checkArguments({ args, command: SIM_COMMAND });
+  const evaluate = (...args: string[]): string | null =>
+    checkArguments({ args, command: EVAL_COMMAND });
+
+  it('passes the documented forms through untouched', () => {
+    expect(evaluate('--replay')).toBeNull();
+    expect(evaluate('--live')).toBeNull();
+    expect(evaluate()).toBeNull();
+    expect(sim('overload', '--replay')).toBeNull();
+    expect(sim('--live', 'normal-day')).toBeNull();
+    expect(sim()).toBeNull();
+  });
+
+  it('refuses a misspelt flag instead of falling through to the bare form', () => {
+    // The trap this exists for: `--lve` is not `--live`, and the run that follows is
+    // the one nobody asked for.
+    expect(sim('overload', '--lve')).toContain('unknown option `--lve`');
+    expect(evaluate('--relpay')).toContain('unknown option `--relpay`');
+  });
+
+  it('refuses a scenario that does not exist, which used to run and exit 0', () => {
+    const complaint = sim('overlaod', '--replay');
+
+    expect(complaint).toContain('`overlaod` is not a scenario');
+    // The list of real ones travels with the complaint; a name is not enough to fix it.
+    for (const scenario of SCENARIOS) expect(complaint).toContain(scenario);
+  });
+
+  it('refuses two scenarios rather than silently playing the first', () => {
+    expect(sim('overload', 'normal-day')).toContain('one scenario at a time');
+  });
+
+  it('refuses a stray word on the command that takes none', () => {
+    expect(evaluate('overload')).toContain('it takes no argument');
+  });
+
+  it('ends every complaint on the usage line for that command', () => {
+    expect(sim('nope')).toContain(SIM_USAGE);
+    expect(evaluate('nope')).toContain(EVAL_USAGE);
+  });
+
+  it('lets `--` through, because yarn passes the npm habit straight to us', () => {
+    expect(evaluate('--', '--replay')).toBeNull();
+    expect(sim('--', 'overload', '--replay')).toBeNull();
+  });
+});
+
+describe('wantsHelp', () => {
+  it('recognises the question, so it is answered rather than refused', () => {
+    expect(wantsHelp(['--help'])).toBe(true);
+    expect(wantsHelp(['-h'])).toBe(true);
+    expect(wantsHelp(['overload', '--replay'])).toBe(false);
   });
 });

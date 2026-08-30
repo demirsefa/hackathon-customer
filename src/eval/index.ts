@@ -31,7 +31,16 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { askMode, isCancelled, isInteractive, resolveMode } from '../cli/ask.ts';
+import {
+  askMode,
+  checkArguments,
+  EVAL_COMMAND,
+  EVAL_USAGE,
+  isCancelled,
+  isInteractive,
+  resolveMode,
+  wantsHelp,
+} from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
 import { parseCaseFile, type CaseFile } from '../core/cases.ts';
 import { PIPELINES } from '../core/pipeline.ts';
@@ -53,15 +62,26 @@ function stop(message: string): never {
   process.exit(1);
 }
 
+const args = process.argv.slice(2);
+
+// Answered before anything else happens: somebody asking what the command takes has
+// not started a run, and should not be given one.
+if (wantsHelp(args)) {
+  console.log(EVAL_USAGE);
+  process.exit(0);
+}
+
 const env = loadEnvFile();
 if (env.warning !== null) console.warn(env.warning);
 
-const mode = resolveMode({
-  args: process.argv.slice(2),
-  canAsk: isInteractive(),
-});
+// A word this command cannot act on stops it here. Falling through to the bare form
+// would replay — the safe run, but not the one that was typed, and silently.
+const complaint = checkArguments({ args, command: EVAL_COMMAND });
+if (complaint !== null) stop(complaint);
 
-if (mode.mode === null) stop(mode.error);
+const mode = resolveMode({ args, canAsk: isInteractive() });
+
+if (mode.mode === null) stop(`${mode.error}\n${EVAL_USAGE}`);
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 
