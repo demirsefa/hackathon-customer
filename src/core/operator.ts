@@ -31,6 +31,8 @@
  * conversion below goes through the named zone.
  */
 
+import { shapeChecks, type ShapeChecks } from '../utils/parse.ts';
+
 /** ISO-8601 weekday numbering: 1 = Monday … 7 = Sunday. */
 export type IsoWeekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -402,16 +404,11 @@ export function advanceWorkingMinutes(
 
 // --- the parser ------------------------------------------------------------------
 
-function fail(message: string): never {
-  throw new Error(`operator config: ${message}`);
-}
-
-function asRecord(value: unknown, label: string): Record<string, unknown> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    fail(`${label} must be an object`);
-  }
-  return value as Record<string, unknown>;
-}
+const checks = shapeChecks('operator config');
+const { asRecord } = checks;
+// `fail` never returns, and TypeScript only reads that off a name carrying an explicit
+// type annotation — without one, every check below stops narrowing what it rejected.
+const fail: ShapeChecks['fail'] = checks.fail;
 
 function requireNonEmptyString(value: unknown, label: string): string {
   if (typeof value !== 'string' || value.length === 0) {

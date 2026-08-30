@@ -22,6 +22,10 @@ baseline/      one model call, then the risky-category check. CHALLENGE §8.
 advanced/      a placeholder plus its prompts. CHALLENGE §9.
 ```
 
+`cases.ts`, `scenario.ts` and `operator.ts` validate through `../utils/parse.ts` — the
+shape checks all three used to keep a copy of. It is pure, so importing it costs this
+folder none of the promise above; `src/utils/README.md` says why it is its own area.
+
 ## What the metric needs from here
 
 Three of the files above exist for the primary metric rather than for a decision, and

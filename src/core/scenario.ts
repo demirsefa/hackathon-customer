@@ -12,6 +12,7 @@
  * from different people, and the queue has to order the copies as well as the originals.
  * `resolveArrivals` is where the two files are joined.
  */
+import { shapeChecks, type ShapeChecks } from '../utils/parse.ts';
 import type { CaseSubset, EvaluationCase } from './cases.ts';
 import { isInstant, type InboundMessage } from './message.ts';
 import { parseOperatorConfig, type OperatorConfig } from './operator.ts';
@@ -37,24 +38,11 @@ export interface Scenario {
   readonly arrivals: readonly Arrival[];
 }
 
-function fail(path: string, expected: string): never {
-  throw new Error(`scenario file: ${path} ${expected}`);
-}
-
-function asRecord(value: unknown, path: string): Record<string, unknown> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    fail(path, 'must be an object');
-  }
-  return value as Record<string, unknown>;
-}
-
-function asText(source: Record<string, unknown>, key: string, path: string): string {
-  const value = source[key];
-  if (typeof value !== 'string' || value.length === 0) {
-    fail(`${path}.${key}`, 'must be a non-empty string');
-  }
-  return value;
-}
+const checks = shapeChecks('scenario file');
+const { asRecord, asText } = checks;
+// `fail` never returns, and TypeScript only reads that off a name carrying an explicit
+// type annotation — without one, every check below stops narrowing what it rejected.
+const fail: ShapeChecks['fail'] = checks.fail;
 
 function parseArrival(value: unknown, path: string): Arrival {
   const source = asRecord(value, path);

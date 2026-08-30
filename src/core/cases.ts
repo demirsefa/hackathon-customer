@@ -12,6 +12,7 @@
  * expectation to one would score a line against a design it does not have; pinning
  * it to the route scores it against what the operator actually gets.
  */
+import { shapeChecks, type ShapeChecks } from '../utils/parse.ts';
 import type { Route } from './decision.ts';
 import { isInstant, type InboundMessage } from './message.ts';
 import type { Order, OrderStatus, SenderProfile } from './records.ts';
@@ -54,29 +55,11 @@ export interface CaseFile {
   readonly cases: readonly EvaluationCase[];
 }
 
-function fail(path: string, expected: string): never {
-  throw new Error(`case file: ${path} ${expected}`);
-}
-
-function asRecord(value: unknown, path: string): Record<string, unknown> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    fail(path, 'must be an object');
-  }
-  return value as Record<string, unknown>;
-}
-
-function asArray(value: unknown, path: string): readonly unknown[] {
-  if (!Array.isArray(value)) fail(path, 'must be an array');
-  return value;
-}
-
-function asText(source: Record<string, unknown>, key: string, path: string): string {
-  const value = source[key];
-  if (typeof value !== 'string' || value.length === 0) {
-    fail(`${path}.${key}`, 'must be a non-empty string');
-  }
-  return value;
-}
+const checks = shapeChecks('case file');
+const { asRecord, asArray, asText } = checks;
+// `fail` never returns, and TypeScript only reads that off a name carrying an explicit
+// type annotation — without one, every check below stops narrowing what it rejected.
+const fail: ShapeChecks['fail'] = checks.fail;
 
 function asFlag(source: Record<string, unknown>, key: string, path: string): boolean {
   const value = source[key];
