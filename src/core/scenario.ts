@@ -40,8 +40,7 @@ export interface Scenario {
 
 const checks = shapeChecks('scenario file');
 const { asRecord, asText } = checks;
-// `fail` never returns, and TypeScript only reads that off a name carrying an explicit
-// type annotation — without one, every check below stops narrowing what it rejected.
+// Annotated rather than destructured, so its `never` still narrows — see `ShapeChecks`.
 const fail: ShapeChecks['fail'] = checks.fail;
 
 function parseArrival(value: unknown, path: string): Arrival {

@@ -19,6 +19,11 @@ export interface ShapeChecks {
   /**
    * Two arguments where a location and an expectation read better apart, one where the
    * sentence is already whole — `workdays lists day 3 twice` has no expectation half.
+   *
+   * Take this one as `const fail: ShapeChecks['fail'] = checks.fail` rather than by
+   * destructuring: it never returns, and TypeScript only reads that off a name
+   * carrying an explicit type annotation. Without one, every caller downstream stops
+   * narrowing away the value it just rejected.
    */
   readonly fail: (path: string, expected?: string) => never;
   readonly asRecord: (value: unknown, path: string) => Record<string, unknown>;

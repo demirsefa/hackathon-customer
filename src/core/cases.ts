@@ -57,8 +57,7 @@ export interface CaseFile {
 
 const checks = shapeChecks('case file');
 const { asRecord, asArray, asText } = checks;
-// `fail` never returns, and TypeScript only reads that off a name carrying an explicit
-// type annotation — without one, every check below stops narrowing what it rejected.
+// Annotated rather than destructured, so its `never` still narrows — see `ShapeChecks`.
 const fail: ShapeChecks['fail'] = checks.fail;
 
 function asFlag(source: Record<string, unknown>, key: string, path: string): boolean {

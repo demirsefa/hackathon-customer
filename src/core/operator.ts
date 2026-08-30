@@ -406,8 +406,7 @@ export function advanceWorkingMinutes(
 
 const checks = shapeChecks('operator config');
 const { asRecord } = checks;
-// `fail` never returns, and TypeScript only reads that off a name carrying an explicit
-// type annotation — without one, every check below stops narrowing what it rejected.
+// Annotated rather than destructured, so its `never` still narrows — see `ShapeChecks`.
 const fail: ShapeChecks['fail'] = checks.fail;
 
 function requireNonEmptyString(value: unknown, label: string): string {
