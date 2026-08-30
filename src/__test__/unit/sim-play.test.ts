@@ -13,11 +13,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { baseline } from '../../core/baseline/index.ts';
-import type { LlmClient } from '../../core/llm.ts';
 import { parseOperatorConfig } from '../../core/operator.ts';
 import { createRecordStore } from '../../core/records.ts';
 import type { ResolvedArrival } from '../../core/scenario.ts';
 import { playScenario, walkQueue, type Pending } from '../../sim/play.ts';
+import type { LlmClient } from '../../types/llm.ts';
 
 const MERVE = parseOperatorConfig({
   id: 'merve',

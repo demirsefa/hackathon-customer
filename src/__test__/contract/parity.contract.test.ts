@@ -42,10 +42,10 @@ import {
   ROUTES,
   type Route,
 } from '../../core/decision.ts';
-import type { InboundMessage } from '../../core/message.ts';
 import { PIPELINES, REQUIRED_FEATURES, type Pipeline } from '../../core/pipeline.ts';
 import { isSensitive } from '../../core/policy.ts';
 import { createRecordStore } from '../../core/records.ts';
+import type { InboundMessage } from '../../types/message.ts';
 import { agreeingScript, scriptedLlm, type TaskName } from '../fakes.ts';
 
 const caseFile = parseCaseFile(

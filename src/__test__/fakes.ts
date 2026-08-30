@@ -5,7 +5,7 @@
  * failing loudly if one happens, and `agreeingScript` lets one script drive both
  * pipelines, so a parity check compares implementations rather than scripts.
  */
-import type { LlmClient, LlmRequest } from '../core/llm.ts';
+import type { LlmClient, LlmRequest } from '../types/llm.ts';
 
 /**
  * Painted text back as plain text, for the two log checks.

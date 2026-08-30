@@ -20,18 +20,18 @@
  */
 import type { CaseSubset } from '../core/cases.ts';
 import type { Decision } from '../core/decision.ts';
-import type { LlmClient } from '../core/llm.ts';
 import {
   advanceWorkingMinutes,
   nextWorkingMinute,
   workingMinutesBetween,
-  type OperatorConfig,
 } from '../core/operator.ts';
 import type { Pipeline } from '../core/pipeline.ts';
 import { INTERIM_AFTER_MINUTES, needsInterim } from '../core/policy.ts';
 import { sortedQueue, type QueueEntry } from '../core/queue.ts';
-import type { RecordStore } from '../core/records.ts';
 import type { ResolvedArrival } from '../core/scenario.ts';
+import type { LlmClient } from '../types/llm.ts';
+import type { OperatorConfig } from '../types/operator.ts';
+import type { RecordStore } from '../types/records.ts';
 
 const MS_PER_MINUTE = 60_000;
 

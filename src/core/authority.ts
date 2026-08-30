@@ -7,9 +7,10 @@
  * authority violation, because the sender does not own what they are asking about.
  * That fact is not in the text, so no amount of reading the text can find it.
  */
+import type { InboundMessage } from '../types/message.ts';
+import type { Order, RecordStore } from '../types/records.ts';
 import { humanReview, type Decision } from './decision.ts';
-import { extractOrderReferences, type InboundMessage } from './message.ts';
-import type { Order, RecordStore } from './records.ts';
+import { extractOrderReferences } from './message.ts';
 
 export type AuthorityOutcome =
   /** Nothing in the message points at a record, so there is nothing to own. */

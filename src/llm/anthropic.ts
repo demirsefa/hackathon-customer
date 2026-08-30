@@ -21,7 +21,7 @@
  */
 import Anthropic from '@anthropic-ai/sdk';
 
-import type { LlmClient, LlmRequest, LlmResponse } from '../core/llm.ts';
+import type { LlmClient, LlmRequest, LlmResponse } from '../types/llm.ts';
 import { PINNED_PARAMS, type LlmParams } from './key.ts';
 
 /**

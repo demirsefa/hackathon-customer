@@ -12,31 +12,13 @@
  * from different people, and the queue has to order the copies as well as the originals.
  * `resolveArrivals` is where the two files are joined.
  */
+import type { InboundMessage } from '../types/message.ts';
+import type { OperatorConfig } from '../types/operator.ts';
+import type { Arrival, Scenario } from '../types/scenario.ts';
 import { shapeChecks, type ShapeChecks } from '../utils/parse.ts';
 import type { CaseSubset, EvaluationCase } from './cases.ts';
-import { isInstant, type InboundMessage } from './message.ts';
-import { parseOperatorConfig, type OperatorConfig } from './operator.ts';
-
-/** One message landing in the inbox at a stated instant. */
-export interface Arrival {
-  readonly messageId: string;
-  /** Which case from `fixtures/cases.json` arrived. Many arrivals may name one case. */
-  readonly caseId: string;
-  /** ISO, with an explicit offset — `message.ts` owns the rule. */
-  readonly at: string;
-}
-
-export interface Scenario {
-  readonly name: string;
-  /**
-   * Exactly one. The field is an array because the file writes it as one and a desk
-   * with two people is a plausible thing to want later; the player refuses more than
-   * one rather than quietly averaging two calendars into a number nobody agreed to.
-   */
-  readonly operator: OperatorConfig;
-  /** Sorted by arrival, then by message id. Guaranteed by the parser. */
-  readonly arrivals: readonly Arrival[];
-}
+import { isInstant } from './message.ts';
+import { parseOperatorConfig } from './operator.ts';
 
 const checks = shapeChecks('scenario file');
 const { asRecord, asText } = checks;

@@ -10,8 +10,8 @@ import { describe, expect, it } from 'vitest';
 
 import { baseline } from '../../core/baseline/index.ts';
 import { parseTriageOutput } from '../../core/baseline/triage.ts';
-import type { InboundMessage } from '../../core/message.ts';
-import type { RecordStore } from '../../core/records.ts';
+import type { InboundMessage } from '../../types/message.ts';
+import type { RecordStore } from '../../types/records.ts';
 import { agreeingScript, scriptedLlm, type TaskName } from '../fakes.ts';
 
 /**

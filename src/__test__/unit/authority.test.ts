@@ -17,8 +17,8 @@ import {
   resolveAuthority,
 } from '../../core/authority.ts';
 import { honoursApprovalGate } from '../../core/decision.ts';
-import type { InboundMessage } from '../../core/message.ts';
 import { createRecordStore } from '../../core/records.ts';
+import type { InboundMessage } from '../../types/message.ts';
 
 const records = createRecordStore({
   senders: [

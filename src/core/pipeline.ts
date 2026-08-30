@@ -6,12 +6,12 @@
  * a line consults is a design choice, and that choice is exactly what the primary
  * metric measures.
  */
+import type { LlmClient } from '../types/llm.ts';
+import type { InboundMessage } from '../types/message.ts';
+import type { RecordStore } from '../types/records.ts';
 import { advanced } from './advanced/index.ts';
 import { baseline } from './baseline/index.ts';
 import type { Decision } from './decision.ts';
-import type { LlmClient } from './llm.ts';
-import type { InboundMessage } from './message.ts';
-import type { RecordStore } from './records.ts';
 
 /**
  * The feature set every line must expose — the seven capabilities of

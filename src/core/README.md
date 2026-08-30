@@ -8,15 +8,15 @@ identically under `src/eval/`, `src/sim/` and `src/service/`.
 
 ```text
 decision.ts    the vocabulary: routes, reason codes, priority, the approval gate.
-message.ts     the envelope, and the order references pulled out of untrusted text.
-records.ts     the record layer — the only source of ownership and identity.
+message.ts     the instant rule, and the order references pulled out of untrusted text.
+records.ts     the store over the record layer — the only source of ownership and identity.
 authority.ts   the gate over that layer. Waiting for the advanced line.
 policy.ts      the law both lines are written against.
-operator.ts    the operator's calendar: her shift, her breaks, her working minutes.
+operator.ts    arithmetic over the operator's calendar: her shift, her breaks, her minutes.
 cases.ts       the evaluation set parsed and validated. The file read stays outside.
 scenario.ts    a scenario parsed the same way, and joined to the cases it names.
 queue.ts       the read-first order of the operator's queue, and why it is total.
-llm.ts         the client interface and the primitives a response is parsed with.
+llm.ts         the primitives a prompt is built with and a response is parsed with.
 pipeline.ts    what a line is, REQUIRED_FEATURES, and which lines exist.
 baseline/      one model call, then the risky-category check. CHALLENGE §8.
 advanced/      a placeholder plus its prompts. CHALLENGE §9.
@@ -25,6 +25,12 @@ advanced/      a placeholder plus its prompts. CHALLENGE §9.
 `cases.ts`, `scenario.ts` and `operator.ts` validate through `../utils/parse.ts` — the
 shape checks all three used to keep a copy of. It is pure, so importing it costs this
 folder none of the promise above; `src/utils/README.md` says why it is its own area.
+
+The shapes those files decide over are declared in `../types/` — `InboundMessage`,
+`RecordStore`, `OperatorConfig`, `Scenario`, `LlmClient`. Every export there is erased
+before anything runs, so importing it costs this folder none of the promise above
+either; `src/types/README.md` says why it is its own area, and which shapes stay here
+regardless.
 
 ## What the metric needs from here
 

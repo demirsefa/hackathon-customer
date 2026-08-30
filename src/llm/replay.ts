@@ -12,7 +12,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import type { LlmClient, LlmRequest, LlmResponse } from '../core/llm.ts';
+import type { LlmClient, LlmRequest, LlmResponse } from '../types/llm.ts';
 import { cacheKey, PINNED_PARAMS, type Effort, type LlmParams } from './key.ts';
 
 /** Resolved from this file, so the path does not depend on the working directory. */

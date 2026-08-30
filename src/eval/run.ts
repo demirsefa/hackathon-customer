@@ -19,11 +19,12 @@
  */
 import type { CaseFile, CaseSubset } from '../core/cases.ts';
 import type { Decision, Route } from '../core/decision.ts';
-import type { LlmClient } from '../core/llm.ts';
-import type { InboundMessage } from '../core/message.ts';
 import type { Pipeline } from '../core/pipeline.ts';
-import { createRecordStore, type RecordStore } from '../core/records.ts';
+import { createRecordStore } from '../core/records.ts';
 import { CACHE_LABEL, isReplayMiss } from '../llm/replay.ts';
+import type { LlmClient } from '../types/llm.ts';
+import type { InboundMessage } from '../types/message.ts';
+import type { RecordStore } from '../types/records.ts';
 
 /**
  * One thing the line reached for while deciding. Both kinds are kept in a single

@@ -12,7 +12,7 @@
  */
 import { renameSync, writeFileSync } from 'node:fs';
 
-import type { LlmClient, LlmRequest, LlmResponse } from '../core/llm.ts';
+import type { LlmClient, LlmRequest, LlmResponse } from '../types/llm.ts';
 import { cacheKey, requestShape, PINNED_PARAMS, type LlmParams } from './key.ts';
 import { CACHE_FILE, type CacheEntry, type LlmCache } from './replay.ts';
 

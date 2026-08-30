@@ -9,10 +9,10 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { advanced } from '../../core/advanced/index.ts';
 import { parseClassifyOutput } from '../../core/advanced/classify.ts';
-import type { InboundMessage } from '../../core/message.ts';
+import { advanced } from '../../core/advanced/index.ts';
 import { createRecordStore } from '../../core/records.ts';
+import type { InboundMessage } from '../../types/message.ts';
 import { agreeingScript, refusingLlm, scriptedLlm, type TaskName } from '../fakes.ts';
 
 const records = createRecordStore({

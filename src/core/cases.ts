@@ -12,10 +12,11 @@
  * expectation to one would score a line against a design it does not have; pinning
  * it to the route scores it against what the operator actually gets.
  */
+import type { InboundMessage } from '../types/message.ts';
+import type { Order, OrderStatus, SenderProfile } from '../types/records.ts';
 import { shapeChecks, type ShapeChecks } from '../utils/parse.ts';
 import type { Route } from './decision.ts';
-import { isInstant, type InboundMessage } from './message.ts';
-import type { Order, OrderStatus, SenderProfile } from './records.ts';
+import { isInstant } from './message.ts';
 
 /** The four groups of dev/CHALLENGE.md §10, in its order. */
 export const CASE_SUBSETS = ['normal', 'injection', 'authority', 'ambiguous'] as const;

@@ -21,12 +21,9 @@
  * and reddens the one row that says a case was reached too late.
  */
 import { PLAIN, type Paint } from '../cli/paint.ts';
-import {
-  casesPerDay,
-  workingMinutesBetween,
-  type OperatorConfig,
-} from '../core/operator.ts';
+import { casesPerDay, workingMinutesBetween } from '../core/operator.ts';
 import { sortedQueue } from '../core/queue.ts';
+import type { OperatorConfig } from '../types/operator.ts';
 import type { PlayedArrival, Timeline } from './play.ts';
 import { dayClock, localClock } from './report.ts';
 import { reachedInTime } from './score.ts';

@@ -11,49 +11,12 @@
  * in `policy.ts`, so `eval/`, `sim/` and `service/` all get the same answer from the
  * same inputs.
  *
- * The config is written as JSON and read through `parseOperatorConfig`:
- *
- * ```json
- * {
- *   "id": "merve",
- *   "minutesPerCase": 10,
- *   "shift": { "start": "09:00", "end": "17:00" },
- *   "breaks": [["12:00", "13:00"]],
- *   "workdays": [1, 2, 3, 4, 5],
- *   "timezone": "Europe/Istanbul"
- * }
- * ```
- *
- * `timezone` is required rather than defaulted. Without it, "09:00" means whatever
- * the machine producing the number happens to think it means, and a run reproduced
- * on another laptop reports a different metric. Turkey is on permanent +03 today,
- * but that is a fact about a zone, not a fact about the code: every wall-clock
- * conversion below goes through the named zone.
+ * The calendar itself is declared in `types/operator.ts` — the shape, and why the
+ * zone is part of it. This file is how it is read out of JSON and asked questions.
  */
 
+import type { DaySpan, IsoWeekday, OperatorConfig } from '../types/operator.ts';
 import { shapeChecks, type ShapeChecks } from '../utils/parse.ts';
-
-/** ISO-8601 weekday numbering: 1 = Monday … 7 = Sunday. */
-export type IsoWeekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-
-/** A half-open span of a local day, in whole minutes from local midnight. */
-export interface DaySpan {
-  readonly startMinute: number;
-  readonly endMinute: number;
-}
-
-export interface OperatorConfig {
-  readonly id: string;
-  /** How long one case takes her. Whole minutes; there is no fractional case. */
-  readonly minutesPerCase: number;
-  readonly shift: DaySpan;
-  /** Sorted, non-overlapping, inside the shift. Guaranteed by the parser. */
-  readonly breaks: readonly DaySpan[];
-  /** Sorted and unique. Guaranteed by the parser. */
-  readonly workdays: readonly IsoWeekday[];
-  /** An IANA zone name. Required — see the note at the top of this file. */
-  readonly timezone: string;
-}
 
 const MS_PER_MINUTE = 60_000;
 const MS_PER_DAY = 86_400_000;

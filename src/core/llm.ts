@@ -1,29 +1,14 @@
 /**
- * The model boundary: the client interface, and the primitives every prompt file
- * parses its response with.
+ * The primitives every prompt file builds a request with and parses its response
+ * with.
  *
- * The prompts themselves live next to the line that spends them — `baseline/` and
- * `advanced/` — because a prompt is part of a design, not a shared utility. What
- * stays here is what both must not diverge on: how a client is called, and how an
- * untrusted response is read.
- *
- * Whatever is built on top of these takes untrusted material only — the message text
- * and, at most, a summary of the same thread. None of it can be handed the record
- * layer, because a prompt that carries both a customer's words and a verified fact is
- * one generated sentence away from letting the words overwrite the fact.
+ * The client interface itself is declared in `types/llm.ts`; the prompts live next to
+ * the line that spends them — `baseline/` and `advanced/` — because a prompt is part
+ * of a design, not a shared utility. What stays here is the other half of what both
+ * lines must not diverge on: how a prompt is assembled out of untrusted material —
+ * and out of nothing else, for the reason `types/llm.ts` gives — and how an untrusted
+ * response is read back.
  */
-
-export interface LlmRequest {
-  readonly prompt: string;
-}
-
-export interface LlmResponse {
-  readonly text: string;
-}
-
-export interface LlmClient {
-  complete(request: LlmRequest): Promise<LlmResponse>;
-}
 
 export function withThread(text: string, threadSummary: string | undefined): string {
   // The summary is labelled as reported, not established: it is model-written text

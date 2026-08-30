@@ -16,11 +16,8 @@
  * a replayed run is a function of the commit and the committed cache, both named below,
  * so a clock would add diff noise without adding anything a reader could reproduce from.
  */
-import {
-  workingMinutesPerDay,
-  casesPerDay,
-  type OperatorConfig,
-} from '../core/operator.ts';
+import { workingMinutesPerDay, casesPerDay } from '../core/operator.ts';
+import type { OperatorConfig } from '../types/operator.ts';
 import type { PlayedArrival, Timeline } from './play.ts';
 import { recordFile, type SimRecord } from './record.ts';
 import { dayClock, localClock, windowLabel } from './report.ts';

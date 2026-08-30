@@ -12,7 +12,7 @@
  * a recording step you have to remember is a recording step that gets forgotten, one
  * commit before the cache is needed on a machine with no key.
  */
-import type { LlmClient } from '../core/llm.ts';
+import type { LlmClient } from '../types/llm.ts';
 import { anthropicClient } from './anthropic.ts';
 import { PINNED_PARAMS, type LlmParams } from './key.ts';
 import { recordingClient, writeCache, type MutableCache } from './record.ts';
