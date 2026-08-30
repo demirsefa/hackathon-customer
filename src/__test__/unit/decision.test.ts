@@ -1,7 +1,7 @@
 /**
- * The decision vocabulary. Two things are pinned here: the approval invariant
- * `src/service/` depends on, and the fact that a line's own priority score can never
- * push a case outside the scale the queue is sorted on.
+ * The decision vocabulary. Two things are pinned here: the approval invariant every
+ * line is held to, and the fact that a line's own priority score can never push a case
+ * outside the scale the queue is sorted on.
  */
 import { describe, expect, it } from 'vitest';
 

@@ -356,11 +356,12 @@ row worth more than a wide gap nobody believes.
   `llm.ts`, `authority.ts` — and unanchored, and a new contract is the user's call
   ([`CLAUDE.md`](../CLAUDE.md)). If it is wanted, it is a 20-minute job **after** the
   numbers land, not before.
-- **`src/service/`.** It exits 1 saying nothing is listening, which is honest and which
-  the SUBMISSION check accepts. CHALLENGE §12 claims the approval gate is "surfaced by
-  `src/service/`" — either that line is corrected in step 5, or the service is built,
-  and it is only built if step 6 finishes before 19:00. The video can show the gate from
-  `yarn sim overload --replay --log` and the trajectory files instead.
+- **`src/service/`. Removed, not deferred.** It exited 1 saying nothing was listening,
+  and the choice was between correcting CHALLENGE §12's "surfaced by `src/service/`" and
+  building the service before 19:00. Step 6 did not finish in time, so the folder, the
+  `serve` script and the README's command row are gone and §11 carries the cut. The gate
+  is `src/core/decision.ts`; the video shows it from `yarn sim overload --replay --log`
+  and the trajectory files.
 - **A `channel` field, a deterministic thread summary, an audit trajectory, development
   session summaries.** All four are README paragraphs at most, and only if the prose
   step finishes early.
