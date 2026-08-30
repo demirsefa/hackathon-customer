@@ -91,18 +91,28 @@ export function refusingLlm(): RecordingLlm {
  * `urgency` is what the baseline asks for — how loud the message sounds, on the
  * 0-100 scale a decision's priority uses — and `confidence` is the model's own
  * certainty, which only the advanced line has a use for.
+ *
+ * The two flags are questions only the advanced classification pass asks, so they
+ * default to the answer that lets a message through: a fake that held everything
+ * would make its line look careful without the line having decided anything.
  */
 export function agreeingScript(input: {
   readonly category: string;
   readonly urgency: number;
   readonly confidence: number;
   readonly draft: string;
+  /** Whether the text is aimed at the system rather than at the desk. */
+  readonly instruction?: boolean;
+  /** Whether answering would mean reading the sender's own records. */
+  readonly needsRecord?: boolean;
 }): Record<TaskName, string> {
   const { category, urgency, confidence, draft } = input;
+  const instruction = input.instruction ?? false;
+  const needsRecord = input.needsRecord ?? false;
 
   return {
     triage: JSON.stringify({ category, urgency, draft }),
-    classify: JSON.stringify({ category, confidence }),
+    classify: JSON.stringify({ category, confidence, instruction, needsRecord }),
     draft: JSON.stringify({ draft }),
     verify: JSON.stringify({ ok: true, confidence }),
   };
