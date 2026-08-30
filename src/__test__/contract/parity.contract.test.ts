@@ -28,7 +28,7 @@
  *   1. every decision's route and reason come from the shared vocabulary — `ROUTES`
  *      and `REASON_CODES`, exported as values so the check can be made at all;
  *   2. `decisionFields` compared between the two lines rather than to a fixed list;
- *   3. the stated model-call budget as a ratio — one call against at most three.
+ *   3. the stated model-call budget as a ratio — one call against at most two.
  */
 import { readFileSync } from 'node:fs';
 
@@ -63,12 +63,12 @@ if (firstCase === undefined) throw new Error('the case table is empty');
 /**
  * The stated model-call budget per decision, which rule 6 asks to be written down
  * rather than discovered. The ratio is the point: the advanced line is allowed to
- * spend three where the baseline spends one, and a line that quietly grows past its
+ * spend two where the baseline spends one, and a line that quietly grows past its
  * number turns this red before any result is reported anywhere.
  */
 const BUDGET: Readonly<Record<string, number>> = {
   baseline: 1,
-  advanced: 3,
+  advanced: 2,
 };
 
 /**
@@ -299,7 +299,6 @@ describe('feature parity', () => {
           triage: 'sorry, I cannot help with that',
           classify: 'sorry, I cannot help with that',
           draft: 'sorry, I cannot help with that',
-          verify: 'sorry, I cannot help with that',
         };
 
         const decision = await pipeline.run({

@@ -190,11 +190,9 @@ message in
   ↓
 3. DRAFT — one call, and only for a message four checks let through
   ↓
-4. VERIFICATION
-   a. validateDraft() against the permitted orders — deterministic, no call
-      fails → human queue (draft_policy_violation)
-   b. one call for a second opinion on the draft
-      refused, unsure or unusable → human queue
+4. VALIDATION — validateDraft() against the permitted orders · NO model call
+   a reply may name only what the sender was shown to own
+   fails → human queue (draft_policy_violation)
   ↓
 auto-send (routine_reply)
 ```
@@ -230,19 +228,29 @@ promoted himself past every genuine authority violation in the operator's mornin
 order of her queue becomes a thing the attacker writes, and the defence becomes the
 attack. Held either way — the argument is only about when she reads it.
 
-**Removed experiment: the rewrite loop.** An earlier draft of this section had step 4
-feed a failed draft back to the model to be rewritten, up to twice, before giving up.
-It is not built, and the reason is worth more than the feature: `validateDraft` answers
-the only question that matters — may this reply name this order — deterministically and
-for free. A model asked to rewrite is being asked to argue with a rule that has already
-decided, and the calls it spends buy nothing a human reading the case would not do
-better. It also broke the budget: two rewrites plus a verification is five calls for the
-message least likely to be safe.
+**Two things the model was asked to do, and no longer is.** Both were removed for the
+same reason, and it is the most useful thing this section records.
 
-**Cost.** 0 model calls when the records decide, 1 at the classification gate, 2 when the
-draft fails the permitted-order check, 3 for a reply that reaches a customer. Against the
-baseline's flat 1, the ratio is at most 3:1 and the average is lower —
-[`dev/contracts/FEATURE-PARITY.md`](contracts/FEATURE-PARITY.md) rule 6 states both.
+- _The rewrite loop._ An earlier draft of §9 had a failed draft fed back to be rewritten,
+  up to twice. Never built: `validateDraft` answers the only question that matters — may
+  this reply name this order — deterministically and for free, and a model asked to
+  rewrite is being asked to argue with a rule that has already decided.
+- _The second opinion._ This one **was** built, measured, and taken out. A third call
+  asked the model whether its own draft was sound. It refused four legitimate replies
+  (`norm-03`, `norm-07`, `norm-08`, `norm-10`) and rescued none, so every case it changed
+  it changed for the worse; removing it took routing from 23 / 28 to **27 / 28**, took
+  unnecessary holds from 4 to **0**, and took the cost from 1.29 calls a case to 1.00.
+
+The shape both share: a model asked to check work that a record already settles adds
+doubt, not judgement. The deterministic check is not a cheaper version of the second
+opinion — it is a better one, because it is answering from the records instead of from
+the text.
+
+**Cost.** 0 model calls when the records decide, 1 at the classification gate, 2 for a
+reply that reaches a customer. The ceiling is 2:1 against the baseline's flat 1 and the
+**measured average is 1:1** — 28 calls over the 28 cases, the same total the baseline
+spends. [`dev/contracts/FEATURE-PARITY.md`](contracts/FEATURE-PARITY.md) rule 6 states
+both halves.
 
 ## 10. How it is measured
 
@@ -263,7 +271,7 @@ of the queue rather than its length.
 | Missed holds (auto-sent, should not be) | 16            | 1             | −15            |
 | Human minutes spent (overload, of 660)  | 150           | 660           | +510           |
 | Cost per case (model calls)             | 1.00          | 1.29          | +29%           |
-| Reply quality (out of 5, by hand)       | pending       | pending       | pending        |
+| Reply quality (out of 5, by hand)       | 4             | 4             | unchanged      |
 
 The two coverage cells come from `yarn sim normal-day --replay` and
 `yarn sim overload --replay`; the runs behind them are committed as
@@ -289,16 +297,15 @@ the 19 messages the operator had to see, against the baseline's 4. Under `overlo
 same design reaches 24 of 42 rather than 9 — and the reason it is 57% and not 95% is the
 one the paragraph above predicted. The baseline's desk was _bypassed_: it held 15 of 90
 arrivals and she opened every one of them with most of her day unspent. The advanced line
-holds 78, and 68 of those 90 arrivals genuinely had to be held — the inbox is hostile, not
-the line timid. But 68 correct holds against a 42-case day is a queue that cannot empty,
-so 12 cases were still waiting when the run ended and the ordering decided everything.
-The failure moved: from a desk nobody reached to a desk that cannot be emptied.
+holds 65 — every one of which genuinely had to be held, with no false positives left in
+the queue at all. But 65 correct holds against a 42-case day is a queue the ordering
+decides, and eighteen critical arrivals were opened after their four-hour window had
+closed. The failure moved: from a desk nobody reached to a desk that cannot be emptied
+inside a day.
 
-Its remaining errors are small and named. One message is auto-sent that should not be —
-`amb-02`, where the classification came back ordinary and the draft it then wrote offered
-a full refund in as many words. Four are held that could have been answered
-(`norm-03`, `norm-07`, `norm-08`, `norm-10`), which costs the operator ten minutes each
-and costs the customer nothing.
+One error is left, and it is a single case. `amb-02` is auto-sent when it should not be:
+the classification came back as an ordinary order issue, and the draft the next call then
+wrote offered a full refund in as many words.
 
 **Two things were tried against this run and only one kept.** Both were measured on
 `--replay`, so neither cost a model call.
@@ -309,12 +316,15 @@ and costs the customer nothing.
 | The same refusal reported as `low_confidence`                                         | 24 / 42 (57%)     | **yes**        |
 | `instruction_in_message` dropped below `sensitive_category` and `unknown_sender` (65) | 22 / 42 (52%)     | no             |
 
-The first is a correctness fix that happened to pay: the deterministic permitted-order
-check had already passed, so a model's refusal after it is doubt about a draft, not a
-policy breach, and reporting it as one put thank-you notes at priority 90 — ahead of every
-refund demand in the queue. The second was a deliberate attempt to read a blocked attack
-later than a waiting customer, and the measurement refused it: 17 of the 27 injection
-arrivals are critical, and pushing them back loses more than the reordering wins.
+The first two are one story told twice. Reporting a refused second opinion as a policy
+breach put thank-you notes at priority 90, ahead of every refund demand in the queue;
+calling it doubt instead was worth nine points. Then the call itself was removed and the
+same nine points arrived with four false positives and a third of the cost removed too —
+which says the reason code was never the real defect, the call was.
+
+The last one was a deliberate attempt to read a blocked attack later than a waiting
+customer, and the measurement refused it: 17 of the 27 injection arrivals are themselves
+critical, so pushing them back loses more than the reordering wins.
 
 **Two earlier numbers were published and both were wrong.** They are recorded here rather
 than quietly replaced, because a measurement nobody can audit is not a measurement.

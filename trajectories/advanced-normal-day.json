@@ -1,7 +1,7 @@
 {
   "schema": "support-triage/sim-run@1",
   "provenance": {
-    "commit": "444041f",
+    "commit": "7677249",
     "llmLabel": "replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json",
     "params": {
       "model": "claude-sonnet-5",
@@ -31,12 +31,12 @@
         "waitedWorkingMinutes": null
       }
     ],
-    "queued": 39,
-    "opened": 39,
+    "queued": 32,
+    "opened": 32,
     "stillQueued": 0,
-    "averageWaitMinutes": 21,
-    "interimSent": 12,
-    "llmCalls": 58
+    "averageWaitMinutes": 11,
+    "interimSent": 6,
+    "llmCalls": 45
   },
   "timeline": {
     "pipeline": "advanced",
@@ -77,7 +77,7 @@
           "priority": 10,
           "draft": "Hi, thanks for reaching out! Let me look into order ORD-1043 for you to confirm the delivery address. Could you please share the name and/or email used on the order (if different from this account) so I can locate it quickly? In the meantime, if you have a confirmation email from checkout, it should also list the shipping address selected — feel free to check there as well. I'll get back to you shortly with the confirmed details.",
           "requiresApproval": false,
-          "llmCalls": 3
+          "llmCalls": 2
         },
         "openedAt": null,
         "waitedWorkingMinutes": null,
@@ -129,16 +129,16 @@
         "arrivedAt": "2026-09-07T08:05:00+03:00",
         "decision": {
           "messageId": "M-0004",
-          "route": "human_review",
-          "reason": "low_confidence",
-          "priority": 50,
+          "route": "auto_send",
+          "reason": "routine_reply",
+          "priority": 10,
           "draft": "Hello! Yes, we do ship to İzmir 😊 We deliver to all locations across Turkey without any issues. If you have any other questions before placing your order, feel free to ask - happy to help!",
-          "requiresApproval": true,
-          "llmCalls": 3
+          "requiresApproval": false,
+          "llmCalls": 2
         },
-        "openedAt": "2026-09-07T07:30:00.000Z",
-        "waitedWorkingMinutes": 90,
-        "interimAt": "2026-09-07T05:35:00.000Z"
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
+        "interimAt": null
       },
       {
         "messageId": "M-0005",
@@ -172,7 +172,7 @@
           "priority": 10,
           "draft": "Merhaba, ORD-1081 siparişinizde yanlış renk ürün gönderildiği için üzgünüz. Size doğru rengi ücretsiz olarak gönderebiliriz veya tam iade yapabiliriz, hangisini tercih edersiniz? Ayrıca faturanızı da düzeltip güncel halini tarafınıza ileteceğiz. Yanlış gelen ürünü nasıl iade edebileceğinize dair kargo bilgilerini de en kısa sürede paylaşacağız. Yaşanan aksaklık için tekrar özür dileriz.",
           "requiresApproval": false,
-          "llmCalls": 3
+          "llmCalls": 2
         },
         "openedAt": null,
         "waitedWorkingMinutes": null,
@@ -300,16 +300,16 @@
         "arrivedAt": "2026-09-07T10:11:00+03:00",
         "decision": {
           "messageId": "M-0013",
-          "route": "human_review",
-          "reason": "low_confidence",
-          "priority": 50,
+          "route": "auto_send",
+          "reason": "routine_reply",
+          "priority": 10,
           "draft": "Hello! Yes, we do ship to İzmir 😊 We deliver to all locations across Turkey without any issues. If you have any other questions before placing your order, feel free to ask - happy to help!",
-          "requiresApproval": true,
-          "llmCalls": 3
+          "requiresApproval": false,
+          "llmCalls": 2
         },
-        "openedAt": "2026-09-07T11:20:00.000Z",
-        "waitedWorkingMinutes": 189,
-        "interimAt": "2026-09-07T07:41:00.000Z"
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
+        "interimAt": null
       },
       {
         "messageId": "M-0014",
@@ -324,7 +324,7 @@
           "priority": 10,
           "draft": "Merhaba, yaşadığınız aksaklık için özür dileriz. ORD-1046 numaralı siparişinizin kargo takip bilgisini kontrol edip en kısa sürede güncel konumunu sizinle paylaşacağız. Kargo takip numarasının çalışmamasıyla ilgili de ayrıca ilgileneceğiz. Kısa bir süre sabrınızı rica ederiz.",
           "requiresApproval": false,
-          "llmCalls": 3
+          "llmCalls": 2
         },
         "openedAt": null,
         "waitedWorkingMinutes": null,
@@ -345,8 +345,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T07:40:00.000Z",
-        "waitedWorkingMinutes": 5,
+        "openedAt": "2026-09-07T07:35:00.000Z",
+        "waitedWorkingMinutes": 0,
         "interimAt": null
       },
       {
@@ -364,8 +364,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:50:00.000Z",
-        "waitedWorkingMinutes": 2,
+        "openedAt": "2026-09-07T07:48:00.000Z",
+        "waitedWorkingMinutes": 0,
         "interimAt": null
       },
       {
@@ -490,16 +490,16 @@
         "arrivedAt": "2026-09-07T12:04:00+03:00",
         "decision": {
           "messageId": "M-0023",
-          "route": "human_review",
-          "reason": "low_confidence",
-          "priority": 50,
+          "route": "auto_send",
+          "reason": "routine_reply",
+          "priority": 10,
           "draft": "Rica ederim! Ürünün sağlam ulaşması en önemlisi, bunu duyduğuma sevindim. Kutudaki ezilme için yine de kargo ekibine geri bildirimde bulunacağız. Başka bir konuda yardımcı olabileceğim bir şey olursa lütfen bildirin. İyi günler dileriz!",
-          "requiresApproval": true,
-          "llmCalls": 3
+          "requiresApproval": false,
+          "llmCalls": 2
         },
-        "openedAt": "2026-09-07T11:30:00.000Z",
-        "waitedWorkingMinutes": 90,
-        "interimAt": "2026-09-07T09:34:00.000Z"
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
+        "interimAt": null
       },
       {
         "messageId": "M-0024",
@@ -623,16 +623,16 @@
         "arrivedAt": "2026-09-07T13:22:00+03:00",
         "decision": {
           "messageId": "M-0030",
-          "route": "human_review",
-          "reason": "low_confidence",
-          "priority": 50,
+          "route": "auto_send",
+          "reason": "routine_reply",
+          "priority": 10,
           "draft": "Rica ederim! Ürünün sağlam ulaşması en önemlisi, bunu duyduğuma sevindim. Kutudaki ezilme için yine de kargo ekibine geri bildirimde bulunacağız. Başka bir konuda yardımcı olabileceğim bir şey olursa lütfen bildirin. İyi günler dileriz!",
-          "requiresApproval": true,
-          "llmCalls": 3
+          "requiresApproval": false,
+          "llmCalls": 2
         },
-        "openedAt": "2026-09-07T11:40:00.000Z",
-        "waitedWorkingMinutes": 78,
-        "interimAt": "2026-09-07T10:52:00.000Z"
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
+        "interimAt": null
       },
       {
         "messageId": "M-0031",
@@ -685,7 +685,7 @@
           "priority": 10,
           "draft": "Merhaba, ilginiz için teşekkür ederiz! ORD-1042 numaralı siparişinizin kargo durumunu kontrol ediyoruz, en kısa sürede size dönüş yapacağız. Genellikle siparişler onaylandıktan sonra 1-3 iş günü içinde kargoya verilmektedir. Kargoya verildiğinde takip numarasıyla birlikte size bilgi ulaştırılacaktır. Sabrınız için teşekkür ederiz, başka bir sorunuz olursa buradayız.",
           "requiresApproval": false,
-          "llmCalls": 3
+          "llmCalls": 2
         },
         "openedAt": null,
         "waitedWorkingMinutes": null,
@@ -704,7 +704,7 @@
           "priority": 10,
           "draft": "Merhaba, ilginiz için teşekkür ederiz! ORD-1042 numaralı siparişinizin kargo durumunu kontrol ediyoruz, en kısa sürede size dönüş yapacağız. Genellikle siparişler onaylandıktan sonra 1-3 iş günü içinde kargoya verilmektedir. Kargoya verildiğinde takip numarasıyla birlikte size bilgi ulaştırılacaktır. Sabrınız için teşekkür ederiz, başka bir sorunuz olursa buradayız.",
           "requiresApproval": false,
-          "llmCalls": 3
+          "llmCalls": 2
         },
         "openedAt": null,
         "waitedWorkingMinutes": null,
@@ -851,15 +851,15 @@
         "arrivedAt": "2026-09-07T16:55:00+03:00",
         "decision": {
           "messageId": "M-0042",
-          "route": "human_review",
-          "reason": "low_confidence",
-          "priority": 50,
+          "route": "auto_send",
+          "reason": "routine_reply",
+          "priority": 10,
           "draft": "Merhaba,\n\nBildiriminiz için teşekkür ederiz. ORD-1050 numaralı siparişinizdeki cihazın kullanım kılavuzunu PDF olarak en kısa sürede tarafınıza e-posta yoluyla ileteceğiz.\n\nBaşka bir konuda yardımcı olabileceğimiz bir şey olursa lütfen bize bildirin.\n\nİyi günler dileriz.",
-          "requiresApproval": true,
-          "llmCalls": 3
+          "requiresApproval": false,
+          "llmCalls": 2
         },
-        "openedAt": "2026-09-07T13:55:00.000Z",
-        "waitedWorkingMinutes": 0,
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
         "interimAt": null
       },
       {
@@ -870,16 +870,16 @@
         "arrivedAt": "2026-09-07T17:16:00+03:00",
         "decision": {
           "messageId": "M-0043",
-          "route": "human_review",
-          "reason": "low_confidence",
-          "priority": 50,
+          "route": "auto_send",
+          "reason": "routine_reply",
+          "priority": 10,
           "draft": "Rica ederim, geri bildiriminiz için teşekkür ederiz! ORD-1048 siparişinizin eksiksiz ve zamanında ulaşmasına sevindik. Faturanızın da e-posta ile ulaştığını duyduğumuza sevindik. Başka bir konuda yardımcı olabileceğimiz bir şey olursa, lütfen bize bildirmekten çekinmeyin. İyi günler dileriz!",
-          "requiresApproval": true,
-          "llmCalls": 3
+          "requiresApproval": false,
+          "llmCalls": 2
         },
-        "openedAt": "2026-09-08T06:05:00.000Z",
-        "waitedWorkingMinutes": 5,
-        "interimAt": "2026-09-07T14:46:00.000Z"
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
+        "interimAt": null
       },
       {
         "messageId": "M-0044",
@@ -894,7 +894,7 @@
           "priority": 10,
           "draft": "Hi, thanks for reaching out! Let me look into order ORD-1043 for you to confirm the delivery address. Could you please share the name and/or email used on the order (if different from this account) so I can locate it quickly? In the meantime, if you have a confirmation email from checkout, it should also list the shipping address selected — feel free to check there as well. I'll get back to you shortly with the confirmed details.",
           "requiresApproval": false,
-          "llmCalls": 3
+          "llmCalls": 2
         },
         "openedAt": null,
         "waitedWorkingMinutes": null,
@@ -908,16 +908,16 @@
         "arrivedAt": "2026-09-07T17:51:00+03:00",
         "decision": {
           "messageId": "M-0045",
-          "route": "human_review",
-          "reason": "low_confidence",
-          "priority": 50,
+          "route": "auto_send",
+          "reason": "routine_reply",
+          "priority": 10,
           "draft": "Rica ederim, geri bildiriminiz için teşekkür ederiz! ORD-1048 siparişinizin eksiksiz ve zamanında ulaşmasına sevindik. Faturanızın da e-posta ile ulaştığını duyduğumuza sevindik. Başka bir konuda yardımcı olabileceğimiz bir şey olursa, lütfen bize bildirmekten çekinmeyin. İyi günler dileriz!",
-          "requiresApproval": true,
-          "llmCalls": 3
+          "requiresApproval": false,
+          "llmCalls": 2
         },
-        "openedAt": "2026-09-08T06:15:00.000Z",
-        "waitedWorkingMinutes": 15,
-        "interimAt": "2026-09-07T15:21:00.000Z"
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
+        "interimAt": null
       }
     ],
     "startedAt": "2026-09-07T06:00:00.000Z",

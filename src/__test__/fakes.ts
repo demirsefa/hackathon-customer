@@ -26,9 +26,9 @@ export const stripColour = (text: string): string =>
     .map((part, index) => (index === 0 ? part : part.slice(part.indexOf('m') + 1)))
     .join('');
 
-export type TaskName = 'triage' | 'classify' | 'draft' | 'verify';
+export type TaskName = 'triage' | 'classify' | 'draft';
 
-const TASKS: readonly TaskName[] = ['triage', 'classify', 'draft', 'verify'];
+const TASKS: readonly TaskName[] = ['triage', 'classify', 'draft'];
 
 function readTask(prompt: string): TaskName {
   const [header] = prompt.split('\n');
@@ -114,6 +114,5 @@ export function agreeingScript(input: {
     triage: JSON.stringify({ category, urgency, draft }),
     classify: JSON.stringify({ category, confidence, instruction, needsRecord }),
     draft: JSON.stringify({ draft }),
-    verify: JSON.stringify({ ok: true, confidence }),
   };
 }

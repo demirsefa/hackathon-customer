@@ -21,13 +21,16 @@
  * reply anyway.
  *
  * **Nothing is sent that the record layer did not permit.** The draft is checked
- * against the orders this sender was shown to own before the model is asked what it
- * thinks of its own work, so a reply that names someone else's order is stopped by a
- * rule rather than by a second opinion.
+ * against the orders this sender was shown to own — by a rule, deterministically, and
+ * there is no model opinion behind it to argue with. A second opinion was tried here
+ * and removed: over the committed set it was asked eight times, refused four, and all
+ * four were replies that should have gone out. A model reviewing its own draft is not
+ * independent evidence, and the one question with a right answer had already been
+ * answered. The run that measured it is in the README's Improvement Changelog.
  *
- * Cost: 0 model calls when the records answer, 1 when the classification does, 2 when
- * the draft fails the permitted-order check, 3 for a message that reaches a customer.
- * dev/contracts/FEATURE-PARITY.md rule 6 states that budget against the baseline's one.
+ * Cost: 0 model calls when the records answer, 1 when the classification does, 2 for a
+ * message that reaches a customer — the same one-call-per-decision average the baseline
+ * spends, which is what dev/contracts/FEATURE-PARITY.md rule 6 asks to be stated.
  *
  * On priority: every hold here takes the reason's own score rather than passing one of
  * its own, because each reason is a fact this line established. The baseline has only
@@ -40,7 +43,6 @@ import type { Pipeline } from '../pipeline.ts';
 import { CONFIDENCE_THRESHOLD, isSensitive, validateDraft } from '../policy.ts';
 import { buildClassifyPrompt, parseClassifyOutput } from './classify.ts';
 import { buildDraftPrompt, parseDraftOutput } from './draft.ts';
-import { buildVerifyPrompt, parseVerifyOutput } from './verify.ts';
 
 export const advanced: Pipeline = {
   name: 'advanced',
@@ -127,33 +129,6 @@ export const advanced: Pipeline = {
       });
     }
 
-    // 6. The second opinion, on the draft alone. It can only hold the message back;
-    //    there is no path where it releases one the checks above stopped.
-    const verification = await llm.complete({ prompt: buildVerifyPrompt(draft) });
-
-    const verified = parseVerifyOutput(verification.text);
-    if (verified === null) {
-      return humanReview({
-        messageId,
-        reason: 'model_output_unusable',
-        draft,
-        llmCalls: 3,
-      });
-    }
-
-    // A refusal here is doubt, not a breach. The rule that could be broken was checked
-    // above, deterministically, and it passed — so calling this a policy violation puts
-    // a second opinion at the priority of an established fact and sends the operator to
-    // a thank-you note before a refund demand. It is the same answer the threshold below
-    // gives, and it is read in the same place in her morning.
-    if (!verified.ok) {
-      return humanReview({ messageId, reason: 'low_confidence', draft, llmCalls: 3 });
-    }
-
-    if (verified.confidence < CONFIDENCE_THRESHOLD) {
-      return humanReview({ messageId, reason: 'low_confidence', draft, llmCalls: 3 });
-    }
-
-    return autoSend({ messageId, draft, llmCalls: 3 });
+    return autoSend({ messageId, draft, llmCalls: 2 });
   },
 };

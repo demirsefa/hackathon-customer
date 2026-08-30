@@ -135,7 +135,7 @@ describe('advanced · the gate after classification', () => {
     });
 
     expect(decision.route).toBe('auto_send');
-    expect(decision.llmCalls).toBe(3);
+    expect(decision.llmCalls).toBe(2);
   });
 
   it('holds a category the desk never answers unread', async () => {
@@ -197,31 +197,28 @@ describe('advanced · the draft, and what may be said in it', () => {
   });
 
   /**
-   * A refusal here is doubt, not a breach, and the difference is load-bearing rather
-   * than pedantic: the rule that could have been broken was checked one step earlier
-   * and passed. Reported as a policy violation it carried priority 90, which put
-   * thank-you notes ahead of every refund demand in the operator's queue and cost the
-   * overload run nine points of coverage.
+   * There is no second opinion, and the absence is the design. A model asked what it
+   * thinks of its own draft is being asked to re-decide a question `validateDraft` has
+   * already answered against the records, for free and without an opinion in it.
    */
-  it('reads a refused second opinion as doubt, not as a breach', async () => {
-    const { decision } = await run({
-      text: 'Where is ORD-2002?',
-      script: { ...routine, verify: JSON.stringify({ ok: false, confidence: 0.9 }) },
-    });
+  it('asks for no second opinion once the draft passes the record check', async () => {
+    const { llm } = await run({ text: 'Where is ORD-2002?', script: routine });
 
-    expect(decision.reason).toBe('low_confidence');
-    expect(decision.llmCalls).toBe(3);
+    expect(llm.calls).toBe(2);
+    for (const prompt of llm.prompts) {
+      expect(prompt).not.toContain('TASK: verify');
+    }
   });
 
-  it('auto-sends a clean case on three calls', async () => {
+  it('auto-sends a clean case on two calls', async () => {
     const { decision, llm } = await run({ text: 'Where is ORD-2002?', script: routine });
 
     expect(decision.route).toBe('auto_send');
     expect(decision.reason).toBe('routine_reply');
     expect(decision.requiresApproval).toBe(false);
     expect(decision.draft).toBe('ORD-2002 leaves the warehouse today.');
-    expect(decision.llmCalls).toBe(3);
-    expect(llm.calls).toBe(3);
+    expect(decision.llmCalls).toBe(2);
+    expect(llm.calls).toBe(2);
   });
 
   it('keeps the envelope and the record layer out of every prompt', async () => {
