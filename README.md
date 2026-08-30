@@ -212,8 +212,8 @@ said there was nothing to refund. That check does not exist.
 
 **And the desk that used to be bypassed can now no longer be emptied in a day.** Under
 overload the line holds 65 of 90 arrivals and every one of them belongs in the queue -
-against a day that fits 42. The average wait is 257 working minutes and eleven critical
-arrivals were opened after their four-hour window had already closed. Coverage is 67% and
+against a day that fits 42. The average wait is 257 working minutes and nine critical
+arrivals were opened after their four-hour window had already closed. Coverage is 71% and
 not 95% for that reason alone: on a normal day, where the volume fits, the same design
 reaches 18 of 19.
 
