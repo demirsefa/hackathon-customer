@@ -46,8 +46,8 @@ yarn eval --replay
 
 `yarn eval --replay` scores the 28 evaluation cases against the model responses
 recorded in `fixtures/llm-cache.json`. It opens no connection, needs no API key and
-costs nothing, which is why it is the form quoted everywhere here. Around 20 seconds
-for the install and 3 for the run.
+costs nothing, which is why it is the form quoted everywhere here. Around three seconds
+for the install and under one for the run.
 
 | Command                        | What it does                                       | Needs a key |
 | ------------------------------ | -------------------------------------------------- | ----------- |
@@ -233,9 +233,23 @@ Each writes a machine-readable record and a rendering of it into `trajectories/`
 overwritten in place, so `git diff` after a run shows exactly what changed and what did
 not. Re-running changes one row - the commit the run was made at.
 
-To reproduce the recordings themselves rather than replay them, put an API key in the
-environment file and use `--live`. It is the same run against the real model and it costs
-money; nothing in this guide needs it.
+Runtime, measured on an Apple M1 Max: `yarn install` takes about three seconds - it
+fetches 145 MB into an empty Yarn cache, so a slow connection is the only thing that
+makes it longer - and each of the three runs above finishes in under a second. There is
+no build step; Node runs the TypeScript sources directly.
+
+Cost: nothing. The replay path makes no network call and reads no API key, because every
+model response these runs need is committed in `fixtures/llm-cache.json`. A machine with
+no key and no connection reproduces the numbers above in full.
+
+`--live` is the only path that spends anything. To reproduce the recordings themselves
+rather than replay them, put an API key in the environment file and use it: it is the
+same run against the real model. `yarn eval --live` is 28 model calls, one for each
+evaluation case, and a `--live` scenario is 90, one for each arrival. They go to
+`claude-sonnet-5` with `maxTokens` 16000 - the parameters are pinned in
+[`src/llm/key.ts`](src/llm/key.ts) so that a recording is reproducible - and the prompts
+and replies in the committed cache run a few hundred tokens each, which puts a full live
+run in cents rather than dollars. Nothing in this guide needs it.
 
 ## Video
 
