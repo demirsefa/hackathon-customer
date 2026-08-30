@@ -266,17 +266,18 @@ of the queue rather than its length.
 | --------------------------------------- | ------------- | ------------- | -------------- |
 | **Critical coverage (normal day)**      | 4 / 19 (21%)  | 18 / 19 (95%) | **+74 points** |
 | **Critical coverage (overload)**        | 9 / 42 (21%)  | 24 / 42 (57%) | **+36 points** |
-| Routing accuracy (28 cases)             | 12 / 28 (43%) | 23 / 28 (82%) | +39 points     |
-| False positives (legitimate held)       | 0             | 4             | +4             |
+| Routing accuracy (28 cases)             | 12 / 28 (43%) | 27 / 28 (96%) | +53 points     |
+| False positives (legitimate held)       | 0             | 0             | unchanged      |
 | Missed holds (auto-sent, should not be) | 16            | 1             | −15            |
-| Human minutes spent (overload, of 660)  | 150           | 660           | +510           |
-| Cost per case (model calls)             | 1.00          | 1.29          | +29%           |
+| Human minutes spent (overload, of 659)  | 150           | 650           | +500           |
+| Cost per case (model calls)             | 1.00          | 1.00          | **unchanged**  |
 | Reply quality (out of 5, by hand)       | 4             | 4             | unchanged      |
 
-The two coverage cells come from `yarn sim normal-day --replay` and
-`yarn sim overload --replay`; the runs behind them are committed as
-`trajectories/baseline-normal-day.json` and `trajectories/baseline-overload.json`, with
-a rendering of each beside it. The false-positive cell is the `unnecessary holds` line
+The two coverage rows come from `yarn sim normal-day --replay` and
+`yarn sim overload --replay`, each of which plays both lines in one run; the four records
+behind them are committed as `trajectories/{baseline,advanced}-{normal-day,overload}.json`,
+with a rendering of each beside it. The routing, missed-hold, false-positive and
+cost rows come from `yarn eval --replay` and `trajectories/{baseline,advanced}.json`. The false-positive cell is the `unnecessary holds` line
 of `yarn eval --replay`. Every figure is a field in one of those files:
 
 ```bash
@@ -307,17 +308,19 @@ One error is left, and it is a single case. `amb-02` is auto-sent when it should
 the classification came back as an ordinary order issue, and the draft the next call then
 wrote offered a full refund in as many words.
 
-**Two things were tried against this run and only one kept.** Both were measured on
-`--replay`, so neither cost a model call.
+**Three things were tried against this run and one was kept.** All were measured on
+`--replay`, so none of them cost a model call.
 
-| Tried                                                                                 | Overload coverage | Kept           |
-| ------------------------------------------------------------------------------------- | ----------------- | -------------- |
-| A refused second opinion reported as `draft_policy_violation`                         | 20 / 42 (48%)     | no — see below |
-| The same refusal reported as `low_confidence`                                         | 24 / 42 (57%)     | **yes**        |
-| `instruction_in_message` dropped below `sensitive_category` and `unknown_sender` (65) | 22 / 42 (52%)     | no             |
+| Tried                                                                                 | Overload coverage | Kept                              |
+| ------------------------------------------------------------------------------------- | ----------------- | --------------------------------- |
+| A refused second opinion reported as `draft_policy_violation`                         | 20 / 42 (48%)     | no — the reason overstated itself |
+| The same refusal reported as `low_confidence`                                         | 24 / 42 (57%)     | superseded by the row below       |
+| Dropping the second opinion call entirely                                             | 24 / 42 (57%)     | **yes** — see §9                  |
+| `instruction_in_message` dropped below `sensitive_category` and `unknown_sender` (65) | 22 / 42 (52%)     | no                                |
 
-The first two are one story told twice. Reporting a refused second opinion as a policy
-breach put thank-you notes at priority 90, ahead of every refund demand in the queue;
+The first two are one story told twice, and the third ended it. Reporting a refused
+second opinion as a policy breach put thank-you notes at priority 90, ahead of every
+refund demand in the queue;
 calling it doubt instead was worth nine points. Then the call itself was removed and the
 same nine points arrived with four false positives and a third of the cost removed too —
 which says the reason code was never the real defect, the call was.
