@@ -29,6 +29,7 @@ import {
 import { sortedQueue } from '../core/queue.ts';
 import type { PlayedArrival, Timeline } from './play.ts';
 import { dayClock, localClock } from './report.ts';
+import { reachedInTime } from './score.ts';
 
 const MS_PER_MINUTE = 60_000;
 
@@ -237,6 +238,59 @@ export function operatorLog(timeline: Timeline, paint: Paint = PLAIN): readonly 
   const autoSent = played.filter((arrival) => arrival.decision.route === 'auto_send');
   const first = interim[0];
 
+  // The metric, in the same predicate `score.ts` scores with rather than a second copy
+  // of it, so this block and the one printed under it can never quote different numbers.
+  const reachedCritical = critical.filter((arrival) =>
+    reachedInTime(arrival, windowMinutes),
+  );
+  const missedCritical = critical.filter(
+    (arrival) => !reachedInTime(arrival, windowMinutes),
+  );
+  const autoSentCritical = missedCritical.filter(
+    (arrival) => arrival.decision.route === 'auto_send',
+  );
+
+  const coveragePercent =
+    critical.length === 0
+      ? ''
+      : ` — ${String(Math.round((reachedCritical.length / critical.length) * 100))}%`;
+
+  /**
+   * Her time, spent against available. `opened * minutesPerCase` is exactly the operator
+   * model: she takes what is on top and spends the same ten minutes on it, so what she
+   * opened is what she cost.
+   */
+  const spentMinutes = opened.length * operator.minutesPerCase;
+  const availableMinutes = workingMinutesBetween(
+    operator,
+    new Date(timeline.startedAt),
+    new Date(timeline.horizonAt),
+  );
+
+  /**
+   * Where the misses went, and the sentence changes with the answer. All of them
+   * auto-sent is the baseline's failure and the worst of the three, because no ordering
+   * can reach a reply that is already with the customer; a mix is a queue that was also
+   * too slow, and neither is worth saying in the other's words.
+   */
+  const missedLine = ((): string => {
+    const other = `The other ${String(missedCritical.length)}`;
+    const bypassed =
+      'the line answered them automatically and she was never shown that they existed';
+
+    if (autoSentCritical.length === 0) return `${other} did not reach her in time.`;
+    if (autoSentCritical.length === missedCritical.length) {
+      return `${other} never reached her at all: ${bypassed}.`;
+    }
+    return `${other} did not reach her in time, and ${String(autoSentCritical.length)} of those never reached her at all: ${bypassed}.`;
+  })();
+
+  /** Said only when it is true: an idle desk and unread critical mail at the same time. */
+  const idleContrast =
+    spentMinutes * 2 < availableMinutes && autoSentCritical.length > 0
+      ? `. The queue was empty for most of the rest — the desk was not overwhelmed, it was bypassed.`
+      : '.';
+
   return [
     paint.dim(`${operator.id} — ${timeline.pipeline} · ${timeline.scenario}`),
     '',
@@ -286,14 +340,25 @@ export function operatorLog(timeline: Timeline, paint: Paint = PLAIN): readonly 
     '',
     paint.dim('  3 · WHAT IT ADDED UP TO'),
     '',
-    `     ${String(autoSent.length)} message(s) never reached her — the line answered them itself, ${String(autoSent.filter((arrival) => arrival.critical).length)} of them critical.`,
+    // The headline first, and in the same words the metric block below uses. It was
+    // once left for the reader to subtract out of the three numbers underneath, which
+    // meant the one figure the run exists to produce was the one it never said.
+    `     ${String(critical.length)} of the ${String(played.length)} arrivals were the ones she genuinely had to see.`,
+    `     She reached ${String(reachedCritical.length)} of them in time${coveragePercent}. That is the number this run produces.`,
+    '',
+    ...(missedCritical.length === 0 ? [] : [`     ${missedLine}`]),
+    `     ${String(autoSent.length)} of the ${String(played.length)} arrivals were answered without her.`,
     stillQueued.length === 0
       ? '     Nothing was left in the queue when the run ended.'
       : `     ${String(stillQueued.length)} still in the queue when the run ended: ${ids(stillQueued.map((arrival) => arrival.messageId))}.`,
+    '',
+    // The line that says which kind of failure this was. A desk that missed things
+    // because it could not keep up needs a faster desk; one that missed them while
+    // sitting idle needs a different line, and the two are told apart here or nowhere.
+    `     She spent ${String(spentMinutes)} of the ${String(availableMinutes)} working minutes the run gave her${idleContrast}`,
     interim.length === 0 || first === undefined
       ? '     No interim message went out.'
       : `     ${String(interim.length)} interim message(s) went out; the first to ${first.messageId} at ${localClock(first.interimAt ?? '', zone)}.`,
-    `     ${String(critical.length)} of the ${String(played.length)} arrivals were the ones she genuinely had to see.`,
     '',
   ];
 }

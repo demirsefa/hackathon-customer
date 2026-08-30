@@ -54,12 +54,19 @@ export interface Coverage {
   readonly llmCalls: number;
 }
 
-const reached = (arrival: PlayedArrival, windowMinutes: number): boolean =>
+/**
+ * Whether the operator opened this arrival inside its window.
+ *
+ * Exported because `log.ts` states the same number in words and must not carry its own
+ * copy of the predicate: a headline that disagrees with the metric block underneath it
+ * is worse than a headline that is missing.
+ */
+export const reachedInTime = (arrival: PlayedArrival, windowMinutes: number): boolean =>
   arrival.waitedWorkingMinutes !== null && arrival.waitedWorkingMinutes <= windowMinutes;
 
 function missReason(arrival: PlayedArrival, windowMinutes: number): MissReason {
   if (arrival.decision.route === 'auto_send') return 'auto_sent';
-  return reached(arrival, windowMinutes) || arrival.openedAt === null
+  return reachedInTime(arrival, windowMinutes) || arrival.openedAt === null
     ? 'not_reached'
     : 'opened_late';
 }
@@ -79,9 +86,10 @@ export function scoreTimeline(timeline: Timeline): Coverage {
     arrivals: played.length,
     windowMinutes,
     critical: critical.length,
-    criticalReached: critical.filter((arrival) => reached(arrival, windowMinutes)).length,
+    criticalReached: critical.filter((arrival) => reachedInTime(arrival, windowMinutes))
+      .length,
     missed: critical
-      .filter((arrival) => !reached(arrival, windowMinutes))
+      .filter((arrival) => !reachedInTime(arrival, windowMinutes))
       .map((arrival) => ({
         messageId: arrival.messageId,
         caseId: arrival.caseId,

@@ -200,13 +200,38 @@ describe('operatorLog', () => {
   });
 
   it('closes with what it added up to, in sentences', () => {
-    expect(text).toContain(
-      '2 message(s) never reached her — the line answered them itself, 1 of them critical.',
-    );
+    expect(text).toContain('4 of the 6 arrivals were the ones she genuinely had to see.');
+    expect(text).toContain('2 of the 6 arrivals were answered without her.');
     expect(text).toContain('1 still in the queue when the run ended: M-4.');
     expect(text).toContain(
       '1 interim message(s) went out; the first to M-1 at Mon 02 Mar 09:00.',
     );
+  });
+
+  /**
+   * The figure the run exists to produce, in the block a person actually reads. It was
+   * once left implicit — three numbers a reader had to subtract from each other — and
+   * the metric block printed it only after the log had scrolled past.
+   */
+  it('states the coverage number itself, not the arithmetic that would give it', () => {
+    expect(text).toContain('She reached 1 of them in time — 25%.');
+  });
+
+  /** Two of the three misses were held and reached late; one was never held at all. */
+  it('separates a miss she could have reached from one she was never shown', () => {
+    expect(text).toContain(
+      'The other 3 did not reach her in time, and 1 of those never reached her at all',
+    );
+    expect(text).toContain('she was never shown that they existed');
+  });
+
+  /**
+   * An idle desk and unread critical mail at the same time is the baseline's whole
+   * failure, and a reader who cannot see it will read the misses as a capacity problem.
+   */
+  it('says what her time was spent on, so a bypassed desk is not read as a busy one', () => {
+    expect(text).toContain('She spent 30 of the 600 working minutes the run gave her.');
+    expect(text).toContain('the desk was not overwhelmed, it was bypassed');
   });
 
   it('scores nothing: a verdict on a decision is the evaluation run’s to give', () => {
