@@ -9,15 +9,49 @@ share in `src/core/policy.ts`, and every harness that scores them — `src/eval/
 
 ## The agreement
 
-1. `feat(baseline) === feat(advanced)`. Both declare `REQUIRED_FEATURES`, with no extras
-   and no gaps.
+1. `feat(baseline) === feat(advanced)`. Both **exhibit** every capability of
+   [`dev/CHALLENGE.md`](../CHALLENGE.md) §7, with no extras and no gaps.
 
-   A **feature** is a capability the operator gets — the seven of
-   [`dev/CHALLENGE.md`](../CHALLENGE.md) §7. A **mechanism** is how a line reaches one:
-   a record-backed authority gate, a classification pass held apart from the draft, a
-   draft policy check, a confidence threshold. Parity is owed on features and **never**
-   on mechanisms. Requiring a mechanism of every line makes the lines identical by
-   contract, and then the primary metric measures a missing `if` instead of a design.
+   A **feature** is a capability the operator gets. A **mechanism** is how a line
+   reaches one: a record-backed authority gate, a classification pass held apart from
+   the draft, a draft policy check, a confidence threshold. Parity is owed on features
+   and **never** on mechanisms. Requiring a mechanism of every line makes the lines
+   identical by contract, and then the primary metric measures a missing `if` instead
+   of a design.
+
+   **Exhibited, not declared.** Until 30 Aug 2026 this rule was checked by comparing two
+   lists of feature names the lines carried about themselves. That check passed whatever
+   both sides wrote in those lists: a capability neither line had was green as long as
+   both claimed it, and one of the seven — the interim message — was claimed by both
+   while living entirely in `src/core/policy.ts` and `src/sim/`, which is how it stayed
+   green. A list a line writes about itself is a claim, and two identical claims are not
+   evidence about either line. So each capability is pinned to something observable in
+   the decisions a line produces:
+
+   | Capability                      | Proven by                                                                    |
+   | ------------------------------- | ---------------------------------------------------------------------------- |
+   | `assigns-category`              | a witness whose category changes the reason the line comes back with         |
+   | `assigns-urgency`               | the risky hold outranking the routine reply — as an order, never as a number |
+   | `produces-draft`                | a routine witness returning a reply that is not empty                        |
+   | `risky-never-auto-sent`         | a sensitive category held, carrying its approval requirement                 |
+   | `queued-case-carries-reason`    | `decision.ts`: nothing is built except through `humanReview` / `autoSend`    |
+   | `reason-code-on-every-decision` | the same, plus the vocabulary check over all 28 cases on both lines          |
+
+   The four witness probes vary the **model's opinion** around one message from the
+   table and never the mechanism that consumes it, so what is asserted is what a line
+   does with an answer, not how it reached it — which keeps this rule clear of rule 1's
+   own prohibition.
+
+   `interim-message-on-threshold` is **not a line capability** and is no longer claimed
+   as one. It lives at the system boundary — `needsInterim` in `src/core/policy.ts`,
+   applied by `src/sim/play.ts` — and is enforced in
+   [`src/__test__/unit/policy.test.ts`](../../src/__test__/unit/policy.test.ts). §7 of
+   the brief is unchanged; what changed is this contract no longer attributing it to
+   code that never ran it.
+
+   What this rule still cannot do automatically: nothing forces a **new** capability,
+   invented on one line, to be given a probe here. An extra mechanism is free; an extra
+   feature is a parity break, and catching it is review work, not test work.
 
 2. Both produce the **same decision shape** for the same input: identical fields, same
    vocabulary of routes and reason codes.
@@ -28,12 +62,17 @@ share in `src/core/policy.ts`, and every harness that scores them — `src/eval/
    exists only inside one pipeline is a parity break even when its behaviour matches.
 6. Any difference in resources is **stated**, not hidden. The budgets, in full:
 
-   | Line       | Model calls per decision                                                                                                                                  |
-   | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | `baseline` | exactly 1                                                                                                                                                 |
-   | `advanced` | 0 when the record layer decides · 1 at the classification gate · 2 when the draft fails the permitted-order check · 3 for a reply that reaches a customer |
+   | Line       | Model calls per decision                                                                           |
+   | ---------- | -------------------------------------------------------------------------------------------------- |
+   | `baseline` | exactly 1                                                                                          |
+   | `advanced` | 0 when the record layer decides · 1 when the classification gate holds · 2 once a reply is written |
 
-   **The ratio is at most 3:1, and the average is lower than that** — every decision the
+   The `2` tier is every decision that reaches the drafting call, whether the reply goes
+   to the customer or the permitted-order check holds it. There is no third tier: the
+   second-opinion call that used to make one was removed, and `src/core/advanced/index.ts`
+   returns no `llmCalls` above 2.
+
+   **The ratio is at most 2:1, and the average is lower than that** — every decision the
    record gate makes costs nothing, and those are the cases the comparison turns on. Both
    halves have to be said: quoting the ceiling alone overstates what the line spends, and
    quoting the average alone hides what it is allowed to spend. Any result reported
@@ -67,8 +106,9 @@ spends more is a different claim from one that decides better.
   every line in `PIPELINES` and asserts, per case, that the decision's route and reason
   come from the shared vocabulary (`ROUTES`, `REASON_CODES`), that it lands where that
   line's own design lands, and `honoursApprovalGate`. Across lines it compares
-  `decisionFields` between them and holds each to the budget in rule 6. It also asserts
-  every line declares exactly `REQUIRED_FEATURES`.
+  `decisionFields` between them and holds each to the budget in rule 6. Rule 1's
+  capabilities are checked by four witness probes per line — see the table in that rule
+  — rather than by comparing two lists of names the lines write about themselves.
 - Red here means the headline comparison has stopped measuring design and started
   measuring a missing feature.
 - Rules 5 and 7 are **judgment**: structure and code quality are checked by the audit

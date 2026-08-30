@@ -37,11 +37,10 @@ llm.ts        the model client, and what a call to one may carry.
 ## What is deliberately not here
 
 A type read off a value stays with that value. `ReasonCode` is `REASON_CODES`,
-`Feature` is `REQUIRED_FEATURES`, `CaseSubset` is `CASE_SUBSETS` — moving the type
-would mean moving the array, and this area would stop being erasable. The types built
-on those stay with them too, for the same reason: `Decision` carries a `ReasonCode`,
-`Pipeline` carries a `Feature`, `EvaluationCase` and `ResolvedArrival` carry a
-`CaseSubset`. Splitting any of them from its list would buy one file in this folder at
+`CaseSubset` is `CASE_SUBSETS` — moving the type would mean moving the array, and this
+area would stop being erasable. The types built on those stay with them too, for the
+same reason: `Decision` carries a `ReasonCode`, `EvaluationCase` and `ResolvedArrival`
+carry a `CaseSubset`. Splitting any of them from its list would buy one file in this folder at
 the price of an import cycle between the two.
 
 Nor is a shape moved here just because it is a shape. `PipelineInput` is what

@@ -40,9 +40,10 @@ import {
   honoursApprovalGate,
   REASON_CODES,
   ROUTES,
+  type Decision,
   type Route,
 } from '../../core/decision.ts';
-import { PIPELINES, REQUIRED_FEATURES, type Pipeline } from '../../core/pipeline.ts';
+import { PIPELINES, type Pipeline } from '../../core/pipeline.ts';
 import { isSensitive } from '../../core/policy.ts';
 import { createRecordStore } from '../../core/records.ts';
 import type { InboundMessage } from '../../types/message.ts';
@@ -199,6 +200,12 @@ const RECORD_SIGNALS: readonly string[] = [
   'işlem',
 ];
 
+/**
+ * A reply that names no order, so the permitted-order check has nothing to refuse and
+ * a line that reaches a customer is observed reaching one.
+ */
+const ROUTINE_DRAFT = 'Merhaba, mesajınızı aldık ve en kısa sürede dönüş yapacağız.';
+
 /** One model opinion per case, shaped for every line that will ever ask for it. */
 function scriptFor(testCase: EvaluationCase): Record<TaskName, string> {
   const category = categoryFromTextAlone(testCase.message);
@@ -211,7 +218,7 @@ function scriptFor(testCase: EvaluationCase): Record<TaskName, string> {
     category,
     urgency: risky ? 80 : 20,
     confidence: risky ? 0.92 : 0.86,
-    draft: 'Merhaba, mesajınızı aldık ve en kısa sürede dönüş yapacağız.',
+    draft: ROUTINE_DRAFT,
     instruction: INSTRUCTION_SIGNALS.some((signal) => haystack.includes(signal)),
     needsRecord: RECORD_SIGNALS.some((signal) => haystack.includes(signal)),
   });
@@ -222,14 +229,6 @@ function routeReachedBy(pipeline: Pipeline, testCase: EvaluationCase): Route {
 }
 
 describe('feature parity', () => {
-  it('every line declares exactly the required feature set', () => {
-    const required = [...REQUIRED_FEATURES].sort();
-
-    for (const pipeline of PIPELINES) {
-      expect([...pipeline.features].sort()).toEqual(required);
-    }
-  });
-
   it('drives every line from the one committed case table', () => {
     expect(CASES).toHaveLength(28);
   });
@@ -310,6 +309,80 @@ describe('feature parity', () => {
         expect(decision.route).toBe('human_review');
         expect(honoursApprovalGate(decision)).toBe(true);
         expect(REASON_CODES).toContain(decision.reason);
+      });
+
+      /**
+       * The seven capabilities of dev/CHALLENGE.md §7, exhibited rather than declared.
+       *
+       * Rule 1 used to be checked by comparing two lists of feature names the lines
+       * carried about themselves. That check passed whatever both sides wrote in them:
+       * a capability neither line had was green as long as both claimed it, and one of
+       * the seven — the interim message — was claimed by both while living entirely in
+       * `policy.ts` and `src/sim/`, which is how it stayed green for as long as it did.
+       *
+       * So each capability is pinned to something observable in a decision. Three of
+       * them need no probe, because `decision.ts` makes them unskippable: every
+       * decision is built through `humanReview` or `autoSend`, so a reason code and a
+       * matching approval requirement cannot be left off, and the table above already
+       * checks the vocabulary they come from on all 28 cases, both lines.
+       *
+       * The remaining four need a witness, and take the same message from the table —
+       * a routine order question both lines answer — with the model's opinion varied
+       * around it. Varying the opinion rather than the message is the point: what is
+       * asserted is what each line *does* with an answer, never how it got there.
+       */
+      describe('exhibits each capability of the brief', () => {
+        const witness = firstCase.message;
+
+        const decisionOn = async (category: string, urgency: number): Promise<Decision> =>
+          pipeline.run({
+            message: witness,
+            records,
+            llm: scriptedLlm(
+              agreeingScript({
+                category,
+                urgency,
+                confidence: 0.95,
+                draft: ROUTINE_DRAFT,
+              }),
+            ),
+          });
+
+        const held = async (): Promise<Decision> => decisionOn('refund_request', 80);
+        const routine = async (): Promise<Decision> => decisionOn('shipping_status', 20);
+
+        it('assigns-category: reads the category, and the category changes the answer', async () => {
+          expect((await held()).reason).toBe('sensitive_category');
+          expect((await routine()).reason).toBe('routine_reply');
+        });
+
+        it('risky-never-auto-sent: a sensitive category is held for a person', async () => {
+          const decision = await held();
+
+          expect(decision.route).toBe('human_review');
+          expect(decision.requiresApproval).toBe(true);
+        });
+
+        it('produces-draft: a routine message comes back with a reply in it', async () => {
+          const decision = await routine();
+
+          expect(decision.route).toBe('auto_send');
+          expect(decision.draft ?? '').not.toBe('');
+        });
+
+        /**
+         * As an order, not as a number. Which signal a line sorts by — the model's
+         * urgency or the score of the reason it established — is the mechanism the
+         * primary metric compares, and asserting either one here would settle by
+         * contract the question `src/sim/` exists to measure.
+         */
+        it('assigns-urgency: the risky hold is read before the routine reply', async () => {
+          const [risky, ordinary] = await Promise.all([held(), routine()]);
+
+          expect(risky.priority).toBeGreaterThan(ordinary.priority);
+          expect(risky.priority).toBeLessThanOrEqual(100);
+          expect(ordinary.priority).toBeGreaterThanOrEqual(0);
+        });
       });
 
       it('never spends more than its stated model-call budget', async () => {

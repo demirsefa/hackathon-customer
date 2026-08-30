@@ -19,16 +19,6 @@ import { buildTriagePrompt, parseTriageOutput } from './triage.ts';
 
 export const baseline: Pipeline = {
   name: 'baseline',
-  features: [
-    'assigns-category',
-    'assigns-urgency',
-    'produces-draft',
-    'risky-never-auto-sent',
-    'queued-case-carries-reason',
-    'interim-message-on-threshold',
-    'reason-code-on-every-decision',
-  ],
-
   async run({ message, llm }): Promise<Decision> {
     const messageId = message.messageId;
 

@@ -1,7 +1,7 @@
 /**
  * The advanced line, as dev/CHALLENGE.md §9 describes it.
  *
- * The same seven features as the baseline, reached by a different arrangement, and the
+ * The same capabilities as the baseline, reached by a different arrangement, and the
  * arrangement is the whole claim. Three things move:
  *
  * **The record layer is opened first, and it decides on its own.** Who the sender is,
@@ -46,16 +46,6 @@ import { buildDraftPrompt, parseDraftOutput } from './draft.ts';
 
 export const advanced: Pipeline = {
   name: 'advanced',
-  features: [
-    'assigns-category',
-    'assigns-urgency',
-    'produces-draft',
-    'risky-never-auto-sent',
-    'queued-case-carries-reason',
-    'interim-message-on-threshold',
-    'reason-code-on-every-decision',
-  ],
-
   async run({ message, records, llm }): Promise<Decision> {
     const messageId = message.messageId;
 

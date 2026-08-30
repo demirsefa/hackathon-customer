@@ -4,22 +4,22 @@ Pure functions. No I/O, no clock, no network, no process state.
 
 Everything that decides _what happens to a message_ lives here. The clock and the
 LLM client are passed in as arguments, never imported, so the same code runs
-identically under `src/eval/`, `src/sim/` and `src/service/`.
+identically under `src/eval/` and `src/sim/`.
 
 ```text
 decision.ts    the vocabulary: routes, reason codes, priority, the approval gate.
 message.ts     the instant rule, and the order references pulled out of untrusted text.
 records.ts     the store over the record layer — the only source of ownership and identity.
-authority.ts   the gate over that layer. Waiting for the advanced line.
+authority.ts   the gate over that layer, and the verdict no later stage may lift.
 policy.ts      the law both lines are written against.
 operator.ts    arithmetic over the operator's calendar: her shift, her breaks, her minutes.
 cases.ts       the evaluation set parsed and validated. The file read stays outside.
 scenario.ts    a scenario parsed the same way, and joined to the cases it names.
 queue.ts       the read-first order of the operator's queue, and why it is total.
 llm.ts         the primitives a prompt is built with and a response is parsed with.
-pipeline.ts    what a line is, REQUIRED_FEATURES, and which lines exist.
+pipeline.ts    what a line is, and which lines exist.
 baseline/      one model call, then the risky-category check. CHALLENGE §8.
-advanced/      a placeholder plus its prompts. CHALLENGE §9.
+advanced/      record gate, classification, gate, draft, policy check. CHALLENGE §9.
 ```
 
 `cases.ts`, `scenario.ts` and `operator.ts` validate through `../utils/parse.ts` — the
@@ -54,10 +54,15 @@ where every other definition already lives.
 
 ## The two lines
 
-`REQUIRED_FEATURES` lists **features** — the seven capabilities of `dev/CHALLENGE.md`
-§7, what the operator gets. It does not list **mechanisms**. The authority gate, the
-draft policy check and the confidence threshold are ways of reaching a feature, and
-requiring them of every line would make the lines identical by contract.
+A **feature** is one of the capabilities of `dev/CHALLENGE.md` §7 — what the operator
+gets. A **mechanism** is not: the authority gate, the draft policy check and the
+confidence threshold are ways of reaching a feature, and requiring them of every line
+would make the lines identical by contract.
+
+A line does not carry a list of what it can do. It used to, and the check that compared
+two such lists passed whatever both lines wrote in them — see rule 1 of
+`dev/contracts/FEATURE-PARITY.md`. Each capability is now read off the decisions a line
+produces, in `src/__test__/contract/parity.contract.test.ts`.
 
 Every line is handed the same `PipelineInput`, record layer included. The baseline
 never opens it: it decides from the model's answer about the text alone. That is not
