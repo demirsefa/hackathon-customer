@@ -9,7 +9,7 @@ file is reproducible on a machine with no API key.
 | Field | Value |
 | ----- | ----- |
 | Line | `baseline` |
-| Commit | `unknown` |
+| Commit | `2d0e479` |
 | Model | `claude-sonnet-5`, max tokens 16000, effort medium |
 | Client | replay (claude-sonnet-5) — 28 recorded response(s) in fixtures/llm-cache.json |
 | Cases | 28 |
