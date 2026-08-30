@@ -6,6 +6,7 @@
  * a line consults is a design choice, and that choice is exactly what the primary
  * metric measures.
  */
+import { advanced } from './advanced/index.ts';
 import { baseline } from './baseline/index.ts';
 import type { Decision } from './decision.ts';
 import type { LlmClient } from './llm.ts';
@@ -50,4 +51,4 @@ export interface Pipeline {
   run(input: PipelineInput): Promise<Decision>;
 }
 
-export const PIPELINES: readonly Pipeline[] = [baseline];
+export const PIPELINES: readonly Pipeline[] = [baseline, advanced];

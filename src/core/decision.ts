@@ -9,15 +9,31 @@
 
 export type Route = 'auto_send' | 'human_review';
 
-export type ReasonCode =
-  | 'authority_mismatch'
-  | 'unresolved_reference'
-  | 'unknown_sender'
-  | 'draft_policy_violation'
-  | 'sensitive_category'
-  | 'low_confidence'
-  | 'model_output_unusable'
-  | 'routine_reply';
+export const ROUTES = ['auto_send', 'human_review'] as const;
+
+/**
+ * Every reason a decision may carry, as a value and not only as a type.
+ *
+ * A union is checked once at compile time and is gone by the time anything runs, and
+ * dev/contracts/FEATURE-PARITY.md rule 2 asks the two lines to share one *vocabulary* —
+ * which is a claim a check has to be able to make about a decision it is holding. So
+ * the list is the source and the type is read off it; a code added here without a
+ * priority below does not compile.
+ */
+export const REASON_CODES = [
+  'authority_mismatch',
+  'draft_policy_violation',
+  'instruction_in_message',
+  'sensitive_category',
+  'unknown_sender',
+  'unresolved_reference',
+  'unreferenced_record_request',
+  'model_output_unusable',
+  'low_confidence',
+  'routine_reply',
+] as const;
+
+export type ReasonCode = (typeof REASON_CODES)[number];
 
 /**
  * Read-first order for the operator: higher is reached earlier under overload.
@@ -28,9 +44,31 @@ export type ReasonCode =
 const PRIORITY: Readonly<Record<ReasonCode, number>> = {
   authority_mismatch: 95,
   draft_policy_violation: 90,
+
+  /**
+   * Under every fact the record layer established, over every category a reader of the
+   * text would reach for.
+   *
+   * This one is derived from the message, and a signal derived from the message must
+   * not outrank one derived from the records. Put it at the top and the order of the
+   * operator's morning becomes something the sender writes: an attacker who works out
+   * that `SYSTEM:` reaches her first has been handed the front of the queue, and the
+   * defence has become the attack. Held either way — the argument is only about when
+   * she reads it.
+   */
+  instruction_in_message: 85,
+
   sensitive_category: 80,
   unknown_sender: 70,
   unresolved_reference: 60,
+
+  /**
+   * Under `unresolved_reference`, which is the same shape of doubt one step better
+   * established: there the record layer was handed a key and found nothing, here
+   * nothing was ever named.
+   */
+  unreferenced_record_request: 58,
+
   model_output_unusable: 55,
   low_confidence: 50,
   routine_reply: 10,
