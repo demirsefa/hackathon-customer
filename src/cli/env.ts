@@ -8,9 +8,15 @@
  * need no credentials at all.
  *
  * What replaces it is not silence. An absent file is still worth a word, because the
- * run a person meant to start may be the one that needs a key. So the warning goes to
+ * run a person meant to start may be the one that needs a key. So the line goes to
  * stderr, out of the way of the results, and it says what the absence actually costs
  * rather than reporting a missing file as news.
+ *
+ * It is one line, and it says `note:` rather than `warn:`. On a clean clone this fires
+ * on every run of the documented credential-free path, where nothing is wrong at all:
+ * three sentences of prose about a credential, above the results, is the same mistake
+ * Node made in a politer voice. A file that exists and cannot be read still warns —
+ * there something is genuinely wrong.
  *
  * `process.loadEnvFile` is built into Node, so this costs no dependency and no flag.
  */
@@ -39,9 +45,8 @@ export function loadEnvFile(path: string = ENV_FILE): EnvLoad {
       return {
         loaded: false,
         warning:
-          `warn: ${path} not found. Replay runs need no credentials, so this only ` +
-          'affects --live, which reads ANTHROPIC_API_KEY from the environment. ' +
-          `Copy ${path}.example to ${path} if you meant to run live.`,
+          `note: ${path} not found — replay needs no key; --live reads ` +
+          `ANTHROPIC_API_KEY (copy ${path}.example).`,
       };
     }
 
