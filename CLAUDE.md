@@ -24,7 +24,9 @@ tests share live in it. A second copy anywhere is a mistake.
 
 ```text
 src/
+  types/       the domain vocabulary. Declarations only, erased at compile time.
   core/        pure decision logic. No I/O, no clock, no network. Both pipelines are built from it.
+  utils/       small pure helpers more than one area reaches for. Today: the file shape checks.
   llm/         the model clients that implement `core/llm.ts` — replay, live, record. See its README.
   cli/         what every entry point shares about the terminal: loading `.env`, and the menu.
   eval/        scores the evaluation cases against `src/core/` directly.
