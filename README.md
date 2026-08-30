@@ -6,11 +6,46 @@ hold back anything that must not be answered automatically.
 > Status: scaffolding. Baseline, evaluation set and results are being added.
 > This README will carry the user, the bottleneck, the Improvement Changelog
 > and the hot take before submission.
+>
+> **The recorded model responses are not committed yet**, so `yarn eval --replay`
+> stops with the one command that records them instead of printing a scorecard,
+> and the scenario player behind `yarn sim` is still a placeholder. Both say so and
+> exit non-zero: a run that produced no number does not report itself as a run that
+> worked.
 
-## Setup
+## Running it
+
+Node 22.18 or newer, and nothing else installed by hand. The sources are TypeScript
+and Node runs them directly, so an older Node cannot start them at all. Yarn 4 comes
+with the repository — `packageManager` in `package.json` pins the version.
 
 ```bash
-cp .env.example .env   # only needed for live runs
+yarn install
+yarn eval --replay
+```
+
+`yarn eval --replay` scores the 28 evaluation cases against the model responses
+recorded in `fixtures/llm-cache.json`. It opens no connection, needs no API key and
+costs nothing, which is why it is the form quoted everywhere here. Around 20 seconds
+for the install and 3 for the run.
+
+| Command                      | What it does                                       | Needs a key |
+| ---------------------------- | -------------------------------------------------- | ----------- |
+| `yarn eval --replay`         | scores the evaluation set from the committed cache | no          |
+| `yarn eval --live`           | the same run against the real model, recording it  | yes         |
+| `yarn sim overload --replay` | plays the overload scenario — the primary metric   | no          |
+| `yarn serve`                 | the HTTP surface and the approval queue            | no          |
+
+Each of them takes `--live` or `--replay` and nothing else, and `--help` prints its
+usage line. Typed bare at a terminal they ask which mode to run; piped or in CI they
+replay, so an unattended run never waits on a question nobody is there to answer. The
+rule, and why the flagged form is the documented one, is in
+[`src/cli/README.md`](src/cli/README.md).
+
+A key is only ever needed for `--live`:
+
+```bash
+cp .env.example .env   # then put ANTHROPIC_API_KEY in it
 ```
 
 ## Branches
@@ -42,8 +77,9 @@ results reported here — was written during the hackathon.
 ## Checks
 
 ```bash
+yarn check         # validation and the tests together, about 30 seconds
 yarn validation    # tsc --noEmit, eslint, prettier --check
-yarn test          # unit tests
+yarn test          # unit tests, and the checks that enforce dev/contracts/
 yarn security      # leak-check and secretlint
 ```
 
