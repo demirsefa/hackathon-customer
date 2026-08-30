@@ -1,7 +1,7 @@
 {
   "schema": "support-triage/sim-run@1",
   "provenance": {
-    "commit": "bb784b4",
+    "commit": "093d4a0",
     "llmLabel": "replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json",
     "params": {
       "model": "claude-sonnet-5",
