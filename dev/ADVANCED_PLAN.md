@@ -360,7 +360,7 @@ row worth more than a wide gap nobody believes.
   and the choice was between correcting CHALLENGE §12's "surfaced by `src/service/`" and
   building the service before 19:00. Step 6 did not finish in time, so the folder, the
   `serve` script and the README's command row are gone and §11 carries the cut. The gate
-  is `src/core/decision.ts`; the video shows it from `yarn sim overload --replay --log`
+  is `src/core/decision.ts`; the video shows it from `yarn sim overload --replay`
   and the trajectory files.
 - **A `channel` field, a deterministic thread summary, an audit trajectory, development
   session summaries.** All four are README paragraphs at most, and only if the prose

@@ -58,7 +58,6 @@ for the install and under one for the run.
 
 Every command runs **both lines** over the same input and reports them side by side —
 `dev/contracts/FEATURE-PARITY.md` rule 4 asks that they never be scored on separate runs.
-Add `--log` to either `eval` or `sim` to read the run case by case instead of as a table.
 
 Each of them takes `--live` or `--replay` and nothing else, and `--help` prints its
 usage line. Typed bare at a terminal they ask which mode to run; piped or in CI they
@@ -72,7 +71,7 @@ claims one it does not have — `dev/contracts/FEATURE-PARITY.md` rule 3, held o
 lines by `src/__test__/contract/parity.contract.test.ts`. Nothing reaches a customer
 without it. What it does to a run is on screen in the commands above:
 `yarn sim overload --replay` reports how many of the 90 arrivals were held for the
-operator rather than answered automatically, and `yarn eval --replay --log` names the
+operator rather than answered automatically, and `yarn eval --replay` names the
 route case by case. An HTTP surface with a queue the operator clicks through was
 planned and cut; it is in `dev/CHALLENGE.md` §11 with the rest of what this submission
 does not build.
@@ -112,9 +111,10 @@ from the one we started with.
 
 ## Results
 
-Both lines, same 28 cases and same two scenarios, one run each. Every figure below is a
-field in a committed file under `trajectories/`, produced by a command in the
-reproduction guide.
+Both lines, same 28 cases and same two scenarios, one run each. Every figure in the
+table below is a field in a committed file under `trajectories/`, produced by a command
+in the reproduction guide. Two further figures are reported underneath it instead, each
+saying where it comes from, because neither is a field in a committed record.
 
 | Metric                                    | Baseline      | Advanced      | Change         |
 | ----------------------------------------- | ------------- | ------------- | -------------- |
@@ -126,12 +126,18 @@ reproduction guide.
 | Missed holds - auto-sent, should not be   | 16            | 1             | -15            |
 | False positives - held, could be answered | 0             | 0             | unchanged      |
 | Model calls per case                      | 1.00          | 1.00          | **unchanged**  |
-| Reply quality, out of 5                   | 4             | 4             | unchanged      |
-| Operator minutes used - overload, of 659  | 150           | 650           | +500           |
 
 **Critical coverage under overload is the headline**, and it is the only number this
 project set out to move. `yarn sim overload --replay` prints it; the run behind it is
 `trajectories/advanced-overload.json`.
+
+**Operator minutes under overload are printed, not stored.** `yarn sim overload --replay`
+ends each line with the sentence "She spent 150 of the 659 working minutes the run gave
+her" for the baseline and 650 of 659 for the advanced line. The sim derives the figure
+rather than recording it - it is `coverage.opened` from
+`trajectories/{baseline,advanced}-overload.json` (15 and 65) times the operator's 10
+minutes a case - so the number is on screen from a command in the reproduction guide, but
+there is no field to read it from, which is why it is here and not in the table.
 
 **It costs the same.** 28 model calls over 28 cases, exactly what the baseline spends.
 The record gate answers ten of them without a model at all, and that pays for the ones
@@ -143,7 +149,8 @@ formed, and about a real order - asked by somebody who does not own it. No amoun
 reading the text finds that out. The advanced line gets all six, and gets them at **zero
 model calls**, because the fact was in the order records and the work was opening them.
 
-**Reply quality is measured on the three cases both lines answer** (`norm-01`, `norm-02`,
+**Reply quality is scored by hand, so it is not a table row either.** It is measured on
+the three cases both lines answer (`norm-01`, `norm-02`,
 `norm-06`) so the comparison is like for like, scored by the author on a five-point
 scale: 5 answers the question, 4 acknowledges it correctly and promises a follow-up, 3 is
 generic, 2 is wrong, 1 is harmful. Both score 4, and the sameness is the point - the same

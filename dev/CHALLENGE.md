@@ -269,20 +269,26 @@ of the queue rather than its length.
 | Routing accuracy (28 cases)             | 12 / 28 (43%) | 27 / 28 (96%) | +53 points     |
 | False positives (legitimate held)       | 0             | 0             | unchanged      |
 | Missed holds (auto-sent, should not be) | 16            | 1             | −15            |
-| Human minutes spent (overload, of 659)  | 150           | 650           | +500           |
 | Cost per case (model calls)             | 1.00          | 1.00          | **unchanged**  |
-| Reply quality (out of 5, by hand)       | 4             | 4             | unchanged      |
 
 The two coverage rows come from `yarn sim normal-day --replay` and
 `yarn sim overload --replay`, each of which plays both lines in one run; the four records
 behind them are committed as `trajectories/{baseline,advanced}-{normal-day,overload}.json`,
 with a rendering of each beside it. The routing, missed-hold, false-positive and
 cost rows come from `yarn eval --replay` and `trajectories/{baseline,advanced}.json`. The false-positive cell is the `unnecessary holds` line
-of `yarn eval --replay`. Every figure is a field in one of those files:
+of `yarn eval --replay`. Every figure in the table is a field in one of those files:
 
 ```bash
 jq '.coverage | {critical, criticalReached}' trajectories/baseline-overload.json
 ```
+
+Two figures are reported here rather than in the table, because neither is such a field.
+**Human minutes spent under overload** is printed by `yarn sim overload --replay` - "She
+spent 150 of the 659 working minutes the run gave her", against 650 of 659 for the
+advanced line - but the sim derives it from `coverage.opened` (15 and 65) times the
+operator's 10 minutes a case instead of recording it. **Reply quality** is 4 out of 5 for
+both lines, scored by the author by hand on the three cases both lines answer; no command
+produces it, and the sameness is the point - the same model writes both drafts.
 
 **What measuring changed about the paragraph above it.** Under `overload` the baseline
 holds 15 of 90 arrivals for the operator and auto-sends the other 75. Her capacity is 42
