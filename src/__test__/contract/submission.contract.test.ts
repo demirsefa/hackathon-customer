@@ -21,7 +21,7 @@
  *   SUBMISSION_NOW=2026-08-31T00:00:00Z yarn test
  */
 import { execFile } from 'node:child_process';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
@@ -263,6 +263,27 @@ const attempt = async (
     stderr: text(settled.stderr),
   };
 };
+
+/**
+ * `yarn eval` writes `trajectories/<line>.md`, and the file names the commit it was
+ * produced at, so running it here would leave a deliverable rewritten against whatever
+ * HEAD happens to be — a check that dirties the working tree every time it passes.
+ * The directory is put back exactly as it was found.
+ */
+const trajectories = new URL('trajectories/', repoRoot);
+
+const before = new Map(
+  readdirSync(trajectories).map((name) => [
+    name,
+    readFileSync(new URL(name, trajectories)),
+  ]),
+);
+
+afterAll(() => {
+  for (const [name, content] of before) {
+    writeFileSync(new URL(name, trajectories), content);
+  }
+});
 
 /** Every form the README hands out, plus the one a judge reaches by typing badly. */
 const ATTEMPTS: readonly Attempt[] = await Promise.all([

@@ -54,8 +54,9 @@ import { scoreRun } from './score.ts';
 import { renderTrajectory, trajectoryFile } from './trajectory.ts';
 
 /** Resolved from this file, so no command depends on the working directory. */
-const CASES_FILE = fileURLToPath(new URL('../../fixtures/cases.json', import.meta.url));
-const TRAJECTORIES_DIR = fileURLToPath(new URL('../../trajectories/', import.meta.url));
+const REPO_ROOT = fileURLToPath(new URL('../../', import.meta.url));
+const CASES_FILE = `${REPO_ROOT}fixtures/cases.json`;
+const TRAJECTORIES_DIR = `${REPO_ROOT}trajectories/`;
 
 /** One line and an exit code. A judge should read what to do next, not our filenames. */
 function stop(message: string): never {
@@ -132,6 +133,10 @@ const caseFile = ((): CaseFile => {
 function headCommit(): string {
   try {
     return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
+      // Asked of the repository rather than of wherever the command was typed. Run
+      // from another directory it answered `unknown`, and a trajectory that cannot
+      // name the code it came from is the one thing its summary is there to do.
+      cwd: REPO_ROOT,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
