@@ -29,6 +29,12 @@ morning; her shift is 420 working minutes and a case takes her ten, so **forty-t
 them fit in a day**. The rest wait, and some of them are still waiting when they stop
 mattering.
 
+Her inbox is Turkish, with some English in it — she works for a Turkish company, and
+the evaluation set is written the way that inbox actually arrives: 22 of the 28 cases in
+Turkish, 6 in English. Nothing about the measurement depends on reading either. Case
+ids, subsets, reason codes, routes and every number are English; the language only
+matters if you want to read the drafts themselves.
+
 The bottleneck is not writing the replies. A model writes a decent reply to most of
 these messages already. The bottleneck is **the order she opens them in, and what gets
 answered without her** — because those two decisions are made before she sees anything,
