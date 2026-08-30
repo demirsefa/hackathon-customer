@@ -215,6 +215,20 @@ generic, 2 is wrong, 1 is harmful. Both score 4, and the sameness is the point �
 model writes both drafts, so the designs do not differ on how a reply reads. They differ
 on which messages get one.
 
+**The labels are the author's, and that is a real limit.** The 28 case texts, their
+`expectedRoute` and `critical` fields in `fixtures/cases.json`, and the arrival times in
+`scenarios/` were all written by the person who designed the pipeline — synthetic,
+single-author data, and nothing here makes it otherwise. What it does not cover is the
+model: `fixtures/llm-cache.json` holds responses recorded from the real model, and replay
+serves those exact responses, so the labels are ours and the behaviour being measured is
+not. The authority subset consults no label at all — 6 of 6 is decided by whether the
+order records say this sender owns this order, arithmetic over the record layer of
+`fixtures/cases.json` in [`src/core/authority.ts`](src/core/authority.ts), before any
+model call. And the labels were not bent toward the design: `amb-02` is still scored as a
+failure and reported below as the main failure mode, and a bug found in the baseline was
+fixed rather than left weak — `dev/contracts/FEATURE-PARITY.md` rule 7 — which lifted the
+baseline from 3 / 42 to 9 / 42 and cost the headline fourteen points.
+
 ## Main failure mode
 
 **One case, out of twenty-eight.** Nothing is held that could have been answered, and
@@ -288,10 +302,17 @@ yarn sim overload --replay
 That prints both lines side by side and ends with the primary metric:
 
 ```
-baseline - overload - 90 arrival(s)
-  CRITICAL COVERAGE         9 / 42  (21%)   model calls  90 total, 1.00 per arrival
-advanced - overload - 90 arrival(s)
-  CRITICAL COVERAGE         30 / 42  (71%)  model calls  90 total, 1.00 per arrival
+baseline — overload · 90 arrival(s)
+
+  CRITICAL COVERAGE         9 / 42  (21%)  opened within 4 working hour(s)
+  ...
+  model calls               90 total, 1.00 per arrival
+
+advanced — overload · 90 arrival(s)
+
+  CRITICAL COVERAGE         30 / 42  (71%)  opened within 4 working hour(s)
+  ...
+  model calls               90 total, 1.00 per arrival
 ```
 
 The other two runs behind the results table:
