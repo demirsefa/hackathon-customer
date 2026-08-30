@@ -23,7 +23,19 @@ export type LlmSession = {
   readonly llm: LlmClient;
   /** One line for the run's header, so a report says which client produced it. */
   readonly label: string;
-  /** Writes anything newly recorded. A no-op in replay, which records nothing. */
+  /**
+   * Exchanges held right now. Fixed in replay, and growing during a live run as
+   * answers land, which is how a caller tells an answer it just paid for from one the
+   * cache already had.
+   */
+  recorded(): number;
+  /**
+   * Writes anything newly recorded. A no-op in replay, which records nothing.
+   *
+   * Safe to call as often as a caller likes, and meant to be: a live run that saves
+   * only at the end throws away every answer it bought if it falls over on the last
+   * case.
+   */
   save(): void;
 };
 
@@ -44,6 +56,7 @@ export function openLlmSession(input: {
     return {
       llm: replayClient({ cache, params }),
       label: `replay (${params.model}) — ${recorded} recorded response(s) in ${CACHE_LABEL}`,
+      recorded: () => recorded,
       save: () => {},
     };
   }
@@ -66,6 +79,7 @@ export function openLlmSession(input: {
       params,
     }),
     label: `live (${params.model}, effort ${params.effort}) — recording into ${CACHE_LABEL}`,
+    recorded: () => Object.keys(cache).length,
     save: () => writeCache(cache, path),
   };
 }

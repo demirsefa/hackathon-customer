@@ -10,7 +10,7 @@
  * client. Recording is therefore additive by construction: it cannot spend money on
  * answers it already has, and it cannot overwrite a recorded answer by accident.
  */
-import { writeFileSync } from 'node:fs';
+import { renameSync, writeFileSync } from 'node:fs';
 
 import type { LlmClient, LlmRequest, LlmResponse } from '../core/llm.ts';
 import { cacheKey, requestShape, PINNED_PARAMS, type LlmParams } from './key.ts';
@@ -69,6 +69,19 @@ export function serialiseCache(cache: LlmCache): string {
   return `${JSON.stringify(ordered, null, 2)}\n`;
 }
 
+/**
+ * Written whole, then moved into place.
+ *
+ * A live run saves after every case it pays for, so this happens twenty-eight times
+ * rather than once, and the file it is overwriting is a committed deliverable. A
+ * `writeFileSync` interrupted halfway leaves a truncated cache behind — the one file
+ * a reproduction depends on, damaged by a Ctrl-C. The rename is atomic, so the file at
+ * `path` is always either the previous save or the current one, never half of either.
+ */
 export function writeCache(cache: LlmCache, path: string = CACHE_FILE): void {
-  writeFileSync(path, serialiseCache(cache), 'utf8');
+  // The pid keeps two runs on the same machine off each other's temporary file.
+  const staging = `${path}.${String(process.pid)}.tmp`;
+
+  writeFileSync(staging, serialiseCache(cache), 'utf8');
+  renameSync(staging, path);
 }
