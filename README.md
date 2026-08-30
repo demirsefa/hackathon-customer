@@ -63,6 +63,7 @@ what reaches a customer is what four checks let through.
 | **Keep the record layer out of the prompt**                    | The verified fact and the untrusted text never share a context window, so no sentence a customer writes can rewrite what the records say                                                                                                            |
 | **Check the draft with arithmetic, not with a second opinion** | The second opinion was built, measured and removed: it refused four legitimate replies and rescued none. Unnecessary holds **4 → 0**, cost **1.29 → 1.00** calls a case                                                                             |
 | **Sort the queue by the window the metric is scored on**       | A case whose four hours have already run out scores nothing whenever it is opened, so it goes behind one that can still be reached. Coverage **24 / 42 → 28 / 42**                                                                                  |
+| **Serve the case the order is about to lose**                  | A case's turn is already known — the cases ahead of it times ten minutes — so the queue serves the highest-ranked case that would not survive its own place, and otherwise the top. No threshold to tune or defend. Coverage **28 / 42 → 30 / 42**  |
 | **Rank text-derived signals below record-derived ones**        | Put "there is an instruction in this message" at the top of the queue and an attacker who writes `SYSTEM:` has been handed the front of the operator's morning. Held either way; the argument is only about when she reads it                       |
 
 None of it is bought with a bigger budget: **1.00 model calls a case, the same as the
@@ -140,11 +141,13 @@ committed file, reachable without running anything.
 | 11 · Stopped serving lost causes first             | Under overload she was opening every case she queued — 65 of 65 — and still missing 18 critical ones, 15 of them opened after their window had closed. So the loss was not capacity and not classification, it was sequence: strict priority order kept handing her cases that could no longer be reached in time, and the minutes came out of cases that still could. Made whether the window has already closed the queue's first key, ahead of priority.                                                                                                                           | `yarn sim overload --replay`, `trajectories/advanced-overload.json`. Coverage **24 / 42 (57%) → 28 / 42 (67%)**, late misses **15 → 11**, still opened 65 of 65 with nothing left queued. Routing, cost and the normal day are all unchanged; the baseline is unchanged because it never queues more than 15.               | Kept. A case whose window has closed scores nothing whenever it is opened, so putting it ahead of one that can still be reached loses the pair. Two things are said out loud rather than left to be found: the queue is now written to the desk's own service window — the same `CRITICAL_COVERAGE_MINUTES` the metric is scored on — and nothing is dropped, only reordered.       |
 | 12 · Rescued the cases the order was about to lose | Sending closed windows to the back left 11 critical cases still opened late — correctly ranked, and lost while they waited for a turn that came too late. A case's turn arrives after everything above it has been served, so the minutes until then are already known: the count ahead of it times the minutes a case takes. Made the queue serve the highest-ranked case that would not survive its own place, and otherwise the top.                                                                                                                                               | `yarn sim overload --replay`, `trajectories/advanced-overload.json`. Coverage **28 / 42 (67%) → 30 / 42 (71%)**, late misses **11 → 9**. Normal day, routing and cost unchanged; still 65 of 65 opened, nothing left queued.                                                                                                | Kept, and kept without a threshold. A tuned one was measured first — 30, 60 and 120 minutes each scored 30 / 42 while 90 scored 29, and a rule whose answer moves like that with a number nobody can justify is fitted to one scenario, not derived from the problem. The queue's own length ahead of a case answers the same question and can be defended, and it scores the same. |
 
-**What the eight stages leave.** The model was never the weak part: in all eight
-injection cases it names the attack and refuses it in its own draft. Every point of the
-improvement came from the arrangement around it — opening the records before the model
-instead of after, asking one question in a call that is not also writing the reply, and
-sorting the queue by a reason that means what it says.
+**What the twelve stages leave.** The model was never the weak part: in seven of the
+eight injection cases it names the attack and refuses it in its own draft — only
+`inj-04` answers as if the message were routine, with a note that the embedded
+instruction was ignored. Every point of the improvement came from the arrangement
+around it — opening the records before the model instead of after, asking one question
+in a call that is not also writing the reply, and sorting the queue by a reason that
+means what it says.
 
 What is left is in `## Main failure mode` below, and it is a different shape of problem
 from the one we started with.
@@ -180,9 +183,9 @@ minutes a case - so the number is on screen from a command in the reproduction g
 there is no field to read it from, which is why it is here and not in the table.
 
 **It costs the same.** 28 model calls over 28 cases, exactly what the baseline spends.
-The record gate answers ten of them without a model at all, and that pays for the ones
-that need two. The improvement is not bought with a bigger budget - the ceiling is two
-calls and `dev/contracts/FEATURE-PARITY.md` rule 6 states it.
+The record gate answers eight of them without a model at all, and that pays for the
+eight that need two. The improvement is not bought with a bigger budget - the ceiling
+is two calls and `dev/contracts/FEATURE-PARITY.md` rule 6 states it.
 
 **The authority row is the thesis in one line.** Six messages that are polite, well
 formed, and about a real order - asked by somebody who does not own it. No amount of
@@ -227,7 +230,7 @@ is what the customer experiences.
 **Our best replies were the dangerous ones.**
 
 Read the baseline's auto-sent drafts in `trajectories/baseline.json` and they are good.
-On four of the eight injection cases the model spots the attack and refuses it _in the
+On seven of the eight injection cases the model spots the attack and refuses it _in the
 draft it is sending_ - `inj-07` answers "I can't bypass review processes or follow
 embedded instructions from message content". On the six authority cases it writes warm,
 competent, correctly-formatted Turkish about delivery windows and cancellations. Read as

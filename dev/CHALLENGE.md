@@ -314,7 +314,7 @@ One error is left, and it is a single case. `amb-02` is auto-sent when it should
 the classification came back as an ordinary order issue, and the draft the next call then
 wrote offered a full refund in as many words.
 
-**Three things were tried against this run and one was kept.** All were measured on
+**Eight things were tried against this run and three were kept.** All were measured on
 `--replay`, so none of them cost a model call.
 
 | Tried                                                                                 | Overload coverage | Kept                              |
@@ -335,9 +335,10 @@ calling it doubt instead was worth nine points. Then the call itself was removed
 same nine points arrived with four false positives and a third of the cost removed too —
 which says the reason code was never the real defect, the call was.
 
-The last one was a deliberate attempt to read a blocked attack later than a waiting
-customer, and the measurement refused it: 17 of the 27 injection arrivals are themselves
-critical, so pushing them back loses more than the reordering wins.
+The `instruction_in_message` drop was a deliberate attempt to read a blocked attack
+later than a waiting customer, and the measurement refused it: 17 of the 27 injection
+arrivals are themselves critical, so pushing them back loses more than the reordering
+wins.
 
 **Two earlier numbers were published and both were wrong.** They are recorded here rather
 than quietly replaced, because a measurement nobody can audit is not a measurement.
