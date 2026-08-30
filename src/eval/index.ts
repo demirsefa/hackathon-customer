@@ -42,6 +42,7 @@ import {
   wantsHelp,
 } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
+import { caseLine, createProgress, summaryLine } from '../cli/progress.ts';
 import { parseCaseFile, type CaseFile } from '../core/cases.ts';
 import { PIPELINES } from '../core/pipeline.ts';
 import { isLiveCallFailed } from '../llm/anthropic.ts';
@@ -151,13 +152,65 @@ console.log('');
 
 const runs: PipelineRun[] = [];
 
+/**
+ * On stderr, so the scorecard on stdout stays a table, and only where a terminal can
+ * take a rewritten line. The rule and the reason are in `src/cli/progress.ts`.
+ */
+const progress = createProgress({
+  write: (chunk) => process.stderr.write(chunk),
+  rewrites: process.stderr.isTTY === true,
+});
+
 /** Set only by a live call that never reached an answer; see the catch below. */
 let liveFailure: string | null = null;
 
 try {
   // Every line over the same case list — dev/contracts/FEATURE-PARITY.md rule 4.
   for (const pipeline of PIPELINES) {
-    runs.push(await runPipeline({ pipeline, caseFile, llm: session.llm }));
+    const startedAt = Date.now();
+    let held = session.recorded();
+    let newlyRecorded = 0;
+
+    const run = await runPipeline({
+      pipeline,
+      caseFile,
+      llm: session.llm,
+      onCase: (progressed) => {
+        // What this case added to the cache. Zero on a live run means the answer was
+        // already there — an interrupted run picking up where it stopped pays for the
+        // cases it never reached and for nothing else.
+        const fresh = session.recorded() - held;
+        held += fresh;
+        newlyRecorded += fresh;
+
+        progress.step(
+          caseLine({
+            pipeline: pipeline.name,
+            done: progressed.done,
+            total: progressed.total,
+            caseId: progressed.caseId,
+            llmCalls: progressed.llmCalls,
+            recorded: live ? fresh : null,
+          }),
+        );
+
+        // Saved case by case rather than once at the end. A run that falls over on the
+        // twenty-seventh case used to throw away twenty-six answers somebody had
+        // already paid for, and the next attempt bought them a second time.
+        if (fresh > 0) session.save();
+      },
+    });
+
+    runs.push(run);
+
+    progress.done(
+      summaryLine({
+        pipeline: pipeline.name,
+        cases: run.runs.length + run.unrecorded.length,
+        recorded: live ? newlyRecorded : null,
+        elapsedMs: Date.now() - startedAt,
+      }),
+    );
   }
 } catch (error) {
   // A live call that never reached an answer — a rejected key, a rate limit, no

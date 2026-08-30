@@ -130,6 +130,41 @@ describe('runPipeline', () => {
   });
 
   /**
+   * What a live run watches. Before it existed, `yarn eval --live` printed the case
+   * count and then nothing for as long as twenty-eight model calls take, and the same
+   * silence is what a run that has hung looks like.
+   */
+  it('reports every case as it finishes, in order and with what it cost', async () => {
+    const seen: string[] = [];
+
+    await runPipeline({
+      pipeline: baseline,
+      caseFile,
+      llm: scriptedLlm(routine),
+      onCase: (progress) =>
+        seen.push(
+          `${String(progress.done)}/${String(progress.total)} ${progress.caseId} ${String(progress.llmCalls)}`,
+        ),
+    });
+
+    expect(seen).toEqual(['1/2 norm-01 1', '2/2 auth-01 1']);
+  });
+
+  /** A case the cache could not answer is still a case that went past. */
+  it('reports a missed case too, with no cost against it', async () => {
+    const seen: (number | null)[] = [];
+
+    await runPipeline({
+      pipeline: baseline,
+      caseFile,
+      llm: replayClient({ cache: {} }),
+      onCase: (progress) => seen.push(progress.llmCalls),
+    });
+
+    expect(seen).toEqual([null, null]);
+  });
+
+  /**
    * A defect in a line is not a missing recording. Reporting one as the other sends
    * the next person to re-record a cache that was fine.
    */

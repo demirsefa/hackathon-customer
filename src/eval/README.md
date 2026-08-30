@@ -53,6 +53,36 @@ Missed holds are printed with their case ids, not as a count. `authority` scorin
 badly on the baseline is the expected result rather than a defect — it is the number
 this project exists to report.
 
+## While the run is going
+
+`yarn eval --live` used to print the case count and then nothing at all until every
+case was done — minutes of silence on twenty-eight model calls, which is also exactly
+what a hung run looks like. Each case now reports itself as it finishes: which one of
+how many, its id, what it cost in model calls, and on a live run how much of that was
+newly recorded rather than served from the cache.
+
+It goes to **stderr**, so the scorecard on stdout stays a clean table and
+`yarn eval --replay > results.txt` is unaffected. And the line is only rewritten in
+place where there is a terminal to rewrite it on; piped or in CI the run writes one
+summary line and nothing else, because carriage returns are rubbish in a log file. The
+rule lives in [`src/cli/progress.ts`](../cli/progress.ts).
+
+## An interrupted live run
+
+The cache is written after **every case that recorded something**, not once when the
+run finishes. A run that fell over on the twenty-seventh case used to throw away
+twenty-six answers somebody had already paid for, and the next attempt bought them a
+second time.
+
+Starting again costs nothing for the cases that already landed:
+`src/llm/record.ts` serves a request it already holds without reaching the live client
+at all, so a re-run pays only for what is genuinely missing. The progress line shows
+it happening — a case that cost a call and recorded nothing was answered out of the
+cache.
+
+The file is written whole and then moved into place, so an interrupted save cannot
+leave half a committed deliverable behind.
+
 ## The trajectory file
 
 Every run writes `trajectories/<line>.md` — the name

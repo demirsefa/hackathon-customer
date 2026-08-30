@@ -4,18 +4,26 @@ What the three entry points — `src/eval/`, `src/sim/`, `src/service/` — shar
 talking to a terminal. Nothing here decides anything about a support message; it is
 the shell around the programs that do.
 
-Two things live here, and they are here because they belong to every entry point and
+Three things live here, and they are here because they belong to every entry point and
 to none of the areas under them:
 
-| File     | What it owns                                                                  |
-| -------- | ----------------------------------------------------------------------------- |
-| `env.ts` | Loading `.env`, and the one warning worth printing when it is not there.      |
-| `ask.ts` | The menus, and the pure rule that decides whether a command may ask anything. |
+| File          | What it owns                                                                  |
+| ------------- | ----------------------------------------------------------------------------- |
+| `env.ts`      | Loading `.env`, and the one line worth printing when it is not there.         |
+| `ask.ts`      | The menus, and the pure rule that decides whether a command may ask anything. |
+| `progress.ts` | The line that says a run is still moving, and where it may be written.        |
 
 `env.ts` does not belong in `src/llm/` even though the only thing the file carries is
 an API key: `src/llm/` takes the key as an argument and reads no environment at all,
 which is what keeps "exactly one place per program where a credential enters" true.
 Loading the file is an entry-point concern, so it sits with the entry points.
+
+`progress.ts` is here rather than in `src/eval/` for the same reason both of the others
+are. Deciding whether a line may be rewritten in place is a question about the
+destination — is it a terminal, or a log file somebody will read later — and it has
+nothing to do with scoring a case. `src/sim/` will want the same answer the moment the
+scenario player runs long enough to be worth watching, and a copy of the rule in two
+folders is how the two stop agreeing.
 
 `ask.ts` does not belong in `src/sim/` even though `yarn sim` was its only caller
 first: it is the same question about the terminal that `env.ts` answers, and putting

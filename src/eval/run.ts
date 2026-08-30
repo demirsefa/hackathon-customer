@@ -98,10 +98,28 @@ function observeRecords(records: RecordStore, steps: Step[]): RecordStore {
   };
 }
 
+/**
+ * One case, the moment it is over. Handed out rather than printed: this file decides
+ * nothing about a terminal, and the entry point that owns stderr does.
+ */
+export type CaseProgress = {
+  /** 1-based, so it reads as "7 of 28" rather than as an index into an array. */
+  readonly done: number;
+  readonly total: number;
+  readonly caseId: string;
+  /** What the case cost, or `null` when the cache could not answer it. */
+  readonly llmCalls: number | null;
+};
+
 export async function runPipeline(input: {
   readonly pipeline: Pipeline;
   readonly caseFile: CaseFile;
   readonly llm: LlmClient;
+  /**
+   * Called once per case, in order, whether it decided or missed. A live run uses it
+   * to say the run is still moving and to write down what it has already paid for.
+   */
+  readonly onCase?: (progress: CaseProgress) => void;
 }): Promise<PipelineRun> {
   const records = createRecordStore(input.caseFile);
   const runs: CaseRun[] = [];
@@ -110,8 +128,12 @@ export async function runPipeline(input: {
   // Sequential and in file order, because dev/CHALLENGE.md §10 requires messages to
   // be processed one at a time: a batch lets a model find a contradiction by
   // comparison, which is an advantage it will never have in production.
+  const total = input.caseFile.cases.length;
+  let done = 0;
+
   for (const evaluationCase of input.caseFile.cases) {
     const steps: Step[] = [];
+    let cost: number | null = null;
 
     try {
       const decision = await input.pipeline.run({
@@ -119,6 +141,8 @@ export async function runPipeline(input: {
         records: observeRecords(records, steps),
         llm: observeLlm(input.llm, steps),
       });
+
+      cost = decision.llmCalls;
 
       runs.push({
         caseId: evaluationCase.caseId,
@@ -136,6 +160,9 @@ export async function runPipeline(input: {
       if (!isReplayMiss(error)) throw error;
       unrecorded.push(evaluationCase.caseId);
     }
+
+    done += 1;
+    input.onCase?.({ done, total, caseId: evaluationCase.caseId, llmCalls: cost });
   }
 
   return { pipeline: input.pipeline.name, runs, unrecorded };
