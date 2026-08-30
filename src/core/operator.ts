@@ -340,6 +340,66 @@ export function workingMinutesBetween(
   return Math.floor(overlapMs / MS_PER_MINUTE);
 }
 
+/**
+ * The instant at which `minutes` working minutes have passed after `from`.
+ *
+ * The inverse of `workingMinutesBetween`, and the reason it exists: the operator takes
+ * ten minutes over a case, and where those ten minutes land depends on whether a break,
+ * an evening or a weekend sits inside them. A case she picks up at 16:55 is finished at
+ * 09:05 the next working morning, not at 17:05 that evening.
+ *
+ * Counting starts at the first working minute at or after `from`, so `minutes = 0`
+ * answers `nextWorkingMinute` and a caller never has to ask twice. The result is the
+ * instant the budget runs out, which at the end of a span is the span's own end —
+ * 16:50 plus ten minutes is 17:00, a minute she is no longer at the queue for, and
+ * `workingMinutesBetween(from, result)` is still exactly `minutes`.
+ */
+export function advanceWorkingMinutes(
+  config: OperatorConfig,
+  from: Date,
+  minutes: number,
+): Date {
+  if (!Number.isInteger(minutes) || minutes < 0) {
+    throw new Error(
+      `operator: cannot advance by ${String(minutes)} working minutes — it must be a whole number, zero or more`,
+    );
+  }
+
+  const fromMs = from.getTime();
+  const spans = workingSpans(config);
+  const today = civilMomentAt(config.timezone, fromMs);
+
+  let remainingMs = minutes * MS_PER_MINUTE;
+
+  for (let offset = 0; offset <= SEARCH_LIMIT_DAYS; offset += 1) {
+    const date = addDays(today, offset);
+    if (!config.workdays.includes(isoWeekdayOf(date))) {
+      continue;
+    }
+
+    for (const span of spans) {
+      // Clamped to `from`, so a span already half spent today contributes only the
+      // half that is still ahead of the instant asked about.
+      const start = Math.max(
+        epochMsOfLocal(config.timezone, date, span.startMinute),
+        fromMs,
+      );
+      const available = epochMsOfLocal(config.timezone, date, span.endMinute) - start;
+      if (available <= 0) {
+        continue;
+      }
+      if (available >= remainingMs) {
+        return new Date(start + remainingMs);
+      }
+      remainingMs -= available;
+    }
+  }
+
+  throw new Error(
+    `operator: "${config.id}" has no ${String(minutes)} working minutes within ${SEARCH_LIMIT_DAYS} days of ${from.toISOString()}`,
+  );
+}
+
 // --- the parser ------------------------------------------------------------------
 
 function fail(message: string): never {

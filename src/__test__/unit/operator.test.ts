@@ -9,6 +9,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  advanceWorkingMinutes,
   casesPerDay,
   isWorking,
   nextWorkingMinute,
@@ -192,6 +193,81 @@ describe('capacity', () => {
   it('is 420 minutes and 42 cases a day', () => {
     expect(workingMinutesPerDay(MERVE)).toBe(420);
     expect(casesPerDay(MERVE)).toBe(42);
+  });
+});
+
+/**
+ * The inverse of `workingMinutesBetween`, and the one the operator's ten minutes a case
+ * are spent through. Every expectation below is the instant her budget runs out — which
+ * at the end of a span is the span's own end, a minute she is no longer working.
+ */
+describe('advanceWorkingMinutes', () => {
+  it('spends a plain quarter of an hour inside the shift', () => {
+    expect(advanceWorkingMinutes(MERVE, istanbul('02', '09:30'), 15)).toEqual(
+      istanbul('02', '09:45'),
+    );
+  });
+
+  it('answers `nextWorkingMinute` for a budget of zero', () => {
+    expect(advanceWorkingMinutes(MERVE, istanbul('02', '10:00'), 0)).toEqual(
+      istanbul('02', '10:00'),
+    );
+    expect(advanceWorkingMinutes(MERVE, istanbul('02', '12:30'), 0)).toEqual(
+      istanbul('02', '13:00'),
+    );
+  });
+
+  it('steps over the lunch break rather than through it', () => {
+    expect(advanceWorkingMinutes(MERVE, istanbul('02', '11:55'), 10)).toEqual(
+      istanbul('02', '13:05'),
+    );
+  });
+
+  it('lands on the end of a span when the budget runs out there', () => {
+    expect(advanceWorkingMinutes(MERVE, istanbul('02', '16:50'), 10)).toEqual(
+      istanbul('02', '17:00'),
+    );
+  });
+
+  it('carries the remainder into the next working morning', () => {
+    expect(advanceWorkingMinutes(MERVE, istanbul('02', '16:55'), 10)).toEqual(
+      istanbul('03', '09:05'),
+    );
+  });
+
+  /**
+   * Friday evening plus four working hours is Monday afternoon: 09:00–12:00 is three
+   * hours of it, the break spends none, and the fourth ends at 14:00.
+   */
+  it('spends nothing over a weekend', () => {
+    expect(advanceWorkingMinutes(MERVE, istanbul('06', '17:30'), 240)).toEqual(
+      istanbul('09', '14:00'),
+    );
+  });
+
+  it('starts counting at the next working minute when handed an idle instant', () => {
+    expect(advanceWorkingMinutes(MERVE, istanbul('07', '11:00'), 30)).toEqual(
+      istanbul('09', '09:30'),
+    );
+  });
+
+  it('round-trips against workingMinutesBetween', () => {
+    for (const minutes of [0, 1, 10, 240, 420, 900]) {
+      const from = istanbul('06', '15:20');
+      const to = advanceWorkingMinutes(MERVE, from, minutes);
+      expect(workingMinutesBetween(MERVE, from, to), `${String(minutes)} minutes`).toBe(
+        minutes,
+      );
+    }
+  });
+
+  it('refuses a budget that is not a whole number of minutes', () => {
+    expect(() => advanceWorkingMinutes(MERVE, istanbul('02', '09:00'), 2.5)).toThrow(
+      /whole number/,
+    );
+    expect(() => advanceWorkingMinutes(MERVE, istanbul('02', '09:00'), -1)).toThrow(
+      /whole number/,
+    );
   });
 });
 
