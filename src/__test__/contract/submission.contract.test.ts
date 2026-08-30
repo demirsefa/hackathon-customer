@@ -317,6 +317,47 @@ describe('rule 2 · a documented command finishes with nobody at the keyboard', 
     ).not.toBe('');
   });
 
+  /**
+   * The other half of the same rule, and the half that was missing: an exit code
+   * answers "did this work" *before* anything on the screen, so a run the README quotes
+   * a number from has to end at zero and have the number in its output.
+   *
+   * The check above only asks for internal consistency, and every one of these commands
+   * satisfies it while failing: a replay miss, an unparseable case file or any thrown
+   * error leaves `yarn eval --replay` and `yarn sim overload --replay` exiting 1 with a
+   * tidy line on stderr. The suite stayed green while nothing at all produced the
+   * headline figure. Naming the label each run has to print is what makes that red.
+   *
+   * `yarn serve` and `yarn sim nosuch --replay` are deliberately outside this list —
+   * refusing is the correct end for both, and the assertions above are the ones that
+   * describe them.
+   */
+  const HEADLINES: readonly (readonly [command: string, label: string])[] = [
+    // src/eval/report.ts — accuracy over the case set, the line the scorecard leads on.
+    ['yarn eval --replay', 'routed correctly'],
+    // src/sim/report.ts — the primary metric of dev/CHALLENGE.md §10.
+    ['yarn sim overload --replay', 'CRITICAL COVERAGE'],
+  ];
+
+  const RUNS = HEADLINES.flatMap(([command, label]) => {
+    const result = ATTEMPTS.find((one) => one.command === command);
+    return result === undefined ? [] : [{ ...result, label }];
+  });
+
+  it('every run expected to produce a number was actually attempted', () => {
+    // A renamed command would otherwise drop out of the list below in silence, and an
+    // empty `it.each` passes.
+    expect(RUNS.map((run) => run.command)).toEqual(HEADLINES.map(([command]) => command));
+  });
+
+  it.each(RUNS)('$command finishes the run and prints its result', (run) => {
+    expect(run.code, `${run.command} exited ${String(run.code)}\n${run.stderr}`).toBe(0);
+
+    expect(run.stdout, `${run.command} exited 0 without printing ${run.label}`).toContain(
+      run.label,
+    );
+  });
+
   it('a scenario that does not exist is refused rather than played', () => {
     const refused = ATTEMPTS.find((one) => one.command.includes('nosuch'));
 
