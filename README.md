@@ -56,8 +56,8 @@ full, how many of the messages she genuinely had to see did she actually reach?*
 
 ## How the advanced line decides
 
-Five steps, in this order, and the order is the design. Each one can stop the message;
-what reaches a customer is what four checks let through.
+Six steps, in this order, and the order is the design. Each one can stop the message;
+nothing reaches a customer that all six let through.
 
 1. **The record gate — before any model call.** Is the sender known? Does every order
    key in the text resolve? Does the sender own what they are asking about? A message
@@ -74,6 +74,11 @@ what reaches a customer is what four checks let through.
 5. **The draft is checked against the records, not against the model.** A reply may name
    only orders this sender was shown to own. That is arithmetic over the record layer,
    and it cannot be talked out of it.
+6. **And the draft is read once more, for what it promises.** Step 3 judged the message
+   before there was a draft to judge, so a reply can commit to something the category
+   never named — a refund. One that does is held. It runs last on purpose: from here it
+   can add a hold and can never lift one, so the worst it costs is a case in her queue
+   that did not need to be there.
 
 ### Which choice bought what
 
