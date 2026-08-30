@@ -4,19 +4,23 @@
  * Scores the evaluation cases against `core/` directly: one message in, one
  * decision out, compared to ground truth. No queue timing, no HTTP.
  *
- *   yarn eval         replay recorded model responses, no API key needed
- *   yarn eval --live  real API calls, and records what they answered
+ *   yarn eval --replay  recorded model responses, no API key needed
+ *   yarn eval --live    real API calls, and records what they answered
+ *   yarn eval           at a terminal: pick the mode. Piped or in CI: replay
  *
  * Yarn 4 passes trailing arguments straight through, so no `--` separator is
- * needed. The reproduction guide quotes these commands verbatim; they are the
- * ones that were run.
+ * needed. The reproduction guide quotes the two flagged commands verbatim; they are
+ * the ones that were run.
  *
- * There is no menu here, unlike `yarn sim`. This command has no required argument
- * to be missing, so a prompt could only interrupt the one command a judge runs
- * first — see the rule in `src/cli/README.md`.
+ * The bare command asks, where there is somebody to ask — see the rule in
+ * `src/cli/README.md`. This command has no required argument, so unlike `yarn sim`
+ * it never has a reason to stop: with no terminal the question is not asked and the
+ * answer is replay, which is what the bare command always did.
  *
- * The API key is read here and nowhere deeper. `openLlmSession` takes it as an
- * argument, so this line is the whole of this program's exposure to a credential.
+ * The API key is read here and nowhere deeper. Everything that needs it — the menu,
+ * which greys out live without one, and `openLlmSession` — takes it as an argument,
+ * so the one line below that reads the environment is the whole of this program's
+ * exposure to a credential.
  *
  * This file is the only part of the evaluation that touches a disk: it reads the case
  * file, because `core/` reads nothing, and it writes the trajectories, because
@@ -27,6 +31,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import { askMode, isCancelled, isInteractive, resolveMode } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
 import { parseCaseFile, type CaseFile } from '../core/cases.ts';
 import { PIPELINES } from '../core/pipeline.ts';
@@ -50,13 +55,34 @@ function stop(message: string): never {
 const env = loadEnvFile();
 if (env.warning !== null) console.warn(env.warning);
 
-const live = process.argv.slice(2).includes('--live');
+const mode = resolveMode({
+  args: process.argv.slice(2),
+  canAsk: isInteractive(),
+});
+
+if (mode.mode === null) stop(mode.error);
+
+const apiKey = process.env.ANTHROPIC_API_KEY;
+
+const live = await (async (): Promise<boolean> => {
+  if (mode.mode !== 'ask') return mode.mode === 'live';
+
+  try {
+    return await askMode(apiKey);
+  } catch (error) {
+    if (isCancelled(error)) {
+      console.error('cancelled.');
+      process.exit(130);
+    }
+    throw error;
+  }
+})();
 
 const params = resolveParams({ model: process.env.ANTHROPIC_MODEL });
 
 const session = ((): ReturnType<typeof openLlmSession> => {
   try {
-    return openLlmSession({ live, apiKey: process.env.ANTHROPIC_API_KEY, params });
+    return openLlmSession({ live, apiKey, params });
   } catch (error) {
     return stop(error instanceof Error ? error.message : String(error));
   }

@@ -4,21 +4,30 @@
  * Feeds a scenario's messages through `core/` in arrival order against a
  * simulated clock, and models the operator working the queue top-down.
  *
- *   yarn sim overload         replay recorded model responses, no API key needed
- *   yarn sim overload --live  real API calls, and records what they answered
- *   yarn sim                  at a terminal: pick the scenario and the mode
+ *   yarn sim overload --replay  recorded model responses, no API key needed
+ *   yarn sim overload --live    real API calls, and records what they answered
+ *   yarn sim overload           replay, as it always has: a named scenario runs
+ *   yarn sim                    at a terminal: pick the scenario and the mode
  *
  * The primary metric comes out of this program, so it carries the same two modes
  * `yarn eval` does. A number a judge cannot reproduce on a machine with no key is
  * not evidence, and this is the number the whole submission rests on.
  *
- * The menu is only ever a stand-in for the argument that is missing — see the rule
- * in `src/cli/README.md`. Naming a scenario skips it entirely, which is why the two
- * commands above still behave exactly as the reproduction guide says they do.
+ * `--replay` names what a bare `yarn sim overload` already did. It buys nothing at
+ * runtime and one thing on the page: a command whose mode can be read off it, which
+ * is the form the reproduction guide now quotes — see the rule in `src/cli/README.md`.
+ * Naming a scenario still skips every question.
  *
  * The API key is read here and nowhere deeper — see the note in `src/eval/index.ts`.
  */
-import { askMode, askScenario, isCancelled, isInteractive, USAGE } from '../cli/ask.ts';
+import {
+  askMode,
+  askScenario,
+  isCancelled,
+  isInteractive,
+  resolveMode,
+  USAGE,
+} from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
 import { resolveParams } from '../llm/key.ts';
 import { openLlmSession } from '../llm/session.ts';
@@ -27,9 +36,19 @@ const env = loadEnvFile();
 if (env.warning !== null) console.warn(env.warning);
 
 const args = process.argv.slice(2);
-const flagged = args.includes('--live');
-// Found by shape rather than by position, so the flag may sit on either side of it.
+// Found by shape rather than by position, so the flags may sit on either side of it.
 const named = args.find((arg) => !arg.startsWith('--'));
+
+// The mode question is asked only where the scenario question already is, so a named
+// scenario runs on the flag it was given, or on replay when it was given none.
+const mode = resolveMode({ args, canAsk: named === undefined && isInteractive() });
+
+// Contradicting flags first: that is a mistake about this command whether or not the
+// scenario is there, and it should be read before anything about a missing argument.
+if (mode.mode === null) {
+  console.error(mode.error);
+  process.exit(1);
+}
 
 // Nobody to ask, and nothing to run: the usage line, exactly as before the menu
 // existed. An unattended run has to fail here rather than wait for an answer.
@@ -41,14 +60,13 @@ if (named === undefined && !isInteractive()) {
 const apiKey = process.env.ANTHROPIC_API_KEY;
 
 const chosen = await (async (): Promise<{ scenario: string; live: boolean }> => {
-  if (named !== undefined) return { scenario: named, live: flagged };
-
   try {
-    const scenario = await askScenario();
-    // `--live` on the command line has already answered this one.
+    const scenario = named ?? (await askScenario());
+
     return {
       scenario,
-      live: flagged || (await askMode(apiKey !== undefined && apiKey.length > 0)),
+      // A flag on the command line has already answered this one.
+      live: mode.mode === 'ask' ? await askMode(apiKey) : mode.mode === 'live',
     };
   } catch (error) {
     if (isCancelled(error)) {
