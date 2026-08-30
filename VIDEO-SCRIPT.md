@@ -301,7 +301,16 @@ yarn check
 > bu: _"the Video section has no URL in it (rule 1)"_. Linki yapıştırınca 562 / 562 olur.
 > Yeşile dönmezse linki yanlış yere koymuşsundur — 2. adımı tekrar et.
 
-### 4. Commit ve push
+### 4. Commit ve push — **GitHub şu an 5 commit geride**
+
+> 🛑 `origin/main` = `854e70a`. amb-02 düzeltmesi ve güncellenmiş README **GitHub'da yok.**
+> Şu an klonlayan bir jüri eski sayıları görür.
+>
+> Push, `pre-push` kancasındaki `SUBMISSION` sözleşmesi rule 1 tarafından bloke ediliyor:
+> _"the Video section carries a link"_. Bu bir arıza değil, kasıtlı kapı — video linki
+> README'ye girmeden hiçbir şey GitHub'a çıkmıyor. **`--no-verify` ile geçme.**
+>
+> 2. adımı yaptığın an kapı açılır ve tek push 6 commit'i birden gönderir.
 
 ```bash
 git add README.md
@@ -318,8 +327,10 @@ git push origin main
 Doğrula:
 
 ```bash
-git status --short && git log --oneline -1
+git status --short && git log --oneline origin/main..HEAD
 ```
+
+Bu komut **boş** dönmeli — boşsa her şey GitHub'da demektir.
 
 ### 5. HackerEarth submission formu
 
