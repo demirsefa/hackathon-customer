@@ -15,7 +15,7 @@ shift, a lunch break and a weekend in the way.
 | ----- | ----- |
 | Line | `baseline` |
 | Scenario | `overload` |
-| Commit | `a5f726c` |
+| Commit | `4928c36` |
 | Model | `claude-sonnet-5`, max tokens 16000, effort medium |
 | Client | replay (claude-sonnet-5) — 28 recorded response(s) in fixtures/llm-cache.json |
 | Arrivals | 90 |
