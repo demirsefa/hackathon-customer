@@ -390,7 +390,7 @@ both reproduce: the overload numbers are in `trajectories/baseline-overload.json
 (4 / 19 and 19 / 19) are in the `-normal-day` records beside them. The Results table
 above is the authority for every figure.
 
-<!-- VIDEO LINK GOES HERE - the submission is incomplete without it -->
+https://www.youtube.com/watch?v=WUZ-WFf7CnY
 
 ## Branches
 
