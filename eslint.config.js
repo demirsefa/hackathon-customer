@@ -28,6 +28,20 @@ export default tseslint.config(
     },
   },
   {
+    // The scenario generator, which is standalone for the same reason: it produces
+    // committed data and must run with nothing installed. ESM rather than CommonJS,
+    // so its globals are declared separately from the block above.
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      sourceType: 'module',
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        URL: 'readonly',
+      },
+    },
+  },
+  {
     rules: {
       // The triage pipeline is judged on its decisions, so unused bindings are
       // usually a sign that a signal was computed and then silently dropped.
