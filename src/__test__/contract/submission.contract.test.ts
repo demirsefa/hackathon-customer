@@ -20,7 +20,11 @@
  *
  *   SUBMISSION_NOW=2026-08-31T00:00:00Z yarn test
  */
+import { execFile } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
@@ -201,6 +205,112 @@ describe('rule 2 · every command handed to a judge resolves', () => {
   it.each(invocations)('$file promises `yarn $script`', ({ script }) => {
     expect(Object.keys(PACKAGE_JSON.scripts)).toContain(script);
   });
+});
+
+// ------------------------------------- rule 2 · and running one unattended ends
+
+/**
+ * The only check in this project that starts the programs.
+ *
+ * Everything else here reads files, and reading a file cannot tell whether `yarn sim`
+ * hangs on a menu when nobody is at the keyboard, or whether a command that produced
+ * no number exited 0 anyway. Both are invisible on the page and both are what a judge
+ * meets first, so this one spawns them.
+ *
+ * Two things keep it safe to have in the suite: stdio is piped, so `isInteractive()`
+ * is false at both ends and no prompt can open; and every run names `--replay`, so
+ * nothing here can reach the network or spend a key whatever the environment holds.
+ * The working directory is the system temp directory rather than the repository, so a
+ * developer's local environment file cannot make the run behave differently on their
+ * machine than on a clean clone.
+ */
+const run = promisify(execFile);
+
+const entry = (path: string): string => fileURLToPath(new URL(path, repoRoot));
+
+type Attempt = {
+  readonly command: string;
+  readonly code: number;
+  readonly stdout: string;
+  readonly stderr: string;
+};
+
+const attempt = async (
+  command: string,
+  file: string,
+  args: readonly string[],
+): Promise<Attempt> => {
+  // A non-zero exit rejects; the rejection carries the same three fields plus the
+  // code, so both outcomes are read through one shape rather than two branches.
+  const settled = (await run(process.execPath, [entry(file), ...args], {
+    cwd: tmpdir(),
+    timeout: 60_000,
+    // Never inherited: a key in the environment must not be able to change what this
+    // check does, and `--replay` must be the only path any of these runs can take.
+    env: { ...process.env, ANTHROPIC_API_KEY: '' },
+  }).catch((error: unknown) => error)) as {
+    readonly code?: unknown;
+    readonly stdout?: unknown;
+    readonly stderr?: unknown;
+  };
+
+  const text = (value: unknown): string => (typeof value === 'string' ? value : '');
+
+  return {
+    command,
+    code: typeof settled.code === 'number' ? settled.code : 0,
+    stdout: text(settled.stdout),
+    stderr: text(settled.stderr),
+  };
+};
+
+/** Every form the README hands out, plus the one a judge reaches by typing badly. */
+const ATTEMPTS: readonly Attempt[] = await Promise.all([
+  attempt('yarn eval --replay', 'src/eval/index.ts', ['--replay']),
+  attempt('yarn eval --help', 'src/eval/index.ts', ['--help']),
+  attempt('yarn sim overload --replay', 'src/sim/index.ts', ['overload', '--replay']),
+  attempt('yarn sim --help', 'src/sim/index.ts', ['--help']),
+  attempt('yarn sim nosuch --replay', 'src/sim/index.ts', ['nosuch', '--replay']),
+  attempt('yarn serve', 'src/service/index.ts', []),
+]);
+
+describe('rule 2 · a documented command finishes with nobody at the keyboard', () => {
+  // Reaching these at all is half the assertion: a prompt with piped stdio would have
+  // held every one of them until the timeout killed it.
+  it.each(ATTEMPTS)('$command answers instead of waiting', ({ stdout, stderr }) => {
+    expect(`${stdout}${stderr}`.trim()).not.toBe('');
+  });
+
+  it.each(ATTEMPTS)('$command exits saying what it did', (result) => {
+    if (result.code === 0) {
+      // Exit 0 is read before anything else on the screen, so it may not stand over an
+      // empty one: a run that produced nothing has to say so with a code.
+      expect(result.stdout.trim(), `${result.command} exited 0 with no result`).not.toBe(
+        '',
+      );
+      return;
+    }
+
+    expect(
+      result.stderr.trim(),
+      `${result.command} exited ${String(result.code)} with nothing on stderr`,
+    ).not.toBe('');
+  });
+
+  it('a scenario that does not exist is refused rather than played', () => {
+    const refused = ATTEMPTS.find((one) => one.command.includes('nosuch'));
+
+    expect(refused?.code).not.toBe(0);
+    expect(refused?.stderr).toContain('is not a scenario');
+  });
+
+  it.each(ATTEMPTS.filter((one) => one.command.endsWith('--help')))(
+    '$command prints its usage line and stops',
+    ({ code, stdout }) => {
+      expect(code).toBe(0);
+      expect(stdout).toContain('usage:');
+    },
+  );
 });
 
 // ------------------------------------------------------- rule 3 · no blank evidence

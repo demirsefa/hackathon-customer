@@ -34,6 +34,15 @@ here rather than restated — see rule 8.
    `package.json`. A repro guide whose commands do not run is worse than none: it
    spends the judge's goodwill before the project gets a chance.
 
+   **And running one unattended ends.** Piped, redirected or in CI, no documented
+   command waits for an answer — a menu is only ever a stand-in for something nobody
+   said, and a prompt with nobody at the keyboard is a hang, not a question. Its exit
+   code then answers "did this work" before anything is read: `0` only with the run's
+   result on stdout, non-zero with a line on stderr saying what went wrong and what to
+   do next. A placeholder that prints one line and exits `0` is a run a judge reads as
+   successful, and it is the cheapest way to be believed about a number that was never
+   produced.
+
 3. **No blank evidence.** A **results table** — a markdown table whose first header
    cell is `Metric` — never has an empty cell. A value that is not measured yet is
    written as the literal `pending`, so an unmeasured number can never be mistaken
@@ -86,6 +95,9 @@ badly. It is doing something well that nobody scores.
 ## Traps
 
 - Writing `yarn evaluate` in the README when the script is `yarn eval`.
+- A command that prints a placeholder line and exits `0`, so an unwritten program and
+  a finished one are the same two characters in a shell.
+- A menu that is right at a terminal and a hang everywhere else.
 - Leaving a results cell blank "until the numbers land", then submitting the table.
 - Reporting a number no command reproduces, or one produced by a run that is not
   committed.
@@ -99,6 +111,13 @@ badly. It is doing something well that nobody scores.
 - **Test:** `src/__test__/contract/submission.contract.test.ts`.
   - Rules 2, 6 and 8 are asserted unconditionally — they are true today and going red
     means someone broke them.
+  - Rule 2's second half is the only check here that **starts the programs**. Every
+    entry point is spawned with piped stdio — no terminal at either end, which is what
+    a judge's pipe and a CI runner both look like — always on `--replay`, so the suite
+    can never reach the network or spend a key. Each one has to finish inside the
+    timeout, and its exit code has to agree with what it wrote: `0` with something on
+    stdout, non-zero with an explanation on stderr. `--help` is spawned too, because a
+    command that cannot say what it takes is one a judge has to read the source for.
   - Rules 1, 3, 4 and 5 describe deliverables that do not exist yet. Until the code
     freeze the check **reports** each missing item as `PENDING` with its rule number
     and fails nothing; from the freeze instant onward the same items are assertions.
@@ -126,7 +145,11 @@ badly. It is doing something well that nobody scores.
 > Here is the **SUBMISSION** contract: `dev/contracts/SUBMISSION.md`. Read these files:
 > `README.md`, `dev/CHALLENGE.md`, `package.json`, `lefthook.yml`, and list
 > `trajectories/`, `scenarios/`, `fixtures/`.
-> For each numbered rule, decide whether it is currently honoured. For rule 3, check
+> For each numbered rule, decide whether it is currently honoured. For rule 2, run
+> every documented command yourself, including the wrong forms — a scenario that does
+> not exist, a misspelt flag, both flags at once — and say for each whether the message
+> names the next step and whether the exit code matches what was actually produced.
+> For rule 3, check
 > every results number against a command in the Reproduction guide that would produce
 > it, and against committed evidence. For rule 7, look at the last few commits and say
 > whether the work they contain lands inside the rubric of `dev/CHALLENGE.md` §3 or
