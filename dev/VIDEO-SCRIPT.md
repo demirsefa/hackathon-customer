@@ -80,13 +80,15 @@ clear
 
 **SÖYLE**
 
+> **Let me show you the problem first.** //
+>
 > Merve runs a support desk alone. //
 >
 > Her work day is **420 minutes**. One message takes her **10 minutes**. //
 > So she can handle **42** messages in a day. //
 > **90** messages arrive.
 
-> The hard part is not writing the replies. // A model can already write a good reply. //
+> The hard part is not writing the replies. // A model can already do that. //
 >
 > The hard part is **which ones she opens first**, // and **which ones get answered
 > without her**.
@@ -107,7 +109,7 @@ yarn sim overload --replay
 
 **SÖYLE**
 
-> One command. //
+> **So let's run it.** // One command. //
 >
 > It replays model answers that are saved inside this repository. //
 > **No API key. No internet.** The same numbers every time. //
@@ -132,7 +134,7 @@ jq -c '.coverage | {criticalReached, critical, queued}' trajectories/baseline-ov
 
 **SÖYLE**
 
-> First, the baseline. // This is what a good engineer builds on day one. //
+> **Let's start with the baseline.** // This is what a good engineer builds on day one. //
 >
 > **One** model call gives the category, the urgency and the draft together. //
 > Then **one** simple check: is this category on a sensitive list?
@@ -140,8 +142,8 @@ jq -c '.coverage | {criticalReached, critical, queued}' trajectories/baseline-ov
 > Now the result. // **42** messages really needed her eyes. // She reached **9**. //
 > That is **21 percent**.
 
-> And look at this number: it held back only **15** messages out of **90**. //
-> The other **75** it answered on its own, without her.
+> And it held back only **15** messages out of **90**. // The other **75** it answered
+> on its own, without her.
 
 **Vurgu:** "9" ve "21 percent" yavaş. Sonra bir saniye dur — sonraki sahne bunu ikiye katlıyor.
 
@@ -160,6 +162,8 @@ jq -c '.scorecard | {llmCalls, cases}' trajectories/baseline.json trajectories/a
 
 **SÖYLE**
 
+> **Now the same run, with the new design.** //
+>
 > Same command. Same **90** messages. Same recorded model. //
 >
 > **32** out of **42**. // That is **76 percent**, up from **21**.
@@ -187,7 +191,7 @@ jq -r '.run.runs[] | select(.caseId=="auth-01") | "sender: \(.message.senderId)\
 
 **SÖYLE**
 
-> Let me show you why. // Case `auth-01`. //
+> **So where does that come from?** // Let me show you one case. // Case `auth-01`. //
 >
 > A customer called **S-ARAS** asks when order **1060** will arrive. //
 > This is the reply the baseline sent. //
@@ -232,10 +236,9 @@ jq '[to_entries[] | select(.value.prompt | startswith("TASK: verify"))] | length
 
 **SÖYLE**
 
-> One more thing — something we **removed**. //
+> **One more thing — this time, something we removed.** //
 >
-> We built a third model call. It asked the model: "is your own draft safe?" //
-> It sounded like a good idea.
+> We built a third model call. It asked the model: "is your own draft safe?"
 
 > It was not. // It blocked **4** good replies, and it caught **0** real problems. //
 > Every case it touched, it made worse.
@@ -262,7 +265,7 @@ jq -c '.coverage | {queued, opened, averageWaitMinutes}' trajectories/advanced-o
 
 **SÖYLE**
 
-> What is still broken? //
+> **So what is still broken?** //
 >
 > Routing is now **28** out of **28**. Nothing is sent that should be held. //
 > But there is a new problem, and it is the **queue**.
@@ -292,6 +295,8 @@ corepack enable && yarn install && yarn sim overload --replay
 
 **SÖYLE**
 
+> **Last thing: how you run this yourself.** //
+>
 > Three commands from a clean clone. //
 > **No API key. No internet.** // You get these exact numbers. //
 >
