@@ -26,10 +26,19 @@ share in `src/core/policy.ts`, and every harness that scores them — `src/eval/
 4. Both are measured on the **same cases**, driven from one table, never from two.
 5. A rule that applies to both lives in shared code (`src/core/policy.ts`). A rule that
    exists only inside one pipeline is a parity break even when its behaviour matches.
-6. Any difference in resources is **stated**, not hidden. Today there is one line: the
-   baseline, at one model call per decision. When the advanced line lands, its budget
-   and the ratio between the two are written here, in this rule, before the results are
-   reported anywhere else.
+6. Any difference in resources is **stated**, not hidden. The budgets, in full:
+
+   | Line       | Model calls per decision                                                                                                                                  |
+   | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `baseline` | exactly 1                                                                                                                                                 |
+   | `advanced` | 0 when the record layer decides · 1 at the classification gate · 2 when the draft fails the permitted-order check · 3 for a reply that reaches a customer |
+
+   **The ratio is at most 3:1, and the average is lower than that** — every decision the
+   record gate makes costs nothing, and those are the cases the comparison turns on. Both
+   halves have to be said: quoting the ceiling alone overstates what the line spends, and
+   quoting the average alone hides what it is allowed to spend. Any result reported
+   anywhere else carries this ratio with it.
+
 7. The baseline is written as well as the advanced pipeline. Its code quality is never
    weakened to widen the gap.
 
@@ -55,24 +64,30 @@ spends more is a different claim from one that decides better.
 ## Enforcement
 
 - **Test:** `src/__test__/contract/parity.contract.test.ts` — runs one case table through
-  every line in `PIPELINES` and asserts, per case, the expected reason code, the shared
-  decision shape (`decisionFields`) and `honoursApprovalGate`. It also asserts every line
-  declares exactly `REQUIRED_FEATURES`.
+  every line in `PIPELINES` and asserts, per case, that the decision's route and reason
+  come from the shared vocabulary (`ROUTES`, `REASON_CODES`), that it lands where that
+  line's own design lands, and `honoursApprovalGate`. Across lines it compares
+  `decisionFields` between them and holds each to the budget in rule 6. It also asserts
+  every line declares exactly `REQUIRED_FEATURES`.
 - Red here means the headline comparison has stopped measuring design and started
   measuring a missing feature.
 - Rules 5 and 7 are **judgment**: structure and code quality are checked by the audit
   prompt below, not by the test.
-- **Partly suspended, in the open.** `src/core/advanced/` is a placeholder, so `PIPELINES`
-  holds one line and the cross-line half of this contract has nothing to compare. Three
-  assertions are therefore not running:
+- **The suspension is over, and one of its three lines was wrong.** While
+  `src/core/advanced/` was a placeholder, three assertions had nothing to compare and were
+  named here as suspended. Two are back as they were written. The first was
+  **misdescribed**: it was recorded as "the same route and reason code on both sides of
+  each case", which is not what rule 2 says and never was. Rule 2 asks for "identical
+  fields, same vocabulary of routes and reason codes" — a shared vocabulary, not a shared
+  verdict.
 
-  1. the same route and reason code on both sides of each case (rule 2);
-  2. `decisionFields` compared between the lines rather than against a fixed list (rule 2);
-  3. the model-call budget as a ratio rather than a single line's number (rule 6).
+  Per-case route equality would have been a rule that makes the two lines agree by
+  contract, and a comparison between two lines that are required to agree measures
+  nothing. The lines are _supposed_ to diverge on cases; that divergence is the primary
+  metric. What they may never diverge on is the words they express a decision in.
 
-  They are named in the test file's header as well, and they come back in the same commit
-  as the advanced line. A contract is suspended out loud or not at all — quietly dropping
-  an assertion and leaving the file green is the failure this note exists to prevent.
+  So the correction is to the note, not to the contract: nothing here has been relaxed,
+  and the assertion that now runs is the one rule 2 always stated.
 
 - When `src/eval/` lands, it drives every line from the same case list. A harness that
   scores only one of them, or scores them on different inputs, breaks rule 4.

@@ -167,41 +167,82 @@ choice a person would plausibly make:
 
 ## 9. Advanced
 
-**Not built yet.** `src/core/advanced/index.ts` is a placeholder; what stands there is
-the material it will be assembled from — `src/core/authority.ts`, `src/core/policy.ts`,
-and the three prompt files beside it.
+Built: `src/core/advanced/`. Same seven features as the baseline, different
+arrangement — and the arrangement is the entire claim.
 
 ```
 message in
   ↓
-1. RISK SCAN (independent of the text)
-   - keywords: refund, bank details, payment, cancellation
-   - record reference: does it cite an order number?
-   - sender: account age, prior message count
+0. RECORD GATE — src/core/authority.ts · ZERO model calls
+   sender unknown to the record layer       → human queue (unknown_sender)
+   an ORD-nnnn key that resolves to nothing → human queue (unresolved_reference)
+   order.owner != message.senderId          → human queue (authority_mismatch)
+   otherwise: the orders a reply may name are now fixed, and nothing below widens them
   ↓
-2. AUTHORITY CHECK (without reading the text) — src/core/authority.ts
-   sender unknown to the record layer      → human queue (unknown_sender)
-   reference that resolves to nothing      → human queue (unresolved_reference)
-   order.owner != message.senderId         → human queue (authority_mismatch)
+1. CLASSIFICATION — one call, with no draft in the same breath
+   category + confidence + instruction + needsRecord
   ↓
-3. CLASSIFICATION (separate pass, no draft pressure)
-   category + confidence
+2. GATE
+   instruction                        → human queue (instruction_in_message)
+   needsRecord AND no reference        → human queue (unreferenced_record_request)
+   sensitive category                  → human queue (sensitive_category)
+   confidence < CONFIDENCE_THRESHOLD   → human queue (low_confidence)
   ↓
-4. GATE
-   risky category OR confidence < CONFIDENCE_THRESHOLD
-   → human queue with a reason (sensitive_category | low_confidence), STOP
+3. DRAFT — one call, and only for a message four checks let through
   ↓
-5. DRAFT (safe cases only)
-  ↓
-6. POLICY VALIDATION — src/core/policy.ts validateDraft()
-   fails → feed back, rewrite (max 2)
-   still fails → human queue (draft_policy_violation)
+4. VERIFICATION
+   a. validateDraft() against the permitted orders — deterministic, no call
+      fails → human queue (draft_policy_violation)
+   b. one call for a second opinion on the draft
+      refused, unsure or unusable → human queue
   ↓
 auto-send (routine_reply)
 ```
 
-The gate runs before any model call, which is what makes "this decision cost zero
-model calls" an observable fact rather than a claim.
+Step 0 runs before any model call, which is what makes "this decision cost zero model
+calls" an observable fact rather than a claim: `llmCalls` is a field on the decision and
+`refusingLlm` in the test suite fails the moment one happens.
+
+**Two questions the baseline structurally cannot ask.** Both ride on the classification
+call rather than adding one.
+
+- `instruction` — is this text aimed at the system rather than at the desk? The baseline
+  cannot ask it honestly, because its single call produces the category _and_ the reply
+  that complies with the attack: the model reporting on the instruction is the model that
+  just followed it. Split apart, the classifier has no draft to justify. The recorded
+  baseline run shows how close the miss is — on two injection cases the model named the
+  attack in its own category, and the single risk check, holding a closed list with no
+  word for it, sent the reply anyway.
+- `needsRecord` — would answering mean reading this sender's own records? Asked because
+  the record layer cannot answer it: with no key in the text there is nothing to resolve,
+  and whether a question is _about_ a record is a reading of the text. So this one is
+  decided after step 1 and costs that call, and no zero-call claim is made for it. It
+  separates "the order I placed last week, I have lost the number" from "do you deliver
+  to İzmir, no order yet" — and on the committed set it moves no case that another rule
+  would not also catch. It is here because the class of message is real, not because it
+  earns a point.
+
+**Priority.** `instruction_in_message` sits at 85 — under every reason the record layer
+established, over every category read out of the text. It is derived from the message,
+and a signal derived from the message must not outrank one derived from the records.
+Ranked above them, a sender who writes `SYSTEM:` at the top of an email would have
+promoted himself past every genuine authority violation in the operator's morning: the
+order of her queue becomes a thing the attacker writes, and the defence becomes the
+attack. Held either way — the argument is only about when she reads it.
+
+**Removed experiment: the rewrite loop.** An earlier draft of this section had step 4
+feed a failed draft back to the model to be rewritten, up to twice, before giving up.
+It is not built, and the reason is worth more than the feature: `validateDraft` answers
+the only question that matters — may this reply name this order — deterministically and
+for free. A model asked to rewrite is being asked to argue with a rule that has already
+decided, and the calls it spends buy nothing a human reading the case would not do
+better. It also broke the budget: two rewrites plus a verification is five calls for the
+message least likely to be safe.
+
+**Cost.** 0 model calls when the records decide, 1 at the classification gate, 2 when the
+draft fails the permitted-order check, 3 for a reply that reaches a customer. Against the
+baseline's flat 1, the ratio is at most 3:1 and the average is lower —
+[`dev/contracts/FEATURE-PARITY.md`](contracts/FEATURE-PARITY.md) rule 6 states both.
 
 ## 10. How it is measured
 
