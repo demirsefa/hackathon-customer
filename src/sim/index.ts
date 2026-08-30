@@ -30,6 +30,7 @@ import {
 } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
 import { resolveParams } from '../llm/key.ts';
+import { CACHE_FILE, readCacheIfPresent } from '../llm/replay.ts';
 import { openLlmSession } from '../llm/session.ts';
 
 const env = loadEnvFile();
@@ -66,7 +67,13 @@ const chosen = await (async (): Promise<{ scenario: string; live: boolean }> => 
     return {
       scenario,
       // A flag on the command line has already answered this one.
-      live: mode.mode === 'ask' ? await askMode(apiKey) : mode.mode === 'live',
+      live:
+        mode.mode === 'ask'
+          ? await askMode({
+              apiKey,
+              recorded: Object.keys(readCacheIfPresent(CACHE_FILE)).length,
+            })
+          : mode.mode === 'live',
     };
   } catch (error) {
     if (isCancelled(error)) {

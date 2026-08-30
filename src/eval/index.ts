@@ -36,6 +36,7 @@ import { loadEnvFile } from '../cli/env.ts';
 import { parseCaseFile, type CaseFile } from '../core/cases.ts';
 import { PIPELINES } from '../core/pipeline.ts';
 import { resolveParams } from '../llm/key.ts';
+import { CACHE_FILE, readCacheIfPresent } from '../llm/replay.ts';
 import { openLlmSession } from '../llm/session.ts';
 import { reportLines } from './report.ts';
 import { runPipeline, unrecordedNotice, type PipelineRun } from './run.ts';
@@ -64,11 +65,14 @@ if (mode.mode === null) stop(mode.error);
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 
+/** Read only to answer the menu; the session opens its own copy a moment later. */
+const recordedCount = (): number => Object.keys(readCacheIfPresent(CACHE_FILE)).length;
+
 const live = await (async (): Promise<boolean> => {
   if (mode.mode !== 'ask') return mode.mode === 'live';
 
   try {
-    return await askMode(apiKey);
+    return await askMode({ apiKey, recorded: recordedCount() });
   } catch (error) {
     if (isCancelled(error)) {
       console.error('cancelled.');

@@ -105,21 +105,43 @@ export async function askScenario(): Promise<Scenario> {
  * It takes the key rather than a boolean so that both entry points ask the same
  * question of it, instead of each writing its own idea of what a usable key is.
  */
-export async function askMode(apiKey: string | undefined): Promise<boolean> {
-  const hasKey = apiKey !== undefined && apiKey.length > 0;
+/**
+ * The menu knows what is on the shelf.
+ *
+ * An empty cache makes replay a choice that cannot succeed: every request misses and
+ * the run stops without a number. Offering it as though it might work is how somebody
+ * picks it twice. So when nothing is recorded the option says so, live is the answer
+ * already selected, and replay is put out of reach — but only when live is actually
+ * available, because a menu with no reachable answer is worse than a run that fails
+ * with an explanation.
+ */
+export async function askMode(input: {
+  readonly apiKey: string | undefined;
+  /** Responses already in fixtures/llm-cache.json. Zero is the case worth naming. */
+  readonly recorded: number;
+}): Promise<boolean> {
+  const hasKey = input.apiKey !== undefined && input.apiKey.length > 0;
+  const empty = input.recorded === 0;
 
   return select<boolean>({
     message: 'How should the model be called?',
+    default: empty && hasKey,
     choices: [
       {
         value: false,
         name: 'replay',
-        description: 'recorded responses from fixtures/llm-cache.json — free, no key',
+        description: empty
+          ? 'fixtures/llm-cache.json is empty — nothing recorded yet, so nothing to replay'
+          : `${input.recorded} recorded response(s) from fixtures/llm-cache.json — free, no key`,
+        disabled:
+          empty && hasKey ? '(nothing recorded yet — run live once to record it)' : false,
       },
       {
         value: true,
         name: 'live',
-        description: 'real API calls, recorded as they come back — costs money',
+        description: empty
+          ? 'real API calls, recorded as they come back — run this once, then commit the cache'
+          : 'real API calls, recorded as they come back — costs money',
         disabled: hasKey ? false : '(no ANTHROPIC_API_KEY in the environment)',
       },
     ],
