@@ -17,6 +17,7 @@ import {
   isInteractive,
   resolveMode,
   wantsHelp,
+  wantsLog,
 } from '../../cli/ask.ts';
 
 describe('isInteractive', () => {
@@ -106,6 +107,25 @@ describe('SIM_USAGE', () => {
     expect(SIM_USAGE).toContain('yarn sim <scenario>');
     expect(SIM_USAGE).toContain('--live');
     expect(SIM_USAGE).toContain('--replay');
+    expect(SIM_USAGE).toContain('--log');
+  });
+});
+
+describe('wantsLog', () => {
+  it('is off unless it was asked for, which is what keeps the default output the same', () => {
+    expect(wantsLog([])).toBe(false);
+    expect(wantsLog(['overload', '--replay'])).toBe(false);
+  });
+
+  it('is read wherever it sits on the line, and past the npm separator', () => {
+    expect(wantsLog(['--log'])).toBe(true);
+    expect(wantsLog(['--log', 'overload', '--replay'])).toBe(true);
+    expect(wantsLog(['--', '--log'])).toBe(true);
+  });
+
+  it('answers nothing about the mode: the two questions are independent', () => {
+    expect(resolveMode({ args: ['--log'], canAsk: false }).mode).toBe('replay');
+    expect(resolveMode({ args: ['--log', '--live'], canAsk: false }).mode).toBe('live');
   });
 });
 
@@ -122,6 +142,9 @@ describe('checkArguments', () => {
     expect(sim('overload', '--replay')).toBeNull();
     expect(sim('--live', 'normal-day')).toBeNull();
     expect(sim()).toBeNull();
+    // `--log` is a word both commands take, so it is not a usage mistake in either.
+    expect(evaluate('--replay', '--log')).toBeNull();
+    expect(sim('overload', '--log')).toBeNull();
   });
 
   it('refuses a misspelt flag instead of falling through to the bare form', () => {

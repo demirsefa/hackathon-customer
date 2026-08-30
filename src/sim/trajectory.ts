@@ -23,7 +23,7 @@ import {
   type OperatorConfig,
 } from '../core/operator.ts';
 import type { PlayedArrival, Timeline } from './play.ts';
-import { windowLabel } from './report.ts';
+import { dayClock, localClock, windowLabel } from './report.ts';
 import { missedCaseIds, type Coverage, type MissReason } from './score.ts';
 
 /**
@@ -52,31 +52,6 @@ const percent = (part: number, whole: number): string =>
 const ids = (caseIds: readonly string[]): string =>
   caseIds.length === 0 ? 'none' : caseIds.map((id) => `\`${id}\``).join(', ');
 
-/**
- * An instant on the operator's own wall clock, as `Mon 31 Aug 09:03`.
- *
- * Her zone rather than UTC or the reader's, because every sentence in this file is
- * about her day: "opened at 06:03Z" is not something anybody can check against a shift
- * that starts at 09:00. The zone name is printed beside the table so the offset is
- * stated rather than assumed.
- */
-function localClock(instant: string, timezone: string): string {
-  const parts = new Intl.DateTimeFormat('en-GB', {
-    timeZone: timezone,
-    hourCycle: 'h23',
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).formatToParts(new Date(instant));
-
-  const read = (type: Intl.DateTimeFormatPartTypes): string =>
-    parts.find((part) => part.type === type)?.value ?? '?';
-
-  return `${read('weekday')} ${read('day')} ${read('month')} ${read('hour')}:${read('minute')}`;
-}
-
 const MISS_REASON: Readonly<Record<MissReason, string>> = {
   auto_sent: 'answered automatically — she never saw it',
   not_reached: 'still in the queue when the run ended',
@@ -84,18 +59,15 @@ const MISS_REASON: Readonly<Record<MissReason, string>> = {
 };
 
 function operatorTable(operator: OperatorConfig): readonly string[] {
-  const time = (minuteOfDay: number): string =>
-    `${String(Math.floor(minuteOfDay / 60)).padStart(2, '0')}:${String(minuteOfDay % 60).padStart(2, '0')}`;
-
   const breaks = operator.breaks
-    .map((span) => `${time(span.startMinute)}–${time(span.endMinute)}`)
+    .map((span) => `${dayClock(span.startMinute)}–${dayClock(span.endMinute)}`)
     .join(', ');
 
   return [
     '| Field | Value |',
     '| ----- | ----- |',
     `| Operator | \`${operator.id}\` |`,
-    `| Shift | ${time(operator.shift.startMinute)}–${time(operator.shift.endMinute)} ${operator.timezone} |`,
+    `| Shift | ${dayClock(operator.shift.startMinute)}–${dayClock(operator.shift.endMinute)} ${operator.timezone} |`,
     `| Breaks | ${breaks === '' ? 'none' : breaks} |`,
     `| Workdays | ISO ${operator.workdays.join(', ')} (1 = Monday … 7 = Sunday) |`,
     `| Minutes per case | ${String(operator.minutesPerCase)} |`,

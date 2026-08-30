@@ -7,6 +7,10 @@
  * buried in a column. Here it is the first row and it is the headline of the whole
  * project, and the cases she never reached are printed by id underneath it, because a
  * percentage says how bad the ordering was and the ids say what it was bad at.
+ *
+ * The two labels the other renderers in this folder need — the window, and an instant
+ * on the operator's own clock — are exported from here for the same reason: `sim/` has
+ * one place that decides how a number is worded, and one format written once.
  */
 import type { Coverage } from './score.ts';
 import { missedCaseIds } from './score.ts';
@@ -19,6 +23,39 @@ const perArrival = (calls: number, arrivals: number): string =>
 
 const ids = (caseIds: readonly string[]): string =>
   caseIds.length === 0 ? 'none' : caseIds.join(', ');
+
+/**
+ * An instant on the operator's own wall clock, as `Mon 31 Aug 09:03`.
+ *
+ * Her zone rather than UTC or the reader's, because every sentence that quotes an
+ * instant here is about her day: "opened at 06:03Z" is not something anybody can check
+ * against a shift that starts at 09:00. The zone name is printed beside the times so
+ * the offset is stated rather than assumed.
+ *
+ * It lives beside `windowLabel` for the reason that one does: `trajectory.ts` and
+ * `log.ts` both write her times, and two copies of a clock format are two formats.
+ */
+export function localClock(instant: string, timezone: string): string {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: timezone,
+    hourCycle: 'h23',
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(new Date(instant));
+
+  const read = (type: Intl.DateTimeFormatPartTypes): string =>
+    parts.find((part) => part.type === type)?.value ?? '?';
+
+  return `${read('weekday')} ${read('day')} ${read('month')} ${read('hour')}:${read('minute')}`;
+}
+
+/** A minute of the day as `09:00`. Her shift, her breaks: the same two digits twice. */
+export function dayClock(minuteOfDay: number): string {
+  return `${String(Math.floor(minuteOfDay / 60)).padStart(2, '0')}:${String(minuteOfDay % 60).padStart(2, '0')}`;
+}
 
 /** `4h` reads better than `240 working minutes` and is the same number stated once. */
 export function windowLabel(minutes: number): string {

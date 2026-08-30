@@ -25,8 +25,20 @@ import { select } from '@inquirer/prompts';
 export const LIVE_FLAG = '--live';
 export const REPLAY_FLAG = '--replay';
 
-/** The only two options either command takes. Anything else on the line is a typo. */
-const FLAGS: readonly string[] = [LIVE_FLAG, REPLAY_FLAG];
+/**
+ * The running commentary, off by default.
+ *
+ * Both programs print a result and, on a terminal, one line that says the run is
+ * moving. That is what a judge should meet, and nothing about it changes here. `--log`
+ * is for the person developing the thing: it adds a block on **stderr** — the operator
+ * working her queue for `yarn sim`, the case-by-case verdicts for `yarn eval` — and
+ * leaves stdout exactly as it was, so `yarn eval --replay > results.txt` still writes
+ * the same table it always did.
+ */
+export const LOG_FLAG = '--log';
+
+/** The only options either command takes. Anything else on the line is a typo. */
+const FLAGS: readonly string[] = [LIVE_FLAG, REPLAY_FLAG, LOG_FLAG];
 
 export const HELP_FLAGS: readonly string[] = ['--help', '-h'];
 
@@ -35,10 +47,10 @@ export const SCENARIOS = ['normal-day', 'overload'] as const;
 export type Scenario = (typeof SCENARIOS)[number];
 
 /** Built from `SCENARIOS` and the flags, so the usage line cannot drift from them. */
-export const SIM_USAGE = `usage: yarn sim <scenario> [${LIVE_FLAG} | ${REPLAY_FLAG}]   (${SCENARIOS.join(' | ')})`;
+export const SIM_USAGE = `usage: yarn sim <scenario> [${LIVE_FLAG} | ${REPLAY_FLAG}] [${LOG_FLAG}]   (${SCENARIOS.join(' | ')})`;
 
 /** The same line for the command that takes no positional argument at all. */
-export const EVAL_USAGE = `usage: yarn eval [${LIVE_FLAG} | ${REPLAY_FLAG}]`;
+export const EVAL_USAGE = `usage: yarn eval [${LIVE_FLAG} | ${REPLAY_FLAG}] [${LOG_FLAG}]`;
 
 /**
  * What a command answers to, and what it accepts. Held as data rather than as two
@@ -125,6 +137,17 @@ export function checkArguments(input: {
   return positionals.length > 1
     ? complain(`one ${command.noun} at a time, and got ${quoted(positionals)}.`)
     : null;
+}
+
+/**
+ * Whether the run was asked to narrate itself.
+ *
+ * It is not part of `resolveMode`: the mode decides what the run costs and whether a
+ * question is asked, and this decides nothing at all — a run with `--log` and one
+ * without produce the same decisions, the same numbers and the same files.
+ */
+export function wantsLog(args: readonly string[]): boolean {
+  return meaningful(args).includes(LOG_FLAG);
 }
 
 /** `--help` is answered rather than refused: it is a question, not a mistake. */

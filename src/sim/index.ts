@@ -39,8 +39,10 @@ import {
   SIM_COMMAND,
   SIM_USAGE,
   wantsHelp,
+  wantsLog,
 } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
+import { createPaint, wantsColour } from '../cli/paint.ts';
 import { caseLine, createProgress } from '../cli/progress.ts';
 import { parseCaseFile, type CaseFile } from '../core/cases.ts';
 import { PIPELINES } from '../core/pipeline.ts';
@@ -51,6 +53,7 @@ import { isLiveCallFailed } from '../llm/anthropic.ts';
 import { resolveParams } from '../llm/key.ts';
 import { CACHE_FILE, isReplayMiss, readCacheIfPresent } from '../llm/replay.ts';
 import { openLlmSession } from '../llm/session.ts';
+import { operatorLog } from './log.ts';
 import { playScenario } from './play.ts';
 import { playedLine, reportLines } from './report.ts';
 import { scoreTimeline } from './score.ts';
@@ -87,6 +90,10 @@ if (complaint !== null) stop(complaint);
 
 // Found by shape rather than by position, so the flags may sit on either side of it.
 const named = args.find((arg) => !arg.startsWith('-'));
+
+// Asked for once, here, because it changes nothing about the run: the same arrivals,
+// the same decisions, the same coverage number and the same trajectory file.
+const logging = wantsLog(args);
 
 // The mode question is asked only where the scenario question already is, so a named
 // scenario runs on the flag it was given, or on replay when it was given none.
@@ -196,6 +203,11 @@ const progress = createProgress({
   rewrites: process.stderr.isTTY === true,
 });
 
+/** The same destination and the same question: what may be written to stderr here. */
+const paint = createPaint({
+  colours: wantsColour({ isTTY: process.stderr.isTTY === true, env: process.env }),
+});
+
 const records = createRecordStore(caseFile);
 const commit = headCommit();
 mkdirSync(TRAJECTORIES_DIR, { recursive: true });
@@ -244,6 +256,14 @@ try {
         arrivals: timeline.played.length,
       }),
     );
+
+    // Her day, before the numbers it produced. On stderr with the progress line rather
+    // than on stdout with the metric: a judge reading the block that matters must not
+    // have to scroll past forty rows to reach it, and `yarn sim overload --replay > out`
+    // writes the same file it always did.
+    if (logging) {
+      for (const line of operatorLog(timeline, paint)) process.stderr.write(`${line}\n`);
+    }
 
     const coverage = scoreTimeline(timeline);
 

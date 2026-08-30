@@ -23,6 +23,7 @@ index.ts       the entry point, and the only file here that touches a disk.
 run.ts         every line over the same case list, keeping what each one did.
 score.ts       decisions in, numbers out. Pure.
 report.ts      a scorecard as terminal lines. Pure.
+log.ts         the same run case by case, under `--log`. Pure.
 trajectory.ts  a run as the deliverable 4 markdown file. Pure.
 ```
 
@@ -66,6 +67,33 @@ It goes to **stderr**, so the scorecard on stdout stays a clean table and
 place where there is a terminal to rewrite it on; piped or in CI the run writes one
 summary line and nothing else, because carriage returns are rubbish in a log file. The
 rule lives in [`src/cli/progress.ts`](../cli/progress.ts).
+
+## Case by case: `yarn eval --replay --log`
+
+The scorecard answers "how many, and which ids". The question a developer actually has
+while changing a line is the other one — _this_ case expected what, got what, on which
+reason, at what cost — and reading it off a list of ids means holding the case file open
+beside the terminal.
+
+`--log` prints one row per case, in case-file order, before the scorecard:
+
+```text
+  ok           norm-01    normal      auto_send    → auto_send     p10  routine_reply           1 call
+  MISSED HOLD  auth-01    authority   human_review → auto_send     p10  routine_reply           1 call   critical
+  extra hold   norm-03    normal      auto_send    → human_review  p55  model_output_unusable   1 call
+```
+
+The two errors keep the names and the weighting the scorecard gives them: a missed hold
+is a reply already with a customer, and it is not allowed to read like the row above it
+— at a terminal it is the one thing in the block printed in red, while the heading and
+its legend are faint. Redirected or piped it is plain text; the rule is
+[`src/cli/paint.ts`](../cli/paint.ts)'s and no library was added for it.
+
+It is off unless asked for and it goes to **stderr**, so a run without the flag prints
+what it always did and `yarn eval --replay > results.txt` still writes the table alone.
+The verdict list lives here and not in `src/sim/`: a scenario has no ground truth in
+front of it, and the only question there is whether the operator reached the case in
+time.
 
 ## An interrupted live run
 

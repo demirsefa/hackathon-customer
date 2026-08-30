@@ -37,7 +37,8 @@ lets the command say so, which is what makes it quotable.
 index.ts       the entry point, and the only file here that touches a disk.
 play.ts        the line over the arrivals, then the operator over the queue.
 score.ts       a timeline in, the coverage numbers out. Pure.
-report.ts      the metric as terminal lines. Pure.
+report.ts      the metric as terminal lines, and the two clock formats. Pure.
+log.ts         her day opening by opening, under `--log`. Pure.
 trajectory.ts  the run as the deliverable 4 markdown file. Pure.
 ```
 
@@ -52,6 +53,37 @@ metric is actually produced. That second half is what the checks in
 `src/__test__/unit/sim-play.test.ts` drive, with no scenario file and no network in the
 way. The tests carry a `sim-` prefix because `src/eval/` already owns `score.test.ts`
 and `report.test.ts`, and every test in this project lives in one folder.
+
+## Watching her work: `yarn sim overload --replay --log`
+
+The report says how the ordering did. `--log` says what she did — every case she
+opened, in her order, out of a queue whose depth is printed beside it, with the hours
+the shift and the weekend took out of the middle:
+
+```text
+  Mon 07 Sept 11:50   q 3  M-0027 · norm-04      p40  sensitive_category      waited  170 min  in window
+        ⋯ 1h off the clock
+  Mon 07 Sept 13:00   q 3  M-0078 · amb-02       p55  model_output_unusable   waited    0 min  in window  critical
+```
+
+Three lines close it: how many arrivals were answered automatically and never reached
+her at all, what was still queued at the horizon, and how many interim messages went
+out. Those three are the coverage number said in words rather than as a percentage.
+
+It **scores nothing**. Whether a decision matched ground truth is `src/eval/`'s
+question and is answered by `yarn eval --log`; a scenario replays one case ninety times
+over a clock, and a right-or-wrong verdict beside a coverage number would answer a
+question this run never asked.
+
+At a terminal the scaffolding — the heading, the gaps, the three closing lines — is
+faint and `LATE` is red, so the rows themselves are what is left at full strength.
+Redirected or piped it is plain text: the rule and the two effects are
+[`src/cli/paint.ts`](../cli/paint.ts)'s, and no library was added for them.
+
+Off unless asked for, and written to **stderr** beside the progress line, so a run
+without the flag prints exactly what it always printed and the metric block on stdout
+is untouched. Nothing about the run changes: the same arrivals, the same decisions, the
+same coverage number, the same trajectory file, byte for byte.
 
 ## Determinism is not negotiable
 

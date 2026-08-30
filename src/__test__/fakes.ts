@@ -7,6 +7,25 @@
  */
 import type { LlmClient, LlmRequest } from '../core/llm.ts';
 
+/**
+ * Painted text back as plain text, for the two `--log` checks.
+ *
+ * Both make the same assertion: the colour is decoration, so taking it off gives back
+ * the block the plain painter produced, column for column.
+ *
+ * It cuts the sequences out rather than matching them, because a control character in a
+ * regular expression is a lint error — and a fair one, since nobody can see it in a
+ * diff. Every sequence `src/cli/paint.ts` writes is `ESC[…m`, so everything up to and
+ * including the first `m` after an escape is the part that is not text.
+ */
+const ESCAPE = '\u001b';
+
+export const stripColour = (text: string): string =>
+  text
+    .split(ESCAPE)
+    .map((part, index) => (index === 0 ? part : part.slice(part.indexOf('m') + 1)))
+    .join('');
+
 export type TaskName = 'triage' | 'classify' | 'draft' | 'verify';
 
 const TASKS: readonly TaskName[] = ['triage', 'classify', 'draft', 'verify'];
