@@ -44,6 +44,7 @@ import {
 import { loadEnvFile } from '../cli/env.ts';
 import { parseCaseFile, type CaseFile } from '../core/cases.ts';
 import { PIPELINES } from '../core/pipeline.ts';
+import { isLiveCallFailed } from '../llm/anthropic.ts';
 import { resolveParams } from '../llm/key.ts';
 import { CACHE_FILE, readCacheIfPresent } from '../llm/replay.ts';
 import { openLlmSession } from '../llm/session.ts';
@@ -145,16 +146,28 @@ console.log('');
 
 const runs: PipelineRun[] = [];
 
+/** Set only by a live call that never reached an answer; see the catch below. */
+let liveFailure: string | null = null;
+
 try {
   // Every line over the same case list — dev/contracts/FEATURE-PARITY.md rule 4.
   for (const pipeline of PIPELINES) {
     runs.push(await runPipeline({ pipeline, caseFile, llm: session.llm }));
   }
+} catch (error) {
+  // A live call that never reached an answer — a rejected key, a rate limit, no
+  // network — is a fact about the environment, exactly like a missing key, and it gets
+  // one line for the same reason. Anything else keeps its stack: that one is a defect
+  // in a line, and the stack is the part somebody needs.
+  if (!isLiveCallFailed(error)) throw error;
+  liveFailure = error.message;
 } finally {
   // Whatever a live run has already paid for is written down even if it fell over
   // halfway, so the next attempt does not buy the same answers twice.
   session.save();
 }
+
+if (liveFailure !== null) stop(liveFailure);
 
 const missing = runs.flatMap((run) => run.unrecorded);
 
