@@ -141,13 +141,13 @@ export const advanced: Pipeline = {
       });
     }
 
+    // A refusal here is doubt, not a breach. The rule that could be broken was checked
+    // above, deterministically, and it passed — so calling this a policy violation puts
+    // a second opinion at the priority of an established fact and sends the operator to
+    // a thank-you note before a refund demand. It is the same answer the threshold below
+    // gives, and it is read in the same place in her morning.
     if (!verified.ok) {
-      return humanReview({
-        messageId,
-        reason: 'draft_policy_violation',
-        draft,
-        llmCalls: 3,
-      });
+      return humanReview({ messageId, reason: 'low_confidence', draft, llmCalls: 3 });
     }
 
     if (verified.confidence < CONFIDENCE_THRESHOLD) {

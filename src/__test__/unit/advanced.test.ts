@@ -196,13 +196,20 @@ describe('advanced · the draft, and what may be said in it', () => {
     expect(llm.calls).toBe(2);
   });
 
-  it('holds a draft the second opinion refuses', async () => {
+  /**
+   * A refusal here is doubt, not a breach, and the difference is load-bearing rather
+   * than pedantic: the rule that could have been broken was checked one step earlier
+   * and passed. Reported as a policy violation it carried priority 90, which put
+   * thank-you notes ahead of every refund demand in the operator's queue and cost the
+   * overload run nine points of coverage.
+   */
+  it('reads a refused second opinion as doubt, not as a breach', async () => {
     const { decision } = await run({
       text: 'Where is ORD-2002?',
       script: { ...routine, verify: JSON.stringify({ ok: false, confidence: 0.9 }) },
     });
 
-    expect(decision.reason).toBe('draft_policy_violation');
+    expect(decision.reason).toBe('low_confidence');
     expect(decision.llmCalls).toBe(3);
   });
 
