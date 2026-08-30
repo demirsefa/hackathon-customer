@@ -1,5 +1,5 @@
 /**
- * The evaluation case by case. `yarn eval --log`.
+ * The evaluation case by case, on every run.
  *
  * The scorecard beside this one is a count of what went right and a list of ids for
  * what went wrong. That is the right shape for a result and the wrong shape for the
@@ -13,9 +13,8 @@
  * there is whether the operator reached it in time. Printing a per-case right-or-wrong
  * beside a coverage number would answer a question that run never asked.
  *
- * Pure, and off unless asked for. It returns lines and never writes them; the entry
- * point puts them on **stderr**, so the scorecard on stdout is byte for byte what it
- * was without the flag.
+ * Pure. It returns lines and never writes them; the entry point puts them on
+ * **stderr**, so the scorecard on stdout is untouched.
  *
  * The `Paint` it is handed decides nothing about the words: given none it produces the
  * plain text the checks assert on, and given the terminal's it faints the heading and

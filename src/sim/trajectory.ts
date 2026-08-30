@@ -16,15 +16,15 @@
  * a replayed run is a function of the commit and the committed cache, both named below,
  * so a clock would add diff noise without adding anything a reader could reproduce from.
  */
-import type { LlmParams } from '../llm/key.ts';
 import {
   workingMinutesPerDay,
   casesPerDay,
   type OperatorConfig,
 } from '../core/operator.ts';
 import type { PlayedArrival, Timeline } from './play.ts';
+import { recordFile, type SimRecord } from './record.ts';
 import { dayClock, localClock, windowLabel } from './report.ts';
-import { missedCaseIds, type Coverage, type MissReason } from './score.ts';
+import { missedCaseIds, type MissReason } from './score.ts';
 
 /**
  * `trajectories/<line>-<scenario>.md`.
@@ -121,16 +121,9 @@ function sliceRows(input: {
   ];
 }
 
-export function renderTrajectory(input: {
-  readonly timeline: Timeline;
-  readonly coverage: Coverage;
-  /** The commit the run was produced at, so the code behind a number is nameable. */
-  readonly commit: string;
-  /** `LlmSession.label` — which client answered, and out of which cache. */
-  readonly llmLabel: string;
-  readonly params: LlmParams;
-}): string {
-  const { commit, coverage, params, timeline } = input;
+export function renderTrajectory(record: SimRecord): string {
+  const { coverage, provenance, timeline } = record;
+  const { commit, params } = provenance;
   const zone = timeline.operator.timezone;
 
   const opened = timeline.played
@@ -151,6 +144,11 @@ export function renderTrajectory(input: {
     `\`yarn sim ${timeline.scenario} --replay\`, which reads the committed model responses, so this`,
     'file is reproducible on a machine with no API key.',
     '',
+    `**This document is a rendering.** The run itself is \`trajectories/${recordFile(timeline.pipeline, timeline.scenario)}\` —`,
+    'every arrival, its decision, when she opened it and how long it waited, as JSON. The',
+    'queue below is a slice of it; that file is not. This page is generated from it and',
+    'states nothing it does not contain.',
+    '',
     'This is the run the **primary metric** comes out of. The evaluation trajectory beside it',
     'shows the same agent deciding; this one shows what those decisions cost a person with a',
     'shift, a lunch break and a weekend in the way.',
@@ -163,7 +161,7 @@ export function renderTrajectory(input: {
     `| Scenario | \`${timeline.scenario}\` |`,
     `| Commit | \`${commit}\` |`,
     `| Model | \`${params.model}\`, max tokens ${String(params.maxTokens)}, effort ${params.effort} |`,
-    `| Client | ${input.llmLabel} |`,
+    `| Client | ${provenance.llmLabel} |`,
     `| Arrivals | ${String(coverage.arrivals)} |`,
     `| First opened | ${localClock(timeline.startedAt, zone)} |`,
     `| Run ends | ${localClock(timeline.horizonAt, zone)} — ${windowLabel(timeline.windowMinutes)} after the last arrival, past which no queued case could still be reached in time |`,

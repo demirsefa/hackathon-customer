@@ -42,10 +42,38 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/**
+ * A model asked for JSON often returns it inside a markdown code fence — ```` ```json ````
+ * on the first line and ```` ``` ```` on the last. The payload is exactly what was asked
+ * for; the fence is presentation wrapped around it.
+ *
+ * That is a formatting habit, not a malformed answer, so it is removed before parsing
+ * rather than routed as unusable. The distinction is the whole point of the function:
+ * an answer that arrived in the requested shape must be read, and an answer that did
+ * not must not be guessed at. Prose around the JSON is therefore left alone — a model
+ * that explained itself instead of answering did not follow the instruction, and
+ * digging a object out of the sentence would be exactly the guessing this boundary
+ * exists to refuse.
+ *
+ * Found the hard way. Six of the twenty-eight responses in `fixtures/llm-cache.json`
+ * are fenced, every one of them carrying valid JSON, and every one of them was being
+ * discarded — which sent correctly-classified messages to the operator under
+ * `model_output_unusable` and inflated the coverage number the submission is scored on.
+ */
+function stripFence(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed.startsWith('```')) return trimmed;
+
+  return trimmed
+    .replace(/^```[^\n]*\n/, '')
+    .replace(/\n?```$/, '')
+    .trim();
+}
+
 export function parseObject(raw: string): Record<string, unknown> | null {
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(stripFence(raw));
   } catch {
     // Malformed JSON from a model is an expected outcome, not a programming error:
     // it is reported through the return value so the caller can route on it.

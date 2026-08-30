@@ -61,9 +61,31 @@ export function needsInterim(input: {
   return !input.operatorHasSeen && input.elapsedMinutes >= INTERIM_AFTER_MINUTES;
 }
 
-/** Categories a message may not be answered on without a human reading it first. */
+/**
+ * Whether a message may not be answered without a human reading it first.
+ *
+ * Matched by containment rather than by equality, because the category is free text a
+ * model wrote, not a value it chose from a menu. Asked to triage a refund demand the
+ * recorded answers come back as `refund_request`, `returns_refunds` and `billing_dispute`
+ * — none of which equals a word in the list above, and all three of which are the thing
+ * the list is there to catch. Equality made the list depend on the model guessing our
+ * vocabulary exactly, which is not a policy, it is a coincidence.
+ *
+ * It errs toward holding, and that direction is chosen. `src/eval/score.ts` states the
+ * asymmetry the whole product turns on: a message held that could have been answered
+ * costs the operator ten minutes, and a message auto-sent that should have been held
+ * costs a customer and is already gone by the time anyone notices. So `no_refund_needed`
+ * landing in her queue is a cost worth paying for `refund_request` never skipping it.
+ *
+ * What it does **not** fix: the model still names the category in whatever words and
+ * whatever language it likes — one recorded answer is `iade_talebi` — and no amount of
+ * string matching over that is a risk decision. That is the first weakness
+ * dev/CHALLENGE.md §8 lists against the baseline, and it is the advanced line's job,
+ * not this function's.
+ */
 export function isSensitive(category: string): boolean {
-  return SENSITIVE_CATEGORIES.includes(category);
+  const normalised = category.toLowerCase();
+  return SENSITIVE_CATEGORIES.some((sensitive) => normalised.includes(sensitive));
 }
 
 export type DraftVerdict =

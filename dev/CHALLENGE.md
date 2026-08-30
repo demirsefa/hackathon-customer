@@ -213,27 +213,51 @@ morning brings 60–80. The queue therefore never empties: overload is not a sce
 we contrive, it is the normal condition, and what the metric measures is the _order_
 of the queue rather than its length.
 
-| Metric                             | Baseline      | Advanced | Change  |
-| ---------------------------------- | ------------- | -------- | ------- |
-| **Critical coverage (normal day)** | 6 / 19 (32%)  | pending  | pending |
-| **Critical coverage (overload)**   | 13 / 42 (31%) | pending  | pending |
-| False positives (legitimate held)  | pending       | pending  | pending |
-| Reply quality (out of 5, by hand)  | pending       | pending  | pending |
-| Human time per case                | pending       | pending  | pending |
-| Cost per case                      | pending       | pending  | pending |
+| Metric                             | Baseline     | Advanced | Change  |
+| ---------------------------------- | ------------ | -------- | ------- |
+| **Critical coverage (normal day)** | 4 / 19 (21%) | pending  | pending |
+| **Critical coverage (overload)**   | 9 / 42 (21%) | pending  | pending |
+| False positives (legitimate held)  | 0            | pending  | pending |
+| Reply quality (out of 5, by hand)  | pending      | pending  | pending |
+| Human time per case                | pending      | pending  | pending |
+| Cost per case                      | pending      | pending  | pending |
 
 The two coverage cells come from `yarn sim normal-day --replay` and
 `yarn sim overload --replay`; the runs behind them are committed as
-`trajectories/baseline-normal-day.md` and `trajectories/baseline-overload.md`.
+`trajectories/baseline-normal-day.json` and `trajectories/baseline-overload.json`, with
+a rendering of each beside it. The false-positive cell is the `unnecessary holds` line
+of `yarn eval --replay`. Every figure is a field in one of those files:
 
-**What the first measurement changed about the paragraph above it.** Under `overload`
-the baseline holds 22 of 90 arrivals for the operator and auto-sends the other 68. Her
-capacity is 42 a day, so _its_ queue never outruns her day: she opens every case in it,
-and coverage is still 31% — because 29 of the 42 critical arrivals were answered
-automatically and she was never shown that they existed. "The queue never empties" is a
-claim about a line that holds the right things; the baseline's failure is one of
-holding, not of capacity, and the queue ordering is what the advanced line will be
+```bash
+jq '.coverage | {critical, criticalReached}' trajectories/baseline-overload.json
+```
+
+**What measuring changed about the paragraph above it.** Under `overload` the baseline
+holds 15 of 90 arrivals for the operator and auto-sends the other 75. Her capacity is 42
+a day, so _its_ queue never outruns her day: she opens every case in it, after an average
+of 15 working minutes, and coverage is still 21% — because 33 of the 42 critical arrivals
+were answered automatically and she was never shown that they existed. "The queue never
+empties" is a claim about a line that holds the right things; the baseline's failure is
+one of holding, not of capacity, and the queue ordering is what the advanced line will be
 measured on.
+
+**Two earlier numbers were published and both were wrong.** They are recorded here rather
+than quietly replaced, because a measurement nobody can audit is not a measurement.
+
+| Published | Overload      | Normal day   | Why it was wrong                                                                                                                                                                                                                                                                                                                                      |
+| --------- | ------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| first     | 13 / 42 (31%) | 6 / 19 (32%) | Six of the 28 recorded model responses arrive inside a markdown code fence, all six carrying valid JSON. `parseObject` parsed the raw text, so all six were discarded as `model_output_unusable` and routed to the operator. **Every** critical case she reached, she reached by that accident — the design's own risk rule contributed none of them. |
+| second    | 3 / 42 (7%)   | 1 / 19 (5%)  | With the fence stripped, `isSensitive` compared the model's free-text category to the list by equality. The model writes `refund_request`, `returns_refunds`, `billing_dispute`; the list holds `refund` and `billing`. None matched, so a customer demanding a refund in as many words was answered automatically.                                   |
+| current   | 9 / 42 (21%)  | 4 / 19 (21%) | —                                                                                                                                                                                                                                                                                                                                                     |
+
+Both were defects in shared code, not design choices, and neither is among the five
+weaknesses §8 lists. Fixing them was not optional: FEATURE-PARITY rule 7 requires the
+baseline to be written as well as the advanced line, and a baseline flattered by a parser
+bug or hobbled by a string comparison is a comparison that measures neither.
+
+The first fix cost the headline 24 points and the second gave back 14. That direction is
+the point: `src/core/policy.ts` and `src/core/llm.ts` are shared, so the advanced line
+inherits both corrections and the gap between the two lines stays a gap between designs.
 
 ### Evaluation set — 28 cases
 

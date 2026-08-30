@@ -74,4 +74,43 @@ describe('isSensitive', () => {
     expect(isSensitive('refund')).toBe(true);
     expect(isSensitive('shipping')).toBe(false);
   });
+
+  /**
+   * The categories are free text a model wrote, and these five are the ones it actually
+   * wrote in `fixtures/llm-cache.json` for messages the list exists to catch. Equality
+   * caught none of them.
+   */
+  it.each([
+    'refund_request',
+    'returns_refunds',
+    'billing_dispute',
+    'account_access_issue',
+    'legal_threat',
+  ])('catches %s, which no entry in the list equals', (category) => {
+    expect(isSensitive(category)).toBe(true);
+  });
+
+  it('is not confused by case', () => {
+    expect(isSensitive('Refund_Request')).toBe(true);
+    expect(isSensitive('BILLING')).toBe(true);
+  });
+
+  /**
+   * Deliberately held rather than answered. The asymmetry is in `src/eval/score.ts`:
+   * an unnecessary hold costs ten minutes, a wrong auto-send costs a customer.
+   */
+  it('errs toward holding when a sensitive word appears at all', () => {
+    expect(isSensitive('no_refund_needed')).toBe(true);
+  });
+
+  it('still lets an ordinary category through', () => {
+    expect(isSensitive('order_status')).toBe(false);
+    expect(isSensitive('delivery_feedback')).toBe(false);
+    expect(isSensitive('product_support')).toBe(false);
+  });
+
+  /** The limit, stated: a category in another language is not reachable this way. */
+  it('does not pretend to read a category the model wrote in Turkish', () => {
+    expect(isSensitive('iade_talebi')).toBe(false);
+  });
 });

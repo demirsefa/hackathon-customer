@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { CaseSubset } from '../../core/cases.ts';
 import { autoSend, humanReview, type Decision, type Route } from '../../core/decision.ts';
+import { buildRecord } from '../../eval/record.ts';
 import type { CaseRun } from '../../eval/run.ts';
 import { scoreRun } from '../../eval/score.ts';
 import {
@@ -71,13 +72,15 @@ const heldCase = (caseId: string, subset: CaseSubset, expectedRoute: Route): Cas
   });
 
 function render(runs: readonly CaseRun[]): string {
-  return renderTrajectory({
-    run: { pipeline: 'baseline', runs, unrecorded: [] },
-    scorecard: scoreRun({ pipeline: 'baseline', outcomes: runs }),
-    commit: 'abc1234',
-    llmLabel: 'replay (claude-sonnet-5) — 28 recorded response(s)',
-    params: PINNED_PARAMS,
-  });
+  return renderTrajectory(
+    buildRecord({
+      run: { pipeline: 'baseline', runs, unrecorded: [] },
+      scorecard: scoreRun({ pipeline: 'baseline', outcomes: runs }),
+      commit: 'abc1234',
+      llmLabel: 'replay (claude-sonnet-5) — 28 recorded response(s)',
+      params: PINNED_PARAMS,
+    }),
+  );
 }
 
 describe('trajectoryFile', () => {

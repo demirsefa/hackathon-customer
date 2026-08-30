@@ -1,5 +1,5 @@
 /**
- * The case-by-case block `yarn eval --log` prints.
+ * The case-by-case block `yarn eval` prints.
  *
  * The scorecard says how many and which ids; this says what each case expected, what
  * it got, and what it cost. The one rule worth a check is the one the scorecard

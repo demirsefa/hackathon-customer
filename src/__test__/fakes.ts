@@ -8,7 +8,7 @@
 import type { LlmClient, LlmRequest } from '../core/llm.ts';
 
 /**
- * Painted text back as plain text, for the two `--log` checks.
+ * Painted text back as plain text, for the two log checks.
  *
  * Both make the same assertion: the colour is decoration, so taking it off gives back
  * the block the plain painter produced, column for column.

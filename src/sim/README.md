@@ -38,9 +38,14 @@ index.ts       the entry point, and the only file here that touches a disk.
 play.ts        the line over the arrivals, then the operator over the queue.
 score.ts       a timeline in, the coverage numbers out. Pure.
 report.ts      the metric as terminal lines, and the two clock formats. Pure.
-log.ts         her day opening by opening, under `--log`. Pure.
-trajectory.ts  the run as the deliverable 4 markdown file. Pure.
+log.ts         her day, opening by opening. Pure.
+record.ts      the run as the deliverable 4 JSON file — the raw one. Pure.
+trajectory.ts  the same run as the markdown beside it, rendered. Pure.
 ```
+
+`record.ts` mirrors `src/eval/record.ts`, and the reason it is a module of its own is
+given there. It matters more here: the markdown shows the first twenty-four openings of
+ninety arrivals, so the JSON is the only place the rest of the run exists.
 
 The split mirrors `src/eval/` on purpose, and for the same reason: everything that
 decides a number can be checked against inputs written by hand. `index.ts` reads
@@ -54,9 +59,9 @@ metric is actually produced. That second half is what the checks in
 way. The tests carry a `sim-` prefix because `src/eval/` already owns `score.test.ts`
 and `report.test.ts`, and every test in this project lives in one folder.
 
-## Watching her work: `yarn sim overload --replay --log`
+## Watching her work
 
-The report says how the ordering did. `--log` says what she did — every case she
+The report says how the ordering did. The block above it says what she did — every case she
 opened, in her order, out of a queue whose depth is printed beside it, with the hours
 the shift and the weekend took out of the middle:
 
@@ -71,7 +76,7 @@ her at all, what was still queued at the horizon, and how many interim messages 
 out. Those three are the coverage number said in words rather than as a percentage.
 
 It **scores nothing**. Whether a decision matched ground truth is `src/eval/`'s
-question and is answered by `yarn eval --log`; a scenario replays one case ninety times
+question and is answered there; a scenario replays one case ninety times
 over a clock, and a right-or-wrong verdict beside a coverage number would answer a
 question this run never asked.
 
@@ -80,10 +85,8 @@ faint and `LATE` is red, so the rows themselves are what is left at full strengt
 Redirected or piped it is plain text: the rule and the two effects are
 [`src/cli/paint.ts`](../cli/paint.ts)'s, and no library was added for them.
 
-Off unless asked for, and written to **stderr** beside the progress line, so a run
-without the flag prints exactly what it always printed and the metric block on stdout
-is untouched. Nothing about the run changes: the same arrivals, the same decisions, the
-same coverage number, the same trajectory file, byte for byte.
+Written to **stderr** beside the progress line, so the metric block on stdout is
+untouched and `yarn sim overload --replay > out` writes the file it always did.
 
 ## Determinism is not negotiable
 

@@ -23,9 +23,18 @@ index.ts       the entry point, and the only file here that touches a disk.
 run.ts         every line over the same case list, keeping what each one did.
 score.ts       decisions in, numbers out. Pure.
 report.ts      a scorecard as terminal lines. Pure.
-log.ts         the same run case by case, under `--log`. Pure.
-trajectory.ts  a run as the deliverable 4 markdown file. Pure.
+log.ts         the same run, case by case. Pure.
+record.ts      the run as the deliverable 4 JSON file — the raw one. Pure.
+trajectory.ts  the same run as the markdown beside it, rendered. Pure.
 ```
+
+`record.ts` is its own module rather than a function in `trajectory.ts` because the two
+answer to different readers, and only one of them is a document. The JSON is the run:
+every case, every prompt, every raw answer, the scorecard. The markdown is a view of it
+— four representative cases and the numbers — and `index.ts` renders it from the
+**parsed serialisation** of the record, so the page cannot state a fact the file lacks.
+Keeping the shape in one module is what lets that property be asserted
+(`src/__test__/unit/eval-record.test.ts`) instead of maintained by hand.
 
 The split has one purpose: everything that decides a number can be tested against
 inputs written by hand. `index.ts` reads `fixtures/cases.json` — `core/` reads no
@@ -68,14 +77,14 @@ place where there is a terminal to rewrite it on; piped or in CI the run writes 
 summary line and nothing else, because carriage returns are rubbish in a log file. The
 rule lives in [`src/cli/progress.ts`](../cli/progress.ts).
 
-## Case by case: `yarn eval --replay --log`
+## Case by case
 
 The scorecard answers "how many, and which ids". The question a developer actually has
 while changing a line is the other one — _this_ case expected what, got what, on which
 reason, at what cost — and reading it off a list of ids means holding the case file open
 beside the terminal.
 
-`--log` prints one row per case, in case-file order, before the scorecard:
+One row per case, in case-file order, printed before the scorecard:
 
 ```text
   ok           norm-01    normal      auto_send    → auto_send     p10  routine_reply           1 call
@@ -89,9 +98,8 @@ is a reply already with a customer, and it is not allowed to read like the row a
 its legend are faint. Redirected or piped it is plain text; the rule is
 [`src/cli/paint.ts`](../cli/paint.ts)'s and no library was added for it.
 
-It is off unless asked for and it goes to **stderr**, so a run without the flag prints
-what it always did and `yarn eval --replay > results.txt` still writes the table alone.
-The verdict list lives here and not in `src/sim/`: a scenario has no ground truth in
+It goes to **stderr**, so `yarn eval --replay > results.txt` still writes the table
+alone. The verdict list lives here and not in `src/sim/`: a scenario has no ground truth in
 front of it, and the only question there is whether the operator reached the case in
 time.
 

@@ -1,5 +1,5 @@
 /**
- * The narration `yarn sim <scenario> --log` prints.
+ * The narration `yarn sim <scenario>` prints.
  *
  * Two things are worth a check and the rest is formatting. The queue depth and the gaps
  * have to come out of the timeline rather than out of a guess about her day — a run
@@ -128,41 +128,54 @@ describe('operatorLog', () => {
     expect(lines[0]).toBe('merve — baseline · overload');
   });
 
-  it('states the shift the whole walk is measured against', () => {
-    expect(text).toContain('shift 09:00–17:00 Europe/Istanbul');
-    expect(text).toContain('break 12:00–13:00');
-    expect(text).toContain('10 min a case');
+  it('opens with the day in a sentence rather than in columns', () => {
+    expect(text).toContain(
+      '6 messages arrived. The line answered 2 of them itself and left 4 in her queue.',
+    );
+    expect(text).toContain(
+      'She works 09:00–17:00 with 12:00–13:00 off, 10 minutes a case',
+    );
   });
 
-  it('counts what was held for her apart from what arrived', () => {
-    expect(text).toContain('4 of 6 arrival(s) held for her, 3 opened');
+  it('lists the queue she was handed, in the order the queue puts it', () => {
+    // Same priority throughout, so the tie is settled by arrival: M-1 arrived first.
+    const queue = lines.filter((line) => line.trimStart().startsWith('#'));
+
+    expect(queue).toHaveLength(4);
+    expect(queue[0]).toContain('M-1 · auth-01');
+    expect(queue[0]).toContain('priority  95');
+    expect(queue[0]).toContain('arrived Mon 02 Mar 08:30');
+    expect(queue[3]).toContain('M-4 · auth-04');
   });
 
-  it('says how deep the queue was as she opened each case', () => {
-    // Four held, all arrived before she starts: the first opening comes out of a queue
-    // of four, and each one after it out of one fewer.
-    expect(rowFor('M-1')).toContain('q 4');
-    expect(rowFor('M-2')).toContain('q 3');
-    expect(rowFor('M-3')).toContain('q 2');
+  it('says what each opening left behind it, so the queue draining is visible', () => {
+    expect(rowFor('opens M-1')).toContain('3 left in the queue');
+    expect(rowFor('opens M-2')).toContain('2 left in the queue');
+    expect(rowFor('opens M-3')).toContain('1 left in the queue');
+  });
+
+  it('says how long each case had waited, in her working minutes', () => {
+    expect(rowFor('opens M-2')).toContain('it had waited   10 min');
   });
 
   it('marks a case opened past the window, which is the metric turning over', () => {
-    expect(rowFor('M-1')).toContain('in window');
-    expect(rowFor('M-3')).toContain('LATE');
+    expect(rowFor('opens M-1')).toContain('in time');
+    // 420 working minutes waited against a 240-minute window.
+    expect(rowFor('opens M-3')).toContain('LATE by 180 min');
   });
 
   it('marks the critical ones, since they are the only ones the metric counts', () => {
-    expect(rowFor('M-1')).toContain('critical');
-    expect(rowFor('M-2')).not.toContain('critical');
+    expect(rowFor('opens M-1')).toContain('critical');
+    expect(rowFor('opens M-2')).not.toContain('critical');
   });
 
-  it('accounts for the hours she was not at the queue between two openings', () => {
+  it('names the hours she was away rather than leaving them as a number', () => {
     // 09:10 Monday to 09:00 Tuesday is 23h 50m of calendar, 6h 50m of it on her
     // clock — the evening, the night and the lunch hour are the other 17h.
-    expect(text).toContain('17h off the clock');
+    expect(text).toContain('off the clock for 17h — the evening');
   });
 
-  it('reports idle minutes apart, because an empty queue is the opposite failure', () => {
+  it('reports an empty queue apart, because it is the opposite failure', () => {
     const idle = operatorLog(
       timeline([
         held({
@@ -182,20 +195,18 @@ describe('operatorLog', () => {
       ]),
     ).join('\n');
 
-    expect(idle).toContain('50m idle, nothing waiting');
+    expect(idle).toContain('nothing waiting for 50m');
     expect(idle).not.toContain('off the clock');
   });
 
-  it('counts what she never saw, which no ordering could have reached', () => {
-    expect(text).toContain('never in her queue    2 answered automatically, 1 of them');
-  });
-
-  it('names the ones still waiting when the run ended', () => {
-    expect(text).toContain('still queued          1 at the horizon: M-4');
-  });
-
-  it('says how many interim messages went out, and when the first did', () => {
-    expect(text).toContain('interim sent          1, first M-1 at Mon 02 Mar 09:00');
+  it('closes with what it added up to, in sentences', () => {
+    expect(text).toContain(
+      '2 message(s) never reached her — the line answered them itself, 1 of them critical.',
+    );
+    expect(text).toContain('1 still in the queue when the run ended: M-4.');
+    expect(text).toContain(
+      '1 interim message(s) went out; the first to M-1 at Mon 02 Mar 09:00.',
+    );
   });
 
   it('scores nothing: a verdict on a decision is the evaluation run’s to give', () => {
@@ -209,9 +220,9 @@ describe('operatorLog', () => {
 
   it('paints the one row that costs something, and leaves the columns where they were', () => {
     const painted = operatorLog(timeline(PLAYED), createPaint({ colours: true }));
-    const late = painted.find((line) => line.includes('M-3')) ?? '';
+    const late = painted.find((line) => line.includes('opens M-3')) ?? '';
 
-    expect(late).toContain('\u001b[1;31mLATE\u001b[0m');
+    expect(late).toContain('\u001b[1;31mLATE');
     // Strip the escapes and the block is the one asserted above, column for column.
     expect(painted.map(stripColour)).toEqual(lines);
   });

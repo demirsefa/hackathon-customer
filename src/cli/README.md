@@ -44,32 +44,16 @@ the documented command is the one that says what it wants.**
 | bare, at a terminal                         | the menu — scenario if missing, then the mode          |
 | bare, piped or in CI                        | replay: the free run, and never a hanging prompt       |
 | `yarn sim` with no scenario, piped or in CI | `SIM_USAGE`, exit 1 — the one argument nothing invents |
-| `--log`                                     | the run narrates itself on stderr, and decides nothing |
 | `--help` or `-h`                            | the usage line on stdout, exit 0                       |
 | anything else on the line                   | one line naming it, then usage, exit 1                 |
 
-## `--log`, and why it is not a mode
-
-`--live` and `--replay` answer what the run costs. `--log` answers nothing at all: the
-same arrivals, the same decisions, the same scorecard, the same coverage number and the
-same trajectory files, with a block of narration added on **stderr** — the operator
-working her queue for `yarn sim`, the case-by-case verdicts for `yarn eval`.
-
-Two rules keep it out of the way of the run a judge meets. It is **off unless asked
-for**, so every command in the reproduction guide prints exactly what it printed
-before. And it writes to **stderr**, beside the progress line and never on stdout,
-so `yarn eval --replay > results.txt` still holds the scorecard alone.
-
-It sits in `checkArguments`' list of known flags rather than in `resolveMode`, because
-`resolveMode` decides what a run does and this decides how much it says while doing it.
-
-### Colour, and the two effects there are
+## Colour, and the two effects there are
 
 `paint.ts` answers the question `progress.ts` answers, about the same destination: a
 terminal takes escapes, a log file somebody reads later does not. So the narration is
 written in colour only where `wantsColour` says so — a TTY, with `NO_COLOR` unset and
 `TERM` not `dumb`, and `FORCE_COLOR` overriding in both directions so
-`--log 2>&1 | less -R` stays readable. Everywhere else every function is the identity
+`2>&1 | less -R` stays readable. Everywhere else every function is the identity
 function and the output is plain text, byte for byte the text the checks assert on.
 
 There are two effects and there is no third. **`alarm`** — bold red — is for the one

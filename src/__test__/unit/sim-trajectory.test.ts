@@ -13,6 +13,7 @@ import { autoSend, humanReview } from '../../core/decision.ts';
 import { parseOperatorConfig } from '../../core/operator.ts';
 import { PINNED_PARAMS } from '../../llm/key.ts';
 import type { PlayedArrival, Timeline } from '../../sim/play.ts';
+import { buildRecord } from '../../sim/record.ts';
 import { scoreTimeline } from '../../sim/score.ts';
 import { renderTrajectory, trajectoryFile } from '../../sim/trajectory.ts';
 
@@ -79,13 +80,15 @@ const timeline = (played: readonly PlayedArrival[]): Timeline => ({
 
 const render = (played: readonly PlayedArrival[]): string => {
   const one = timeline(played);
-  return renderTrajectory({
-    timeline: one,
-    coverage: scoreTimeline(one),
-    commit: 'abc1234',
-    llmLabel: 'replay (claude-sonnet-5) — 28 recorded response(s)',
-    params: PINNED_PARAMS,
-  });
+  return renderTrajectory(
+    buildRecord({
+      timeline: one,
+      coverage: scoreTimeline(one),
+      commit: 'abc1234',
+      llmLabel: 'replay (claude-sonnet-5) — 28 recorded response(s)',
+      params: PINNED_PARAMS,
+    }),
+  );
 };
 
 const SHORT = [

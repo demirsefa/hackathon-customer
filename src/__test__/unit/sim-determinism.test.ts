@@ -25,6 +25,7 @@ import { PINNED_PARAMS } from '../../llm/key.ts';
 import { readCache, replayClient } from '../../llm/replay.ts';
 import { playScenario } from '../../sim/play.ts';
 import { reportLines } from '../../sim/report.ts';
+import { buildRecord } from '../../sim/record.ts';
 import { scoreTimeline } from '../../sim/score.ts';
 import { renderTrajectory } from '../../sim/trajectory.ts';
 import { SCENARIOS } from '../../cli/ask.ts';
@@ -64,13 +65,15 @@ describe.each(SCENARIOS)('%s, played twice in one process', (name) => {
     expect(reportLines(scoreTimeline(second))).toEqual(reportLines(scoreTimeline(first)));
 
     const render = (timeline: typeof first): string =>
-      renderTrajectory({
-        timeline,
-        coverage: scoreTimeline(timeline),
-        commit: 'fixed',
-        llmLabel: 'replay',
-        params: PINNED_PARAMS,
-      });
+      renderTrajectory(
+        buildRecord({
+          timeline,
+          coverage: scoreTimeline(timeline),
+          commit: 'fixed',
+          llmLabel: 'replay',
+          params: PINNED_PARAMS,
+        }),
+      );
 
     expect(render(second)).toBe(render(first));
   });

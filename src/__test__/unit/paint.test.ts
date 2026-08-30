@@ -35,28 +35,19 @@ describe('createPaint', () => {
 describe('wantsColour', () => {
   const env = (values: Readonly<Record<string, string>> = {}) => values;
 
-  it('needs a terminal: a redirected run writes plain text', () => {
-    expect(wantsColour({ isTTY: true, env: env() })).toBe(true);
-    expect(wantsColour({ isTTY: false, env: env() })).toBe(false);
+  it('is on with nothing said, terminal or not', () => {
+    // There is no TTY question: the console this run is watched in is an IDE's, and
+    // that is a pipe. Asking about a terminal printed grey exactly there.
+    expect(wantsColour({ env: env() })).toBe(true);
   });
 
   it('honours NO_COLOR, which somebody sets once for every tool they run', () => {
-    expect(wantsColour({ isTTY: true, env: env({ NO_COLOR: '1' }) })).toBe(false);
+    expect(wantsColour({ env: env({ NO_COLOR: '1' }) })).toBe(false);
     // The empty value is how it is unset again, and it means nothing was said.
-    expect(wantsColour({ isTTY: true, env: env({ NO_COLOR: '' }) })).toBe(true);
+    expect(wantsColour({ env: env({ NO_COLOR: '' }) })).toBe(true);
   });
 
   it('believes a terminal that says it is dumb', () => {
-    expect(wantsColour({ isTTY: true, env: env({ TERM: 'dumb' }) })).toBe(false);
-  });
-
-  it('lets FORCE_COLOR answer in both directions, which is what makes a pipe readable', () => {
-    expect(wantsColour({ isTTY: false, env: env({ FORCE_COLOR: '1' }) })).toBe(true);
-    expect(wantsColour({ isTTY: true, env: env({ FORCE_COLOR: '0' }) })).toBe(false);
-    // It is read before NO_COLOR: the one typed on this command line wins over the
-    // one exported in a shell profile months ago.
-    expect(
-      wantsColour({ isTTY: false, env: env({ FORCE_COLOR: '1', NO_COLOR: '1' }) }),
-    ).toBe(true);
+    expect(wantsColour({ env: env({ TERM: 'dumb' }) })).toBe(false);
   });
 });

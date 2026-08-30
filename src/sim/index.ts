@@ -39,7 +39,6 @@ import {
   SIM_COMMAND,
   SIM_USAGE,
   wantsHelp,
-  wantsLog,
 } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
 import { createPaint, wantsColour } from '../cli/paint.ts';
@@ -57,6 +56,7 @@ import { operatorLog } from './log.ts';
 import { playScenario } from './play.ts';
 import { playedLine, reportLines } from './report.ts';
 import { scoreTimeline } from './score.ts';
+import { buildRecord, parseRecord, recordFile, serialiseRecord } from './record.ts';
 import { renderTrajectory, trajectoryFile } from './trajectory.ts';
 
 /** Resolved from this file, so no command depends on the working directory. */
@@ -90,10 +90,6 @@ if (complaint !== null) stop(complaint);
 
 // Found by shape rather than by position, so the flags may sit on either side of it.
 const named = args.find((arg) => !arg.startsWith('-'));
-
-// Asked for once, here, because it changes nothing about the run: the same arrivals,
-// the same decisions, the same coverage number and the same trajectory file.
-const logging = wantsLog(args);
 
 // The mode question is asked only where the scenario question already is, so a named
 // scenario runs on the flag it was given, or on replay when it was given none.
@@ -204,9 +200,7 @@ const progress = createProgress({
 });
 
 /** The same destination and the same question: what may be written to stderr here. */
-const paint = createPaint({
-  colours: wantsColour({ isTTY: process.stderr.isTTY === true, env: process.env }),
-});
+const paint = createPaint({ colours: wantsColour({ env: process.env }) });
 
 const records = createRecordStore(caseFile);
 const commit = headCommit();
@@ -258,28 +252,34 @@ try {
     );
 
     // Her day, before the numbers it produced. On stderr with the progress line rather
-    // than on stdout with the metric: a judge reading the block that matters must not
-    // have to scroll past forty rows to reach it, and `yarn sim overload --replay > out`
-    // writes the same file it always did.
-    if (logging) {
-      for (const line of operatorLog(timeline, paint)) process.stderr.write(`${line}\n`);
-    }
+    // than on stdout with the metric, so `yarn sim overload --replay > out` writes the
+    // same file it always did.
+    for (const line of operatorLog(timeline, paint)) process.stderr.write(`${line}\n`);
 
     const coverage = scoreTimeline(timeline);
 
     for (const line of reportLines(coverage)) console.log(line);
     console.log('');
 
+    // The raw record first, then the document rendered from what was written — the
+    // reason `src/eval/index.ts` gives at the same point.
+    const record = buildRecord({
+      timeline,
+      coverage,
+      commit,
+      llmLabel: session.label,
+      params,
+    });
+    const serialised = serialiseRecord(record);
+
+    const jsonName = recordFile(pipeline.name, scenario.name);
+    writeFileSync(`${TRAJECTORIES_DIR}${jsonName}`, serialised, 'utf8');
+    console.log(`record:     trajectories/${jsonName}`);
+
     const name = trajectoryFile(pipeline.name, scenario.name);
     writeFileSync(
       `${TRAJECTORIES_DIR}${name}`,
-      renderTrajectory({
-        timeline,
-        coverage,
-        commit,
-        llmLabel: session.label,
-        params,
-      }),
+      renderTrajectory(parseRecord(serialised)),
       'utf8',
     );
     console.log(`trajectory: trajectories/${name}`);

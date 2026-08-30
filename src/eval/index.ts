@@ -40,7 +40,6 @@ import {
   isInteractive,
   resolveMode,
   wantsHelp,
-  wantsLog,
 } from '../cli/ask.ts';
 import { loadEnvFile } from '../cli/env.ts';
 import { createPaint, wantsColour } from '../cli/paint.ts';
@@ -55,6 +54,7 @@ import { caseLog } from './log.ts';
 import { reportLines } from './report.ts';
 import { runPipeline, unrecordedNotice, type PipelineRun } from './run.ts';
 import { scoreRun } from './score.ts';
+import { buildRecord, parseRecord, recordFile, serialiseRecord } from './record.ts';
 import { renderTrajectory, trajectoryFile } from './trajectory.ts';
 
 /** Resolved from this file, so no command depends on the working directory. */
@@ -83,10 +83,6 @@ if (env.warning !== null) console.warn(env.warning);
 // A word this command cannot act on stops it here. Falling through to the bare form
 // would replay — the safe run, but not the one that was typed, and silently.
 const complaint = checkArguments({ args, command: EVAL_COMMAND });
-
-// Asked for once, here, because it changes nothing about the run: the same cases, the
-// same decisions, the same scorecard and the same trajectory files.
-const logging = wantsLog(args);
 if (complaint !== null) stop(complaint);
 
 const mode = resolveMode({ args, canAsk: isInteractive() });
@@ -169,9 +165,7 @@ const progress = createProgress({
 });
 
 /** The same destination and the same question: what may be written to stderr here. */
-const paint = createPaint({
-  colours: wantsColour({ isTTY: process.stderr.isTTY === true, env: process.env }),
-});
+const paint = createPaint({ colours: wantsColour({ env: process.env }) });
 
 /** Set only by a live call that never reached an answer; see the catch below. */
 let liveFailure: string | null = null;
@@ -256,20 +250,29 @@ for (const run of runs) {
   const scorecard = scoreRun({ pipeline: run.pipeline, outcomes: run.runs });
 
   // The cases, before the counts they add up to. On stderr with the progress line
-  // rather than on stdout with the scorecard: `yarn eval --replay > results.txt` still
-  // writes the same table, and a reader who did not ask for the detail never meets it.
-  if (logging) {
-    for (const line of caseLog(run, paint)) process.stderr.write(`${line}\n`);
-  }
+  // rather than on stdout with the scorecard, so `yarn eval --replay > results.txt`
+  // still writes the same table.
+  for (const line of caseLog(run, paint)) process.stderr.write(`${line}\n`);
 
   for (const line of reportLines(scorecard)) console.log(line);
   console.log('');
 
-  const path = `${TRAJECTORIES_DIR}${trajectoryFile(run.pipeline)}`;
+  // The raw record first, then the document rendered from what was written. Parsing
+  // the serialised text back rather than rendering the object in hand is what makes
+  // "the markdown is a view of the JSON" a fact instead of a claim: anything that did
+  // not survive serialisation is gone before the renderer ever sees it.
+  const record = buildRecord({ run, scorecard, commit, llmLabel: session.label, params });
+  const serialised = serialiseRecord(record);
+
+  const jsonName = recordFile(run.pipeline);
+  writeFileSync(`${TRAJECTORIES_DIR}${jsonName}`, serialised, 'utf8');
+  console.log(`record:     trajectories/${jsonName}`);
+
+  const mdName = trajectoryFile(run.pipeline);
   writeFileSync(
-    path,
-    renderTrajectory({ run, scorecard, commit, llmLabel: session.label, params }),
+    `${TRAJECTORIES_DIR}${mdName}`,
+    renderTrajectory(parseRecord(serialised)),
     'utf8',
   );
-  console.log(`trajectory: trajectories/${trajectoryFile(run.pipeline)}`);
+  console.log(`trajectory: trajectories/${mdName}`);
 }

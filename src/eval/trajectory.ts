@@ -20,9 +20,8 @@
  * regenerated file without adding anything a reader could reproduce from.
  */
 import { CASE_SUBSETS, type CaseSubset } from '../core/cases.ts';
-import type { LlmParams } from '../llm/key.ts';
-import type { CaseRun, PipelineRun, Step } from './run.ts';
-import type { Scorecard } from './score.ts';
+import { recordFile, type EvalRecord } from './record.ts';
+import type { CaseRun, Step } from './run.ts';
 
 /** `trajectories/<line>.md` — the name dev/contracts/SUBMISSION.md rule 4 looks for. */
 export function trajectoryFile(pipeline: string): string {
@@ -209,16 +208,9 @@ const percent = (part: number, whole: number): string =>
 const ids = (caseIds: readonly string[]): string =>
   caseIds.length === 0 ? 'none' : caseIds.map((id) => `\`${id}\``).join(', ');
 
-export function renderTrajectory(input: {
-  readonly run: PipelineRun;
-  readonly scorecard: Scorecard;
-  /** The commit the run was produced at, so the code behind a number is nameable. */
-  readonly commit: string;
-  /** `LlmSession.label` — which client answered, and out of which cache. */
-  readonly llmLabel: string;
-  readonly params: LlmParams;
-}): string {
-  const { params, run, scorecard } = input;
+export function renderTrajectory(record: EvalRecord): string {
+  const { provenance, run, scorecard } = record;
+  const { params } = provenance;
   const chosen = representatives(run.runs);
 
   return [
@@ -228,14 +220,19 @@ export function renderTrajectory(input: {
     'Produced by `yarn eval --replay`, which reads the committed model responses, so this',
     'file is reproducible on a machine with no API key.',
     '',
+    `**This document is a rendering.** The run itself is \`trajectories/${recordFile(run.pipeline)}\` —`,
+    'every case, every prompt, every raw answer and the scorecard, as JSON. This page is',
+    'generated from that file and states nothing it does not contain; the numbers below can',
+    'be recomputed from it without running anything.',
+    '',
     '## The run',
     '',
     '| Field | Value |',
     '| ----- | ----- |',
     `| Line | \`${run.pipeline}\` |`,
-    `| Commit | \`${input.commit}\` |`,
+    `| Commit | \`${provenance.commit}\` |`,
     `| Model | \`${params.model}\`, max tokens ${String(params.maxTokens)}, effort ${params.effort} |`,
-    `| Client | ${input.llmLabel} |`,
+    `| Client | ${provenance.llmLabel} |`,
     `| Cases | ${String(scorecard.cases)} |`,
     '',
     '## Scores',
