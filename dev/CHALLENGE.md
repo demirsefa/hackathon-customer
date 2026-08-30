@@ -265,7 +265,7 @@ of the queue rather than its length.
 | Metric                                  | Baseline      | Advanced      | Change         |
 | --------------------------------------- | ------------- | ------------- | -------------- |
 | **Critical coverage (normal day)**      | 4 / 19 (21%)  | 18 / 19 (95%) | **+74 points** |
-| **Critical coverage (overload)**        | 9 / 42 (21%)  | 24 / 42 (57%) | **+36 points** |
+| **Critical coverage (overload)**        | 9 / 42 (21%)  | 30 / 42 (71%) | **+50 points** |
 | Routing accuracy (28 cases)             | 12 / 28 (43%) | 27 / 28 (96%) | +53 points     |
 | False positives (legitimate held)       | 0             | 0             | unchanged      |
 | Missed holds (auto-sent, should not be) | 16            | 1             | −15            |
@@ -301,12 +301,12 @@ measured on.
 
 **What the advanced line changed, and what it cost.** On a normal day it reaches 18 of
 the 19 messages the operator had to see, against the baseline's 4. Under `overload` the
-same design reaches 24 of 42 rather than 9 — and the reason it is 57% and not 95% is the
+same design reaches 30 of 42 rather than 9 — and the reason it is 71% and not 95% is the
 one the paragraph above predicted. The baseline's desk was _bypassed_: it held 15 of 90
 arrivals and she opened every one of them with most of her day unspent. The advanced line
 holds 65 — every one of which genuinely had to be held, with no false positives left in
 the queue at all. But 65 correct holds against a 42-case day is a queue the ordering
-decides, and eighteen critical arrivals were opened after their four-hour window had
+decides, and nine critical arrivals were opened after their four-hour window had
 closed. The failure moved: from a desk nobody reached to a desk that cannot be emptied
 inside a day.
 
@@ -323,6 +323,10 @@ wrote offered a full refund in as many words.
 | The same refusal reported as `low_confidence`                                         | 24 / 42 (57%)     | superseded by the row below       |
 | Dropping the second opinion call entirely                                             | 24 / 42 (57%)     | **yes** — see §9                  |
 | `instruction_in_message` dropped below `sensitive_category` and `unknown_sender` (65) | 22 / 42 (52%)     | no                                |
+| A closed coverage window sent to the back of the queue, ahead of priority             | 28 / 42 (67%)     | **yes** — see §9                  |
+| The reachable ones then ordered by deadline instead of priority                       | 27 / 42 (64%)     | no — priority earns its place     |
+| Rescuing a case with under 30 / 60 / 120 minutes of window left                       | 30 / 42 (71%)     | no — 90 minutes scored 29         |
+| Rescuing the case that would not survive its own place in the queue                   | 30 / 42 (71%)     | **yes** — no threshold to defend  |
 
 The first two are one story told twice, and the third ended it. Reporting a refused
 second opinion as a policy breach put thank-you notes at priority 90, ahead of every

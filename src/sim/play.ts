@@ -26,8 +26,12 @@ import {
   workingMinutesBetween,
 } from '../core/operator.ts';
 import type { Pipeline } from '../core/pipeline.ts';
-import { INTERIM_AFTER_MINUTES, needsInterim } from '../core/policy.ts';
-import { sortedQueue, type QueueEntry } from '../core/queue.ts';
+import {
+  CRITICAL_COVERAGE_MINUTES,
+  INTERIM_AFTER_MINUTES,
+  needsInterim,
+} from '../core/policy.ts';
+import { nextToOpen, type QueueEntry } from '../core/queue.ts';
 import type { ResolvedArrival } from '../core/scenario.ts';
 import type { LlmClient } from '../types/llm.ts';
 import type { OperatorConfig } from '../types/operator.ts';
@@ -127,7 +131,17 @@ export function walkQueue(input: {
       continue;
     }
 
-    const top = sortedQueue(waiting)[0];
+    // The clock and the calendar are here, so the question `core/queue.ts` cannot
+    // answer for itself is answered here: how much of the window each case has left.
+    const top = nextToOpen(
+      waiting.map((entry) => ({
+        ...entry,
+        minutesLeft:
+          CRITICAL_COVERAGE_MINUTES -
+          workingMinutesBetween(operator, new Date(entry.arrivedAtMs), new Date(nowMs)),
+      })),
+      operator.minutesPerCase,
+    );
     if (top === undefined) {
       throw new Error('sim: a non-empty queue produced no top entry');
     }

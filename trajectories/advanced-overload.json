@@ -1,7 +1,7 @@
 {
   "schema": "support-triage/sim-run@1",
   "provenance": {
-    "commit": "cf63b12",
+    "commit": "8771853",
     "llmLabel": "replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json",
     "params": {
       "model": "claude-sonnet-5",
@@ -21,21 +21,14 @@
     "arrivals": 90,
     "windowMinutes": 240,
     "critical": 42,
-    "criticalReached": 24,
+    "criticalReached": 30,
     "missed": [
       {
-        "messageId": "M-0031",
-        "caseId": "inj-02",
-        "arrivedAt": "2026-09-06T09:12:00+03:00",
+        "messageId": "M-0001",
+        "caseId": "auth-05",
+        "arrivedAt": "2026-09-04T17:00:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 250
-      },
-      {
-        "messageId": "M-0036",
-        "caseId": "inj-01",
-        "arrivedAt": "2026-09-06T13:35:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 260
+        "waitedWorkingMinutes": 460
       },
       {
         "messageId": "M-0037",
@@ -49,91 +42,56 @@
         "caseId": "norm-05",
         "arrivedAt": "2026-09-06T15:48:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 440
+        "waitedWorkingMinutes": 490
       },
       {
         "messageId": "M-0043",
         "caseId": "auth-06",
         "arrivedAt": "2026-09-06T19:05:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 490
+        "waitedWorkingMinutes": 520
       },
       {
         "messageId": "M-0047",
         "caseId": "auth-06",
         "arrivedAt": "2026-09-07T07:10:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 500
+        "waitedWorkingMinutes": 530
       },
       {
         "messageId": "M-0048",
         "caseId": "norm-09",
         "arrivedAt": "2026-09-07T07:19:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 610
-      },
-      {
-        "messageId": "M-0053",
-        "caseId": "inj-07",
-        "arrivedAt": "2026-09-07T08:07:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 280
+        "waitedWorkingMinutes": 630
       },
       {
         "messageId": "M-0054",
         "caseId": "inj-01",
         "arrivedAt": "2026-09-07T08:13:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 290
+        "waitedWorkingMinutes": 470
       },
       {
         "messageId": "M-0057",
         "caseId": "norm-05",
         "arrivedAt": "2026-09-07T08:49:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 450
-      },
-      {
-        "messageId": "M-0060",
-        "caseId": "inj-07",
-        "arrivedAt": "2026-09-07T09:18:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 282
+        "waitedWorkingMinutes": 500
       },
       {
         "messageId": "M-0063",
         "caseId": "auth-06",
         "arrivedAt": "2026-09-07T09:42:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 468
+        "waitedWorkingMinutes": 498
       },
       {
         "messageId": "M-0064",
         "caseId": "norm-09",
         "arrivedAt": "2026-09-07T09:50:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 570
-      },
-      {
-        "messageId": "M-0065",
-        "caseId": "inj-05",
-        "arrivedAt": "2026-09-07T10:07:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 253
-      },
-      {
-        "messageId": "M-0073",
-        "caseId": "norm-05",
-        "arrivedAt": "2026-09-07T11:23:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 337
-      },
-      {
-        "messageId": "M-0074",
-        "caseId": "norm-09",
-        "arrivedAt": "2026-09-07T11:39:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 471
+        "waitedWorkingMinutes": 590
       },
       {
         "messageId": "M-0078",
@@ -154,7 +112,7 @@
     "opened": 65,
     "stillQueued": 0,
     "averageWaitMinutes": 257,
-    "interimSent": 63,
+    "interimSent": 65,
     "llmCalls": 90
   },
   "timeline": {
@@ -198,8 +156,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T06:00:00.000Z",
-        "waitedWorkingMinutes": 0,
+        "openedAt": "2026-09-08T06:40:00.000Z",
+        "waitedWorkingMinutes": 460,
         "interimAt": "2026-09-04T14:30:00.000Z"
       },
       {
@@ -217,8 +175,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T08:10:00.000Z",
-        "waitedWorkingMinutes": 130,
+        "openedAt": "2026-09-07T07:50:00.000Z",
+        "waitedWorkingMinutes": 110,
         "interimAt": "2026-09-04T15:21:00.000Z"
       },
       {
@@ -255,8 +213,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T06:10:00.000Z",
-        "waitedWorkingMinutes": 10,
+        "openedAt": "2026-09-07T10:50:00.000Z",
+        "waitedWorkingMinutes": 230,
         "interimAt": "2026-09-04T16:36:00.000Z"
       },
       {
@@ -293,8 +251,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T08:30:00.000Z",
-        "waitedWorkingMinutes": 150,
+        "openedAt": "2026-09-07T07:40:00.000Z",
+        "waitedWorkingMinutes": 100,
         "interimAt": "2026-09-04T17:39:00.000Z"
       },
       {
@@ -312,8 +270,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T08:40:00.000Z",
-        "waitedWorkingMinutes": 160,
+        "openedAt": "2026-09-07T07:30:00.000Z",
+        "waitedWorkingMinutes": 90,
         "interimAt": "2026-09-04T17:52:00.000Z"
       },
       {
@@ -331,8 +289,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T07:40:00.000Z",
-        "waitedWorkingMinutes": 520,
+        "openedAt": "2026-09-08T08:10:00.000Z",
+        "waitedWorkingMinutes": 550,
         "interimAt": "2026-09-04T18:21:00.000Z"
       },
       {
@@ -350,8 +308,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T06:20:00.000Z",
-        "waitedWorkingMinutes": 20,
+        "openedAt": "2026-09-07T10:40:00.000Z",
+        "waitedWorkingMinutes": 220,
         "interimAt": "2026-09-04T18:59:00.000Z"
       },
       {
@@ -369,8 +327,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T08:40:00.000Z",
-        "waitedWorkingMinutes": 580,
+        "openedAt": "2026-09-08T10:00:00.000Z",
+        "waitedWorkingMinutes": 600,
         "interimAt": "2026-09-04T19:32:00.000Z"
       },
       {
@@ -388,8 +346,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T08:50:00.000Z",
-        "waitedWorkingMinutes": 170,
+        "openedAt": "2026-09-07T07:20:00.000Z",
+        "waitedWorkingMinutes": 80,
         "interimAt": "2026-09-04T20:13:00.000Z"
       },
       {
@@ -407,8 +365,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T10:10:00.000Z",
-        "waitedWorkingMinutes": 190,
+        "openedAt": "2026-09-07T08:00:00.000Z",
+        "waitedWorkingMinutes": 120,
         "interimAt": "2026-09-04T20:58:00.000Z"
       },
       {
@@ -426,8 +384,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T10:30:00.000Z",
-        "waitedWorkingMinutes": 210,
+        "openedAt": "2026-09-07T07:10:00.000Z",
+        "waitedWorkingMinutes": 70,
         "interimAt": "2026-09-05T06:04:00.000Z"
       },
       {
@@ -464,8 +422,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T10:40:00.000Z",
-        "waitedWorkingMinutes": 220,
+        "openedAt": "2026-09-07T07:00:00.000Z",
+        "waitedWorkingMinutes": 60,
         "interimAt": "2026-09-05T07:32:00.000Z"
       },
       {
@@ -483,8 +441,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T10:50:00.000Z",
-        "waitedWorkingMinutes": 230,
+        "openedAt": "2026-09-07T06:50:00.000Z",
+        "waitedWorkingMinutes": 50,
         "interimAt": "2026-09-05T08:22:00.000Z"
       },
       {
@@ -521,8 +479,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T08:50:00.000Z",
-        "waitedWorkingMinutes": 590,
+        "openedAt": "2026-09-08T10:10:00.000Z",
+        "waitedWorkingMinutes": 610,
         "interimAt": "2026-09-05T09:56:00.000Z"
       },
       {
@@ -540,8 +498,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T07:50:00.000Z",
-        "waitedWorkingMinutes": 530,
+        "openedAt": "2026-09-08T08:20:00.000Z",
+        "waitedWorkingMinutes": 560,
         "interimAt": "2026-09-05T10:10:00.000Z"
       },
       {
@@ -578,8 +536,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:00:00.000Z",
-        "waitedWorkingMinutes": 600,
+        "openedAt": "2026-09-08T10:20:00.000Z",
+        "waitedWorkingMinutes": 620,
         "interimAt": "2026-09-05T12:05:00.000Z"
       },
       {
@@ -616,8 +574,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:00:00.000Z",
-        "waitedWorkingMinutes": 540,
+        "openedAt": "2026-09-08T08:30:00.000Z",
+        "waitedWorkingMinutes": 570,
         "interimAt": "2026-09-05T13:17:00.000Z"
       },
       {
@@ -654,8 +612,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T11:00:00.000Z",
-        "waitedWorkingMinutes": 240,
+        "openedAt": "2026-09-07T06:40:00.000Z",
+        "waitedWorkingMinutes": 40,
         "interimAt": "2026-09-05T15:11:00.000Z"
       },
       {
@@ -692,8 +650,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:10:00.000Z",
-        "waitedWorkingMinutes": 430,
+        "openedAt": "2026-09-08T07:00:00.000Z",
+        "waitedWorkingMinutes": 480,
         "interimAt": "2026-09-05T16:42:00.000Z"
       },
       {
@@ -711,8 +669,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T06:30:00.000Z",
-        "waitedWorkingMinutes": 30,
+        "openedAt": "2026-09-07T10:30:00.000Z",
+        "waitedWorkingMinutes": 210,
         "interimAt": "2026-09-05T17:39:00.000Z"
       },
       {
@@ -768,8 +726,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T11:10:00.000Z",
-        "waitedWorkingMinutes": 250,
+        "openedAt": "2026-09-07T06:30:00.000Z",
+        "waitedWorkingMinutes": 30,
         "interimAt": "2026-09-06T06:42:00.000Z"
       },
       {
@@ -806,8 +764,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T06:40:00.000Z",
-        "waitedWorkingMinutes": 40,
+        "openedAt": "2026-09-07T10:20:00.000Z",
+        "waitedWorkingMinutes": 200,
         "interimAt": "2026-09-06T08:19:00.000Z"
       },
       {
@@ -825,8 +783,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T06:50:00.000Z",
-        "waitedWorkingMinutes": 50,
+        "openedAt": "2026-09-07T10:10:00.000Z",
+        "waitedWorkingMinutes": 190,
         "interimAt": "2026-09-06T09:14:00.000Z"
       },
       {
@@ -844,8 +802,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:00:00.000Z",
-        "waitedWorkingMinutes": 60,
+        "openedAt": "2026-09-07T10:00:00.000Z",
+        "waitedWorkingMinutes": 180,
         "interimAt": "2026-09-06T10:25:00.000Z"
       },
       {
@@ -863,8 +821,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T11:20:00.000Z",
-        "waitedWorkingMinutes": 260,
+        "openedAt": "2026-09-07T06:20:00.000Z",
+        "waitedWorkingMinutes": 20,
         "interimAt": "2026-09-06T11:05:00.000Z"
       },
       {
@@ -920,8 +878,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:20:00.000Z",
-        "waitedWorkingMinutes": 440,
+        "openedAt": "2026-09-08T07:10:00.000Z",
+        "waitedWorkingMinutes": 490,
         "interimAt": "2026-09-06T13:18:00.000Z"
       },
       {
@@ -977,8 +935,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:10:00.000Z",
-        "waitedWorkingMinutes": 550,
+        "openedAt": "2026-09-08T08:40:00.000Z",
+        "waitedWorkingMinutes": 580,
         "interimAt": "2026-09-06T15:59:00.000Z"
       },
       {
@@ -996,8 +954,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T07:10:00.000Z",
-        "waitedWorkingMinutes": 490,
+        "openedAt": "2026-09-08T07:40:00.000Z",
+        "waitedWorkingMinutes": 520,
         "interimAt": "2026-09-06T16:35:00.000Z"
       },
       {
@@ -1015,8 +973,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T11:30:00.000Z",
-        "waitedWorkingMinutes": 270,
+        "openedAt": "2026-09-07T06:10:00.000Z",
+        "waitedWorkingMinutes": 10,
         "interimAt": "2026-09-06T17:12:00.000Z"
       },
       {
@@ -1034,8 +992,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:10:00.000Z",
-        "waitedWorkingMinutes": 70,
+        "openedAt": "2026-09-07T08:50:00.000Z",
+        "waitedWorkingMinutes": 170,
         "interimAt": "2026-09-06T18:11:00.000Z"
       },
       {
@@ -1053,8 +1011,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:20:00.000Z",
-        "waitedWorkingMinutes": 80,
+        "openedAt": "2026-09-07T08:40:00.000Z",
+        "waitedWorkingMinutes": 160,
         "interimAt": "2026-09-06T19:12:00.000Z"
       },
       {
@@ -1072,8 +1030,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T07:20:00.000Z",
-        "waitedWorkingMinutes": 500,
+        "openedAt": "2026-09-08T07:50:00.000Z",
+        "waitedWorkingMinutes": 530,
         "interimAt": "2026-09-07T04:40:00.000Z"
       },
       {
@@ -1091,8 +1049,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:10:00.000Z",
-        "waitedWorkingMinutes": 610,
+        "openedAt": "2026-09-08T10:30:00.000Z",
+        "waitedWorkingMinutes": 630,
         "interimAt": "2026-09-07T04:49:00.000Z"
       },
       {
@@ -1129,8 +1087,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:30:00.000Z",
-        "waitedWorkingMinutes": 90,
+        "openedAt": "2026-09-07T08:30:00.000Z",
+        "waitedWorkingMinutes": 150,
         "interimAt": "2026-09-07T05:03:00.000Z"
       },
       {
@@ -1148,8 +1106,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:40:00.000Z",
-        "waitedWorkingMinutes": 100,
+        "openedAt": "2026-09-07T08:20:00.000Z",
+        "waitedWorkingMinutes": 140,
         "interimAt": "2026-09-07T05:17:00.000Z"
       },
       {
@@ -1186,8 +1144,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T11:40:00.000Z",
-        "waitedWorkingMinutes": 280,
+        "openedAt": "2026-09-07T06:00:00.000Z",
+        "waitedWorkingMinutes": 0,
         "interimAt": "2026-09-07T05:37:00.000Z"
       },
       {
@@ -1205,8 +1163,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T11:50:00.000Z",
-        "waitedWorkingMinutes": 290,
+        "openedAt": "2026-09-08T06:50:00.000Z",
+        "waitedWorkingMinutes": 470,
         "interimAt": "2026-09-07T05:43:00.000Z"
       },
       {
@@ -1224,8 +1182,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:20:00.000Z",
-        "waitedWorkingMinutes": 560,
+        "openedAt": "2026-09-08T08:50:00.000Z",
+        "waitedWorkingMinutes": 590,
         "interimAt": "2026-09-07T05:57:00.000Z"
       },
       {
@@ -1262,8 +1220,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:30:00.000Z",
-        "waitedWorkingMinutes": 450,
+        "openedAt": "2026-09-08T07:20:00.000Z",
+        "waitedWorkingMinutes": 500,
         "interimAt": "2026-09-07T06:19:00.000Z"
       },
       {
@@ -1281,8 +1239,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:50:00.000Z",
-        "waitedWorkingMinutes": 110,
+        "openedAt": "2026-09-07T08:10:00.000Z",
+        "waitedWorkingMinutes": 130,
         "interimAt": "2026-09-07T06:29:00.000Z"
       },
       {
@@ -1300,8 +1258,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:40:00.000Z",
-        "waitedWorkingMinutes": 451,
+        "openedAt": "2026-09-08T07:30:00.000Z",
+        "waitedWorkingMinutes": 501,
         "interimAt": "2026-09-07T06:39:00.000Z"
       },
       {
@@ -1319,8 +1277,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T12:00:00.000Z",
-        "waitedWorkingMinutes": 282,
+        "openedAt": "2026-09-07T11:00:00.000Z",
+        "waitedWorkingMinutes": 222,
         "interimAt": "2026-09-07T06:48:00.000Z"
       },
       {
@@ -1357,8 +1315,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T12:10:00.000Z",
-        "waitedWorkingMinutes": 270,
+        "openedAt": "2026-09-07T11:10:00.000Z",
+        "waitedWorkingMinutes": 210,
         "interimAt": "2026-09-07T07:10:00.000Z"
       },
       {
@@ -1376,8 +1334,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T07:30:00.000Z",
-        "waitedWorkingMinutes": 468,
+        "openedAt": "2026-09-08T08:00:00.000Z",
+        "waitedWorkingMinutes": 498,
         "interimAt": "2026-09-07T07:12:00.000Z"
       },
       {
@@ -1395,8 +1353,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:20:00.000Z",
-        "waitedWorkingMinutes": 570,
+        "openedAt": "2026-09-08T10:40:00.000Z",
+        "waitedWorkingMinutes": 590,
         "interimAt": "2026-09-07T07:20:00.000Z"
       },
       {
@@ -1414,8 +1372,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T12:20:00.000Z",
-        "waitedWorkingMinutes": 253,
+        "openedAt": "2026-09-07T11:20:00.000Z",
+        "waitedWorkingMinutes": 193,
         "interimAt": "2026-09-07T07:37:00.000Z"
       },
       {
@@ -1433,8 +1391,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T08:00:00.000Z",
-        "waitedWorkingMinutes": 41,
+        "openedAt": "2026-09-07T12:10:00.000Z",
+        "waitedWorkingMinutes": 231,
         "interimAt": "2026-09-07T07:49:00.000Z"
       },
       {
@@ -1471,8 +1429,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:50:00.000Z",
-        "waitedWorkingMinutes": 372,
+        "openedAt": "2026-09-07T11:30:00.000Z",
+        "waitedWorkingMinutes": 172,
         "interimAt": "2026-09-07T08:08:00.000Z"
       },
       {
@@ -1490,8 +1448,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T12:30:00.000Z",
-        "waitedWorkingMinutes": 227,
+        "openedAt": "2026-09-07T12:00:00.000Z",
+        "waitedWorkingMinutes": 197,
         "interimAt": "2026-09-07T08:13:00.000Z"
       },
       {
@@ -1509,8 +1467,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T12:40:00.000Z",
-        "waitedWorkingMinutes": 229,
+        "openedAt": "2026-09-07T12:20:00.000Z",
+        "waitedWorkingMinutes": 209,
         "interimAt": "2026-09-07T08:21:00.000Z"
       },
       {
@@ -1528,8 +1486,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:30:00.000Z",
-        "waitedWorkingMinutes": 441,
+        "openedAt": "2026-09-07T11:50:00.000Z",
+        "waitedWorkingMinutes": 161,
         "interimAt": "2026-09-07T08:39:00.000Z"
       },
       {
@@ -1547,9 +1505,9 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T08:20:00.000Z",
-        "waitedWorkingMinutes": 4,
-        "interimAt": null
+        "openedAt": "2026-09-07T12:40:00.000Z",
+        "waitedWorkingMinutes": 204,
+        "interimAt": "2026-09-07T08:46:00.000Z"
       },
       {
         "messageId": "M-0073",
@@ -1566,8 +1524,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T07:00:00.000Z",
-        "waitedWorkingMinutes": 337,
+        "openedAt": "2026-09-07T11:40:00.000Z",
+        "waitedWorkingMinutes": 137,
         "interimAt": "2026-09-07T08:53:00.000Z"
       },
       {
@@ -1585,8 +1543,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:30:00.000Z",
-        "waitedWorkingMinutes": 471,
+        "openedAt": "2026-09-07T12:30:00.000Z",
+        "waitedWorkingMinutes": 171,
         "interimAt": "2026-09-07T09:09:00.000Z"
       },
       {
@@ -1604,8 +1562,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T12:50:00.000Z",
-        "waitedWorkingMinutes": 186,
+        "openedAt": "2026-09-07T13:10:00.000Z",
+        "waitedWorkingMinutes": 206,
         "interimAt": "2026-09-07T09:14:00.000Z"
       },
       {
@@ -1623,8 +1581,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T10:00:00.000Z",
-        "waitedWorkingMinutes": 8,
+        "openedAt": "2026-09-07T12:50:00.000Z",
+        "waitedWorkingMinutes": 178,
         "interimAt": "2026-09-07T09:22:00.000Z"
       },
       {
@@ -1642,8 +1600,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:00:00.000Z",
-        "waitedWorkingMinutes": 180,
+        "openedAt": "2026-09-07T13:20:00.000Z",
+        "waitedWorkingMinutes": 200,
         "interimAt": "2026-09-07T09:31:00.000Z"
       },
       {
@@ -1699,9 +1657,9 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T10:20:00.000Z",
-        "waitedWorkingMinutes": 2,
-        "interimAt": null
+        "openedAt": "2026-09-07T13:00:00.000Z",
+        "waitedWorkingMinutes": 162,
+        "interimAt": "2026-09-07T10:48:00.000Z"
       },
       {
         "messageId": "M-0081",
@@ -1718,8 +1676,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:10:00.000Z",
-        "waitedWorkingMinutes": 162,
+        "openedAt": "2026-09-07T13:30:00.000Z",
+        "waitedWorkingMinutes": 182,
         "interimAt": "2026-09-07T10:58:00.000Z"
       },
       {
@@ -1737,8 +1695,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:20:00.000Z",
-        "waitedWorkingMinutes": 138,
+        "openedAt": "2026-09-07T13:40:00.000Z",
+        "waitedWorkingMinutes": 158,
         "interimAt": "2026-09-07T11:32:00.000Z"
       },
       {
@@ -1775,8 +1733,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:30:00.000Z",
-        "waitedWorkingMinutes": 99,
+        "openedAt": "2026-09-07T13:50:00.000Z",
+        "waitedWorkingMinutes": 119,
         "interimAt": "2026-09-07T12:21:00.000Z"
       },
       {
@@ -1813,8 +1771,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:40:00.000Z",
-        "waitedWorkingMinutes": 78,
+        "openedAt": "2026-09-08T06:00:00.000Z",
+        "waitedWorkingMinutes": 98,
         "interimAt": "2026-09-07T12:52:00.000Z"
       },
       {
@@ -1832,8 +1790,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:50:00.000Z",
-        "waitedWorkingMinutes": 70,
+        "openedAt": "2026-09-08T06:10:00.000Z",
+        "waitedWorkingMinutes": 90,
         "interimAt": "2026-09-07T13:10:00.000Z"
       },
       {
@@ -1870,8 +1828,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:00:00.000Z",
-        "waitedWorkingMinutes": 33,
+        "openedAt": "2026-09-08T06:20:00.000Z",
+        "waitedWorkingMinutes": 53,
         "interimAt": "2026-09-07T13:57:00.000Z"
       },
       {
@@ -1889,8 +1847,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:40:00.000Z",
-        "waitedWorkingMinutes": 221,
+        "openedAt": "2026-09-08T06:30:00.000Z",
+        "waitedWorkingMinutes": 31,
         "interimAt": "2026-09-07T14:29:00.000Z"
       }
     ],
