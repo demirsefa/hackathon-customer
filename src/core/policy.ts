@@ -113,3 +113,58 @@ export function validateDraft(
 
   return { ok: true };
 }
+
+/**
+ * Words a reply uses when it commits, on the desk's behalf, to something the desk
+ * does not answer unread. Both languages, because the categories the classifier
+ * writes are English (`SENSITIVE_CATEGORIES`) and the replies it writes are mostly
+ * Turkish — a list in one language would only ever catch half the drafts.
+ *
+ * Matched as substrings, which is what covers the inflections without listing them:
+ * `iade` reaches `iadesi` and `iadeyi`, `refund` reaches `refunds` and `refunded`.
+ * Kept to the one promise that is actually expensive to take back. A longer list is
+ * not more careful, it is only less examined.
+ */
+export const SENSITIVE_DRAFT_TERMS: readonly string[] = ['iade', 'refund'];
+
+/**
+ * Whether a written reply promises something a person should have signed off on.
+ *
+ * It exists for the gap between the two model calls a line makes. The classifier is
+ * asked what the message *is*, and answers about the message: `wrong_item_received`,
+ * confident, not sensitive. The drafter is then asked for a reply to that same
+ * message and offers a full refund — a promise nobody classified, because at the
+ * moment the category was judged there was no draft to judge it against. Reading the
+ * draft is the only place that gap can be closed without a third call.
+ *
+ * State the weakness plainly: this reads generated text. That is weaker evidence than
+ * anything in `authority.ts`, where a fact is looked up rather than written, and it is
+ * the same shape of signal the project already refused once — a keyword scan over
+ * model output, which is not a risk decision (see `isSensitive` above on categories).
+ *
+ * What makes it acceptable here is the direction it can move a decision. It is applied
+ * after `isSensitive` has already said no and only ever turns an automatic send into a
+ * hold; there is no arrangement of these words that releases a message another rule
+ * stopped. So a term matched wrongly costs the operator a case in her queue, and a
+ * term missed leaves the line exactly where it stood. It cannot put a reply in front
+ * of a customer that would not have gone out anyway.
+ */
+export function draftCommitsToSensitiveAction(draft: string): boolean {
+  return SENSITIVE_DRAFT_TERMS.some((term) => normaliseDraft(draft).includes(term));
+}
+
+/**
+ * Lowercase, then drop the combining marks the lowercasing leaves behind.
+ *
+ * The second half is not tidiness. A Turkish reply opening a sentence with `İade`
+ * lowercases to `i` followed by a combining dot above, which contains `ade` and does
+ * not contain `iade` — the one word this rule is here for, missed on the one letter
+ * Turkish spells differently. Stripping the marks can only ever make a term match
+ * where it already almost did, never invent one that was not written.
+ */
+function normaliseDraft(draft: string): string {
+  return draft
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Mn}/gu, '');
+}

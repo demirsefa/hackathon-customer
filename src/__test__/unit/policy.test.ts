@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  draftCommitsToSensitiveAction,
   INTERIM_AFTER_MINUTES,
   isSensitive,
   needsInterim,
@@ -112,5 +113,56 @@ describe('isSensitive', () => {
   /** The limit, stated: a category in another language is not reachable this way. */
   it('does not pretend to read a category the model wrote in Turkish', () => {
     expect(isSensitive('iade_talebi')).toBe(false);
+  });
+});
+
+describe('draftCommitsToSensitiveAction', () => {
+  /**
+   * The recorded `amb-02` draft, which is the whole reason the rule exists: the
+   * classifier called it `wrong_item_received` and was sure, and the reply it led to
+   * offers to refund the order outright.
+   */
+  it('catches a reply that offers a refund the classifier never mentioned', () => {
+    expect(
+      draftCommitsToSensitiveAction(
+        'Size doğru rengi ücretsiz olarak gönderebiliriz veya tam iade yapabiliriz.',
+      ),
+    ).toBe(true);
+  });
+
+  /** The categories arrive in English and the replies in Turkish. Both, or neither. */
+  it('reads the promise in either language', () => {
+    expect(draftCommitsToSensitiveAction('We can issue a full refund today.')).toBe(true);
+    expect(draftCommitsToSensitiveAction('Para iadesi yapabiliriz.')).toBe(true);
+  });
+
+  it('is not confused by case', () => {
+    expect(draftCommitsToSensitiveAction('A REFUND is possible.')).toBe(true);
+    expect(draftCommitsToSensitiveAction('Tam İADE yapılacaktır.')).toBe(true);
+  });
+
+  /**
+   * Substring matching is what covers the inflections, and listing them out is what
+   * the term list is deliberately not doing.
+   */
+  it.each(['iadesi', 'iadeyi', 'refunds', 'refunded'])(
+    'reaches %s without listing it',
+    (word) => {
+      expect(draftCommitsToSensitiveAction(`... ${word} ...`)).toBe(true);
+    },
+  );
+
+  /**
+   * The number this rule is measured on is unnecessary holds, and it is zero. These
+   * are the ordinary replies the line writes on the committed set; none of them may
+   * be caught.
+   */
+  it.each([
+    'ORD-1042 bugün kargoya veriliyor, takip numarasını paylaşacağız.',
+    'Yes, we ship to İzmir.',
+    'Kılavuzun PDF halini e-postanıza gönderdik.',
+    'Kargo takip numaranızı yeniledik, ORD-1046 yolda.',
+  ])('lets an ordinary reply through: %s', (draft) => {
+    expect(draftCommitsToSensitiveAction(draft)).toBe(false);
   });
 });

@@ -40,7 +40,12 @@
 import { gateOnAuthority, permittedOrderIds, resolveAuthority } from '../authority.ts';
 import { autoSend, humanReview, type Decision } from '../decision.ts';
 import type { Pipeline } from '../pipeline.ts';
-import { CONFIDENCE_THRESHOLD, isSensitive, validateDraft } from '../policy.ts';
+import {
+  CONFIDENCE_THRESHOLD,
+  draftCommitsToSensitiveAction,
+  isSensitive,
+  validateDraft,
+} from '../policy.ts';
 import { buildClassifyPrompt, parseClassifyOutput } from './classify.ts';
 import { buildDraftPrompt, parseDraftOutput } from './draft.ts';
 
@@ -114,6 +119,22 @@ export const advanced: Pipeline = {
       return humanReview({
         messageId,
         reason: 'draft_policy_violation',
+        draft,
+        llmCalls: 2,
+      });
+    }
+
+    // 6. Last, the one question the gate above could not have asked. Step 3 judged the
+    //    message and let it through on a category about the message — `wrong_item_received`,
+    //    confident, not sensitive. The reply to that same message offers a full refund.
+    //    Nothing had compared the two, because at the moment the category was judged the
+    //    draft did not exist yet. This reads the draft, which is generated text and the
+    //    weakest evidence in the line; it is placed here, and only here, because from
+    //    this position it can add a hold and can never lift one.
+    if (draftCommitsToSensitiveAction(draft)) {
+      return humanReview({
+        messageId,
+        reason: 'sensitive_category',
         draft,
         llmCalls: 2,
       });

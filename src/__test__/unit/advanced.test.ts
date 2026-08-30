@@ -210,6 +210,48 @@ describe('advanced · the draft, and what may be said in it', () => {
     }
   });
 
+  /**
+   * The gap between the two calls, which is the only place it can be closed. The
+   * classifier answered about the message and was right about it — the wrong colour
+   * arrived — and nothing in that answer is a category the desk holds. The reply to
+   * the same message then offers a refund. Held on the second call, not a third.
+   */
+  it('holds a draft that promises what the classification never mentioned', async () => {
+    const { decision, llm } = await run({
+      text: 'ORD-2002 yanlış renk geldi. Ya doğrusunu gönderin ya da para iadesi yapın.',
+      script: agreeingScript({
+        category: 'wrong_item_received',
+        urgency: 70,
+        confidence: 0.85,
+        draft: 'Doğru rengi gönderebilir ya da tam iade yapabiliriz.',
+      }),
+    });
+
+    expect(decision.route).toBe('human_review');
+    expect(decision.reason).toBe('sensitive_category');
+    expect(decision.requiresApproval).toBe(true);
+    expect(decision.draft).toContain('iade');
+    expect(decision.llmCalls).toBe(2);
+    expect(llm.calls).toBe(2);
+  });
+
+  /**
+   * The direction the rule is allowed to move a decision. It runs after the record
+   * check, so a draft that is both invented and generous is still held for the fact
+   * rather than for the wording — the stronger evidence keeps the case.
+   */
+  it('leaves a record violation holding the case, not the wording', async () => {
+    const { decision } = await run({
+      text: 'Where is ORD-2002?',
+      script: agreeingScript({
+        ...routineParts(),
+        draft: 'ORD-3003 için tam iade yapabiliriz.',
+      }),
+    });
+
+    expect(decision.reason).toBe('draft_policy_violation');
+  });
+
   it('auto-sends a clean case on two calls', async () => {
     const { decision, llm } = await run({ text: 'Where is ORD-2002?', script: routine });
 
