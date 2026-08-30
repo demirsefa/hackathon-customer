@@ -88,10 +88,14 @@ for the messages that need two calls.
 ## Running it
 
 Node 22.18 or newer, and nothing else installed by hand. The sources are TypeScript
-and Node runs them directly, so an older Node cannot start them at all. Yarn 4 comes
-with the repository — `packageManager` in `package.json` pins the version.
+and Node runs them directly, so an older Node cannot start them at all. Yarn 4 is not
+vendored here — `packageManager` in `package.json` pins the version, and Corepack, which
+ships with Node, fetches that exact one. If `yarn` is not already on your PATH,
+`corepack enable` puts it there; any other Yarn 4 install does just as well, because the
+version is pinned either way.
 
 ```bash
+corepack enable   # once, only if `yarn` is not already on PATH
 yarn install
 yarn eval --replay
 ```
@@ -289,9 +293,12 @@ From a clean clone to the headline number. No API key, no environment file, no n
 the model responses are committed in `fixtures/llm-cache.json`, which is a deliverable
 rather than a cache artefact.
 
-Node 22.18 or newer is the only prerequisite; Yarn 4 ships with the repository.
+Node 22.18 or newer is the only prerequisite. Yarn 4 is not vendored in the repository:
+`packageManager` in `package.json` pins the version and Corepack, which ships with Node,
+fetches it. Run `corepack enable` once if `yarn` is not already on your PATH.
 
 ```bash
+corepack enable   # once, only if `yarn` is not already on PATH
 yarn install
 ```
 
