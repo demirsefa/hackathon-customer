@@ -335,13 +335,13 @@ from memory:
 ```bash
 git clone <repo> && cd <repo>
 yarn install
-yarn eval
-yarn sim overload
+yarn eval --replay
+yarn sim overload --replay
 ```
 
 What it produces, all of which the Reproduction guide then states: the node and yarn
 versions, the real duration of each command, the real cost (zero on the replay path —
-if `yarn eval` asks for an API key, the repro is broken), and the output a judge should
+if `yarn eval --replay` asks for an API key, the repro is broken), and the output a judge should
 expect to see.
 
 ### The video, five minutes

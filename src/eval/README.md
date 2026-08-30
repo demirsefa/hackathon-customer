@@ -5,12 +5,16 @@ table. No HTTP, no queue timing, no scenario playback — one message in, one
 decision out, scored against ground truth.
 
 ```bash
-yarn eval              # replays fixtures/llm-cache.json, no API key needed
+yarn eval --replay     # replays fixtures/llm-cache.json, no API key needed
 yarn eval --live       # real API calls, requires a key, records what they answered
 ```
 
-The default run must be deterministic and reproducible on a clean machine
-without credentials.
+The replay run must be deterministic and reproducible on a clean machine
+without credentials, and it is the form the reproduction guide quotes.
+
+A bare `yarn eval` typed at a terminal asks which of the two to run; piped or in CI
+it replays, because a prompt nobody can answer is worse than a default. The rule is
+in [`src/cli/README.md`](../cli/README.md).
 
 ## The files
 

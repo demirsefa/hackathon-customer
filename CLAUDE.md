@@ -57,6 +57,6 @@ Where new work goes:
 
 ```bash
 yarn check   # typecheck + lint + format + tests
-yarn eval    # replays fixtures/llm-cache.json, no API key needed
-yarn sim overload
+yarn eval --replay   # replays fixtures/llm-cache.json, no API key needed
+yarn sim overload --replay
 ```
