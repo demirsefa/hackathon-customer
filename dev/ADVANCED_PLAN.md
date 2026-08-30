@@ -156,80 +156,87 @@ Recommended: **(a)**, and write the prose before 20:00 anyway.
 
 ---
 
-## 3. The advanced line, as it will actually be built
+## 3. The advanced line
 
-`src/core/advanced/index.ts` exports `advanced: Pipeline`, and `PIPELINES` becomes
+This is the line that is being built right now, in its own session. What follows is
+what it is _for_; the step-by-step brief driving the implementation lives with that
+session, and where the two disagree the brief is the one that compiles.
+
+`src/core/advanced/index.ts` exports `advanced: Pipeline` and `PIPELINES` becomes
 `[baseline, advanced]`. Nothing else about the harnesses changes: `eval`, `sim`, the
 trajectory writers and the record files all loop over `PIPELINES` already, so adding
 the line produces `trajectories/advanced.md`, `advanced-overload.md` and
 `advanced-normal-day.md` with no new code.
 
-```text
-message in
-  ↓
-1. AUTHORITY — core/authority.ts, on the record layer, zero model calls
-   unknown sender                → human_review(unknown_sender)         llmCalls 0
-   reference resolves to nothing → human_review(unresolved_reference)   llmCalls 0
-   order owner ≠ sender          → human_review(authority_mismatch)     llmCalls 0
-   otherwise: keep `permittedOrderIds(outcome)` and continue
-  ↓
-2. CLASSIFY — advanced/classify.ts, one call, no draft in the prompt,
-   category constrained to a closed set stated in the prompt
-   unparseable, or a category outside the set → human_review(model_output_unusable)
-  ↓
-3. GATE
-   isSensitive(category)             → human_review(sensitive_category)   STOP
-   confidence < CONFIDENCE_THRESHOLD → human_review(low_confidence)       STOP
-  ↓
-4. DRAFT — advanced/draft.ts, one call
-   unparseable → human_review(model_output_unusable)
-  ↓
-5. POLICY — policy.validateDraft(draft, permittedOrderIds)
-   fails → one rewrite with the offending reference fed back (one more call)
-   fails again → human_review(draft_policy_violation)
-  ↓
-auto_send(routine_reply)
-```
+### The five steps, and what each one buys
 
-The closed vocabulary lives in `core/policy.ts` beside `SENSITIVE_CATEGORIES` — the
-mapping from a category to "risky" is shared law, and rule 5 asks for it in one place.
-Which line constrains the model to that vocabulary is the mechanism, and only the
-advanced line does.
+| Step               | Costs   | Answers                                                                                      |
+| ------------------ | ------- | -------------------------------------------------------------------------------------------- |
+| 0 · Record gate    | 0 calls | Is this person allowed to be told this? Read from the record, not the text                   |
+| 1 · Classification | 1 call  | What is this about, how sure are we, and is the message issuing orders?                      |
+| 2 · Gate           | 0 calls | Anything the answer to step 1 makes unsafe to send unread                                    |
+| 3 · Draft          | 1 call  | The reply itself, written only for cases that got this far                                   |
+| 4 · Validation     | 1 call  | Does the draft mention an order this sender does not own — deterministic first, model second |
+| 5 · Auto-send      | —       | What is left                                                                                 |
 
-Four properties this arrangement has to keep, because each one is a claim the
-submission makes:
+**Model-call budget: baseline 1 per case, flat; advanced 0, 1, 2 or 3.** The cheapest
+decisions are the ones the record layer settles on its own, which is the opposite of
+where a naive line spends. This ratio goes into FEATURE-PARITY rule 6 **before** any
+result is reported, and the eval scorecard already prints it.
 
-- **The gate is before the model.** `llmCalls: 0` on every `auth-*` decision, and the
-  trajectory shows record lookups with no exchange after them. `refusingLlm()` in
-  `src/__test__/fakes.ts` is how it gets proven in a unit test.
-- **No `priority` is passed to `humanReview`.** The advanced line established the fact,
-  so it takes the reason's priority (`authority_mismatch` 95 > `sensitive_category` 80).
-  The baseline passes the model's urgency. That difference _is_ the queue ordering, and
-  the queue ordering is what the primary metric measures.
+### Two additions to CHALLENGE §9
+
+**The message that issues orders.** Step 1's output grows one field: is this text
+telling the system what to do? No extra call — the same classification answers it.
+
+Why the baseline cannot have this: its single call both names the category and writes
+the reply that obeys the instruction. The target of the attack and the input to the
+decision are the same point. In the advanced line they are two calls apart, so the
+classifier is not the party producing the compliant output. The recorded run already
+showed the shape of it — on `inj-07` the model labelled the message
+`prompt_injection_attempt` and the baseline auto-sent it anyway, because a category
+nobody asked for is a warning nobody hears.
+
+**The record question with no key.** "The order I placed last week — I do not have the
+number." The gate says `no_reference` today and waves it through. Asking about the
+record without producing the key that opens it is a reason to stop, and it is still
+record-layer reasoning rather than text reading.
+
+Two cautions on this one, both worth stating before it is measured:
+
+- It cannot be answered at zero calls. Whether a message is _about_ a record is a
+  classification, so this hold lands after step 1 and costs one call. The "zero model
+  calls" claim belongs only to the steps that genuinely have it.
+- **No case in the evaluation set needs it.** `auth-06` — the case it was written for —
+  is already held one rule earlier as `unknown_sender`, and the only other
+  reference-free cases are `norm-09` (held on category), `amb-03` (held on confidence),
+  `inj-03` (held on instruction) and `norm-07` ("do you ship to İzmir? no order yet"),
+  which must **not** be held. So this rule moves no number and can only cost one: if it
+  catches `norm-07`, the advanced line buys its gains with a false positive. Keep it,
+  keep it narrow, and say in the changelog that it was designed for production rather
+  than measured into the result.
+
+### Two properties to hold on to
+
+- **Text-derived priority ranks below record-derived priority.** The new reason code
+  sits in the same table as `authority_mismatch` (95) and `sensitive_category` (80). It
+  belongs **between** them, not above: a fact the record layer established outranks a
+  claim read out of a message. Otherwise an attacker promotes themselves to the top of
+  Merve's queue by writing "SYSTEM:" in a message — the queue-flooding attack the vision
+  document names, arriving through our own defence.
 - **The record layer never enters a prompt.** `core/llm.ts` says so; keep it true. The
   authority verdict shapes the control flow, not the text sent to the model.
-- **Same decision shape, same vocabulary of reasons.** No new reason codes. Every code
-  the advanced line emits is already in `core/decision.ts`.
 
-**Model-call budget:** baseline 1 per case, flat. Advanced 0 (gated), 1 (classified and
-held), 2 (drafted), or 3 (drafted, rewritten). This goes into FEATURE-PARITY rule 6 as a
-ratio **before** any result is reported, and into the eval scorecard, which already
-prints `llmCalls`.
+### The removed-experiment slot is now empty
 
-### `verify.ts` is the removed experiment
+`verify.ts` was going to be the experiment we ran and removed — the rubric asks for one,
+and the video has a slot for it. It is in the line instead, as step 4's second opinion.
 
-`src/core/advanced/verify.ts` — a second model opinion on the draft — is written and is
-**not** in the pipeline above. `validateDraft` already answers the question that
-matters (does the reply mention an order this sender does not own) deterministically and
-for free.
-
-Run it once against the eval set, record what it changes, then remove it and write the
-changelog row. The brief asks for a removed experiment and what it taught; the rubric
-has a line for it; the video plan has a slot for it. This is that experiment, and it
-costs one extra live pass over the drafted cases.
-
-If the schedule slips past 18:00, drop the verify pass and write the row from the
-reasoning instead — say plainly in the changelog that it was reasoned, not measured.
+The vacancy is filled by the rewrite loop: CHALLENGE §9 specified up to two rewrites
+when a draft fails policy, and the line being built holds the message instead. That is a
+real experiment with a real lesson — a deterministic check already answers the only
+question that matters, and spending a call to argue with a policy buys nothing — and it
+needs one paragraph in the changelog, not a measurement.
 
 ---
 
@@ -238,17 +245,17 @@ reasoning instead — say plainly in the changelog that it was reasoned, not mea
 Every step ends in a commit. A step that runs long is cut at its box, not extended —
 what gets cut is named in the step.
 
-| Time        | Step                                                                                                                                                                            |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 15:10–15:30 | **0. Land the working tree.** The `record.ts` split, the fence fix, the containment match and their tests are all uncommitted. `yarn check`, commit in logical groups           |
-| 15:30–16:30 | **1. The advanced line**: the closed vocabulary in `policy.ts`, `advanced/index.ts` per §3, unit tests including the zero-call proof with `refusingLlm()`                       |
-| 16:30–16:50 | **2. One live run.** `yarn eval --live` — the baseline's 28 answers are already cached, so this pays only for classify, draft and any rewrite. Commit `fixtures/llm-cache.json` |
-| 16:50–17:10 | **3. The numbers.** `yarn eval --replay`, `yarn sim overload --replay`, `yarn sim normal-day --replay`. Commit the six trajectory files                                         |
-| 17:10–17:40 | **4. Contracts.** Un-suspend the three FEATURE-PARITY assertions; rule 6 gets the call-budget ratio; `REACHES` gets the advanced line; the SUBMISSION clock decision from §2.3  |
-| 17:40–18:10 | **5. CHALLENGE §9 and §10.** §9 stops saying "not built yet"; §10's table gets both columns; the "what the first measurement changed" paragraph is rewritten                    |
-| 18:10–19:30 | **6. README prose.** The seven required sections. Changelog first — it is a rubric row and the hardest to reconstruct                                                           |
-| 19:30–19:50 | **7. `yarn check`, `yarn security`, clean-clone smoke.** Fix only what blocks reproduction                                                                                      |
-| 19:50–20:00 | **8. Freeze.** Tag, write the commit sha into the README                                                                                                                        |
+| Time        | Step                                                                                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| — done      | **0. Land the working tree.** The `record.ts` split, the fence fix, the containment match and their tests are committed; `dev/CHALLENGE.md` §10 and the README changelog carry the corrected numbers                      |
+| 15:15–16:30 | **1. The advanced line**, in its own session: `advanced/index.ts` per §3, the two additions, the parity assertions un-suspended, `src/__test__/unit/advanced.test.ts`. **No live calls** — verified against `scriptedLlm` |
+| 16:30–16:50 | **2. One live run**, by hand: `yarn eval --live`. The baseline's 28 answers are already cached, so this pays only for classify, draft and verify. Commit `fixtures/llm-cache.json`                                        |
+| 16:50–17:10 | **3. The numbers.** `yarn eval --replay`, `yarn sim overload --replay`, `yarn sim normal-day --replay`. Commit the six trajectory files                                                                                   |
+| 17:10–17:40 | **4. Contracts.** Un-suspend the three FEATURE-PARITY assertions; rule 6 gets the call-budget ratio; `REACHES` gets the advanced line; the SUBMISSION clock decision from §2.3                                            |
+| 17:40–18:10 | **5. CHALLENGE §9 and §10.** §9 stops saying "not built yet"; §10's table gets both columns; the "what the first measurement changed" paragraph is rewritten                                                              |
+| 18:10–19:30 | **6. README prose.** The seven required sections. Changelog first — it is a rubric row and the hardest to reconstruct                                                                                                     |
+| 19:30–19:50 | **7. `yarn check`, `yarn security`, clean-clone smoke.** Fix only what blocks reproduction                                                                                                                                |
+| 19:50–20:00 | **8. Freeze.** Tag, write the commit sha into the README                                                                                                                                                                  |
 
 Everything after 20:00 follows [`CHALLENGE.md`](CHALLENGE.md) §13 unchanged.
 
@@ -259,12 +266,14 @@ it starts** — a changed prompt is a changed cache key, and a second recording 
 minutes this schedule does not have.
 
 Free after the recording, because none of it is in a prompt: `CONFIDENCE_THRESHOLD`,
-which categories are sensitive, the reason-to-priority table, the rewrite limit, the
-route a category maps to. Tune those against the recorded answers as much as it takes.
+which categories are sensitive, the reason-to-priority table, the route a category maps
+to, and whether the record-question-with-no-key rule is on at all. Tune those against the recorded answers as much as it takes.
 
-Costs another live pass: any word in `buildClassifyPrompt`, `buildDraftPrompt`, the
-model id, `maxTokens`, effort. `buildTriagePrompt` is not touched at all, which is what
-keeps the baseline's cache, numbers and trajectories valid.
+Costs another live pass: any word in `buildClassifyPrompt`, `buildDraftPrompt`,
+`buildVerifyPrompt`, the model id, `maxTokens`, effort. `buildTriagePrompt` is not
+touched at all, which is what keeps the baseline's cache, numbers and trajectories
+valid. The classification prompt grows a field for the two additions, so it is written
+once and recorded once — a second thought about its wording after 16:30 costs the run.
 
 ### Rollback
 
@@ -289,8 +298,10 @@ Reading the record layer by hand, case by case:
 - **Advanced holds on the closed vocabulary** where the baseline auto-sent because the
   model invented a category name: `inj-01`, `inj-02`, `inj-03`, `inj-05`, `inj-07`,
   `inj-08`. Six more, and the mechanism the contract permits it to have.
-- **Both lines expected to miss:** `inj-04` — an injection wrapped around a genuine
-  shipping question. Already recorded as designed baseline behaviour in `REACHES`.
+- **Advanced holds on the instruction field:** `inj-04` — an injection wrapped around a
+  genuine shipping question, which no category and no record lookup can catch, because
+  the question is real and the order is the sender's own. It is the one case the whole
+  addition exists for, and the only case in the set that tests it alone.
 - **Advanced only, and uncertain:** `amb-03` ("do the thing we discussed") has no
   reference and no category; it is held only if the model's confidence lands below
   `CONFIDENCE_THRESHOLD`. If it does not, that is a documented miss, not a threshold to
@@ -300,8 +311,11 @@ Reading the record layer by hand, case by case:
   it to `billing`, the advanced line buys its gains with a hold that costs Merve ten
   minutes for nothing. It belongs in the results table's false-positive row either way.
 
-Rough expectation: advanced **25–27 / 28** against the baseline's 12, with the gap
+Rough expectation: advanced **26–28 / 28** against the baseline's 12, with the gap
 sitting in `auth-*`, `inj-*` and `amb-*` — and coverage under overload roughly tripling.
+A number that high is itself a warning: the evaluation set was written against this
+design, and a line that scores 28/28 on the cases that shaped it has proven that it is
+consistent, not that it is right. Say that in the README rather than waiting to be told.
 
 Two things to check rather than assume once the run lands:
 
@@ -309,9 +323,11 @@ Two things to check rather than assume once the run lands:
   Advanced will hold far more, and if it holds more than 42 the ordering starts to
   count — which is what §10 says the metric is actually about. If it stays under
   capacity, say so: the gain came from holding the right things, not from ordering them.
-- **What did the model calls cost?** Advanced spends 0–3 per case against a flat 1. If
-  the average lands above 2, FEATURE-PARITY rule 6 wants that ratio stated next to the
-  result, not after it.
+- **What did the model calls cost?** Advanced spends 0–3 per case against a flat 1, and
+  with the verify pass inside the line every clean case costs three. FEATURE-PARITY
+  rule 6 wants that ratio stated next to the result, not after it — an advanced line
+  that decides better by spending three times as much is a different claim from one
+  that decides better.
 
 **If the gap comes out small, report the small gap.** A fair baseline that scores well
 is a finding, and "we fixed the measurement and the difference halved" is a changelog
@@ -324,9 +340,12 @@ row worth more than a wide gap nobody believes.
 - **Changing the baseline prompt.** §2.2. It keeps its cache, its numbers and its
   trajectories, and the contract says the classification mechanism is not owed to it.
 - **A keyword risk scan** (CHALLENGE §9 step 1). It reads the text, which is the thing
-  this project says you cannot decide from, and the closed-vocabulary classify pass
-  covers the same cases. §9 is edited in step 5 to say so — a design cut, stated, not a
-  silent omission.
+  this project says you cannot decide from, and the classification pass covers the same
+  cases with one call it was already spending. §9 is edited in step 5 to say so — a
+  design cut, stated, not a silent omission.
+- **The rewrite loop** (CHALLENGE §9 step 6, "fails → feed back, rewrite (max 2)"). The
+  line holds the message instead. This is the removed experiment the rubric asks for;
+  see §3.
 - **Sender account age / prior message count.** Needs new fields in `fixtures/cases.json`
   and a parser change, and moves no case in the set.
 - **New evaluation cases**, including the payment-redirection case the vision names as
