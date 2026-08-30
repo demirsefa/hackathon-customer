@@ -15,15 +15,16 @@
 import type { InboundMessage } from '../types/message.ts';
 import type { Order, OrderStatus, SenderProfile } from '../types/records.ts';
 import { shapeChecks, type ShapeChecks } from '../utils/parse.ts';
-import type { Route } from './decision.ts';
+// `ROUTES` is imported rather than restated: the routes are `decision.ts`'s
+// vocabulary, and a second copy here would keep rejecting a route the decision
+// layer had already learned to make.
+import { ROUTES, type Route } from './decision.ts';
 import { isInstant } from './message.ts';
 
 /** The four groups of dev/CHALLENGE.md §10, in its order. */
 export const CASE_SUBSETS = ['normal', 'injection', 'authority', 'ambiguous'] as const;
 
 export type CaseSubset = (typeof CASE_SUBSETS)[number];
-
-const ROUTES: readonly Route[] = ['auto_send', 'human_review'];
 
 const ORDER_STATUSES: readonly OrderStatus[] = [
   'placed',
