@@ -64,11 +64,37 @@ export interface Coverage {
 export const reachedInTime = (arrival: PlayedArrival, windowMinutes: number): boolean =>
   arrival.waitedWorkingMinutes !== null && arrival.waitedWorkingMinutes <= windowMinutes;
 
-function missReason(arrival: PlayedArrival, windowMinutes: number): MissReason {
-  if (arrival.decision.route === 'auto_send') return 'auto_sent';
-  return reachedInTime(arrival, windowMinutes) || arrival.openedAt === null
-    ? 'not_reached'
-    : 'opened_late';
+/**
+ * The critical arrivals she did not reach in time, in arrival order, each with why.
+ *
+ * The filter and the reason are one expression on purpose. A reason is only meaningful
+ * for an arrival this same pass has just found unreached — asked about one she opened
+ * inside the window, the same branches would answer `not_reached`, which is a lie. Kept
+ * as a separate function, that precondition could only live in a comment; here it is the
+ * control flow, and there is no second caller to get it wrong.
+ */
+function missesIn(
+  critical: readonly PlayedArrival[],
+  windowMinutes: number,
+): readonly Miss[] {
+  return critical.flatMap<Miss>((arrival) => {
+    if (reachedInTime(arrival, windowMinutes)) return [];
+
+    return [
+      {
+        messageId: arrival.messageId,
+        caseId: arrival.caseId,
+        arrivedAt: arrival.arrivedAt,
+        reason:
+          arrival.decision.route === 'auto_send'
+            ? 'auto_sent'
+            : arrival.openedAt === null
+              ? 'not_reached'
+              : 'opened_late',
+        waitedWorkingMinutes: arrival.waitedWorkingMinutes,
+      },
+    ];
+  });
 }
 
 export function scoreTimeline(timeline: Timeline): Coverage {
@@ -88,15 +114,7 @@ export function scoreTimeline(timeline: Timeline): Coverage {
     critical: critical.length,
     criticalReached: critical.filter((arrival) => reachedInTime(arrival, windowMinutes))
       .length,
-    missed: critical
-      .filter((arrival) => !reachedInTime(arrival, windowMinutes))
-      .map((arrival) => ({
-        messageId: arrival.messageId,
-        caseId: arrival.caseId,
-        arrivedAt: arrival.arrivedAt,
-        reason: missReason(arrival, windowMinutes),
-        waitedWorkingMinutes: arrival.waitedWorkingMinutes,
-      })),
+    missed: missesIn(critical, windowMinutes),
     queued: queued.length,
     opened: opened.length,
     stillQueued: queued.length - opened.length,
