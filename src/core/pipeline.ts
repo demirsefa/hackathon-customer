@@ -34,13 +34,13 @@ export const REQUIRED_FEATURES = [
 
 export type Feature = (typeof REQUIRED_FEATURES)[number];
 
-export type PipelineInput = {
+export interface PipelineInput {
   readonly message: InboundMessage;
   readonly records: RecordStore;
   readonly llm: LlmClient;
-};
+}
 
-export type Pipeline = {
+export interface Pipeline {
   readonly name: string;
   /**
    * Declared per implementation rather than shared, so a capability that lands on one
@@ -48,6 +48,6 @@ export type Pipeline = {
    */
   readonly features: readonly Feature[];
   run(input: PipelineInput): Promise<Decision>;
-};
+}
 
 export const PIPELINES: readonly Pipeline[] = [baseline];

@@ -23,10 +23,10 @@ function readTask(prompt: string): TaskName {
   return task;
 }
 
-export type RecordingLlm = LlmClient & {
+export interface RecordingLlm extends LlmClient {
   readonly prompts: readonly string[];
   readonly calls: number;
-};
+}
 
 export function scriptedLlm(script: Partial<Record<TaskName, string>>): RecordingLlm {
   const prompts: string[] = [];

@@ -18,12 +18,12 @@ export function buildTriagePrompt(text: string, threadSummary?: string): string 
   return `TASK: triage\n${FORMAT_TRIAGE}\n\n${withThread(text, threadSummary)}`;
 }
 
-export type TriageOutput = {
+export interface TriageOutput {
   readonly category: string;
   /** The model's own read-first score, on the same 0-100 scale a decision carries. */
   readonly urgency: number;
   readonly draft: string;
-};
+}
 
 function readUrgency(source: Record<string, unknown>): number | null {
   const value = source.urgency;

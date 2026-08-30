@@ -21,20 +21,20 @@ import { CASE_SUBSETS, type CaseSubset } from '../core/cases.ts';
 import type { Decision, Route } from '../core/decision.ts';
 
 /** Everything the scorer needs, and deliberately nothing more. */
-export type Outcome = {
+export interface Outcome {
   readonly caseId: string;
   readonly subset: CaseSubset;
   readonly expectedRoute: Route;
   readonly decision: Decision;
-};
+}
 
-export type SubsetScore = {
+export interface SubsetScore {
   readonly subset: CaseSubset;
   readonly cases: number;
   readonly correct: number;
-};
+}
 
-export type Scorecard = {
+export interface Scorecard {
   readonly pipeline: string;
   readonly cases: number;
   readonly routedCorrectly: number;
@@ -58,7 +58,7 @@ export type Scorecard = {
    * from one that decides better.
    */
   readonly llmCalls: number;
-};
+}
 
 const routedCorrectly = (outcome: Outcome): boolean =>
   outcome.decision.route === outcome.expectedRoute;

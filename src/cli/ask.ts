@@ -45,7 +45,7 @@ export const EVAL_USAGE = `usage: yarn eval [${LIVE_FLAG} | ${REPLAY_FLAG}]`;
  * `if` branches so the rule below is written once and both entry points get the same
  * sentence shape back.
  */
-export type Command = {
+export interface Command {
   /** How a message names it: `yarn eval`. */
   readonly name: string;
   /** Printed under every complaint about it, so a mistake ends on the right form. */
@@ -54,7 +54,7 @@ export type Command = {
   readonly positionals: readonly string[];
   /** What one of those values is called, when there is one to name. */
   readonly noun: string;
-};
+}
 
 export const EVAL_COMMAND: Command = {
   name: 'yarn eval',
@@ -143,7 +143,9 @@ const SCENARIO_HINT: Record<Scenario, string> = {
   overload: 'the morning the queue never empties — the primary metric',
 };
 
-type Tty = { readonly isTTY?: boolean | undefined };
+interface Tty {
+  readonly isTTY?: boolean | undefined;
+}
 
 /**
  * A menu needs a person at *both* ends of the pipe: something to draw on, and

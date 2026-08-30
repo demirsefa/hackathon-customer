@@ -19,7 +19,7 @@ import { recordingClient, writeCache, type MutableCache } from './record.ts';
 import { CACHE_FILE, CACHE_LABEL, readCache, readCacheIfPresent } from './replay.ts';
 import { replayClient } from './replay.ts';
 
-export type LlmSession = {
+export interface LlmSession {
   readonly llm: LlmClient;
   /** One line for the run's header, so a report says which client produced it. */
   readonly label: string;
@@ -37,7 +37,7 @@ export type LlmSession = {
    * case.
    */
   save(): void;
-};
+}
 
 export function openLlmSession(input: {
   readonly live: boolean;

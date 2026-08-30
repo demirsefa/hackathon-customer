@@ -13,12 +13,17 @@
  * one generated sentence away from letting the words overwrite the fact.
  */
 
-export type LlmRequest = { readonly prompt: string };
-export type LlmResponse = { readonly text: string };
+export interface LlmRequest {
+  readonly prompt: string;
+}
 
-export type LlmClient = {
+export interface LlmResponse {
+  readonly text: string;
+}
+
+export interface LlmClient {
   complete(request: LlmRequest): Promise<LlmResponse>;
-};
+}
 
 export function withThread(text: string, threadSummary: string | undefined): string {
   // The summary is labelled as reported, not established: it is model-written text

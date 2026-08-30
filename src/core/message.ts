@@ -6,7 +6,7 @@
  * attested by nobody.
  */
 
-export type InboundMessage = {
+export interface InboundMessage {
   readonly messageId: string;
   /** From the transport envelope. Never parsed out of `text`. */
   readonly senderId: string;
@@ -19,7 +19,7 @@ export type InboundMessage = {
    * still a claim made by the sender.
    */
   readonly threadSummary?: string;
-};
+}
 
 /**
  * An ISO instant carrying an explicit offset.

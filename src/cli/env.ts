@@ -24,11 +24,11 @@
 /** Read from the working directory, which is the package root under `yarn run`. */
 export const ENV_FILE = '.env';
 
-export type EnvLoad = {
+export interface EnvLoad {
   readonly loaded: boolean;
   /** One line for stderr, or `null` when there is nothing worth saying. */
   readonly warning: string | null;
-};
+}
 
 /**
  * Never throws. A missing or unreadable `.env` is not a reason to stop: the default

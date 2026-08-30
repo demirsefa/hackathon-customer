@@ -36,7 +36,7 @@ const PRIORITY: Readonly<Record<ReasonCode, number>> = {
   routine_reply: 10,
 };
 
-export type Decision = {
+export interface Decision {
   readonly messageId: string;
   readonly route: Route;
   readonly reason: ReasonCode;
@@ -46,7 +46,7 @@ export type Decision = {
   readonly requiresApproval: boolean;
   /** How many model calls this decision cost. Zero is a meaningful answer. */
   readonly llmCalls: number;
-};
+}
 
 function clampPriority(value: number): number {
   return Math.min(100, Math.max(0, value));

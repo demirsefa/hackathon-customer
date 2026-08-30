@@ -15,11 +15,11 @@ import { createHash } from 'node:crypto';
 
 export type Effort = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
 
-export type LlmParams = {
+export interface LlmParams {
   readonly model: string;
   readonly maxTokens: number;
   readonly effort: Effort;
-};
+}
 
 /**
  * The configuration every recorded and every live call uses unless something says

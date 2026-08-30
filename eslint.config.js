@@ -51,6 +51,9 @@ export default tseslint.config(
       ],
       'no-console': 'off',
       eqeqeq: ['error', 'always'],
+      // An object shape is an interface. Type aliases stay for what an interface
+      // cannot say: unions, primitives, and shapes derived from a value.
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
     },
   },
   prettier,

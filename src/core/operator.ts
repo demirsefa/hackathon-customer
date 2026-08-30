@@ -35,12 +35,12 @@
 export type IsoWeekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 /** A half-open span of a local day, in whole minutes from local midnight. */
-export type DaySpan = {
+export interface DaySpan {
   readonly startMinute: number;
   readonly endMinute: number;
-};
+}
 
-export type OperatorConfig = {
+export interface OperatorConfig {
   readonly id: string;
   /** How long one case takes her. Whole minutes; there is no fractional case. */
   readonly minutesPerCase: number;
@@ -51,7 +51,7 @@ export type OperatorConfig = {
   readonly workdays: readonly IsoWeekday[];
   /** An IANA zone name. Required — see the note at the top of this file. */
   readonly timezone: string;
-};
+}
 
 const MS_PER_MINUTE = 60_000;
 const MS_PER_DAY = 86_400_000;
@@ -66,17 +66,17 @@ const TIME_OF_DAY = /^([01]\d|2[0-3]):([0-5]\d)$/;
  */
 const SEARCH_LIMIT_DAYS = 8;
 
-type CivilDate = {
+interface CivilDate {
   readonly year: number;
   readonly month: number;
   readonly day: number;
-};
+}
 
-type CivilMoment = CivilDate & {
+interface CivilMoment extends CivilDate {
   readonly hour: number;
   readonly minute: number;
   readonly second: number;
-};
+}
 
 // --- the zone boundary -----------------------------------------------------------
 

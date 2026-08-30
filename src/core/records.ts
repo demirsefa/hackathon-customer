@@ -7,22 +7,22 @@
 
 export type OrderStatus = 'placed' | 'shipped' | 'delivered' | 'refunded';
 
-export type Order = {
+export interface Order {
   readonly orderId: string;
   /** The single source of truth for who may be told about this order. */
   readonly ownerSenderId: string;
   readonly status: OrderStatus;
-};
+}
 
-export type SenderProfile = {
+export interface SenderProfile {
   readonly senderId: string;
   readonly displayName: string;
-};
+}
 
-export type RecordStore = {
+export interface RecordStore {
   findOrder(orderId: string): Order | undefined;
   findSender(senderId: string): SenderProfile | undefined;
-};
+}
 
 export function createRecordStore(input: {
   readonly orders: readonly Order[];

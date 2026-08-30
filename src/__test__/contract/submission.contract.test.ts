@@ -77,10 +77,10 @@ afterAll(() => {
 
 // ---------------------------------------------------------------- markdown helpers
 
-type Table = {
+interface Table {
   readonly header: readonly string[];
   readonly rows: readonly (readonly string[])[];
-};
+}
 
 const cells = (line: string): readonly string[] =>
   line
@@ -228,12 +228,12 @@ const run = promisify(execFile);
 
 const entry = (path: string): string => fileURLToPath(new URL(path, repoRoot));
 
-type Attempt = {
+interface Attempt {
   readonly command: string;
   readonly code: number;
   readonly stdout: string;
   readonly stderr: string;
-};
+}
 
 const attempt = async (
   command: string,

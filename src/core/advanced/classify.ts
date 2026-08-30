@@ -12,10 +12,10 @@ export function buildClassifyPrompt(text: string, threadSummary?: string): strin
   return `TASK: classify\n${FORMAT_CLASSIFY}\n\n${withThread(text, threadSummary)}`;
 }
 
-export type ClassifyOutput = {
+export interface ClassifyOutput {
   readonly category: string;
   readonly confidence: number;
-};
+}
 
 export function parseClassifyOutput(raw: string): ClassifyOutput | null {
   const parsed = parseObject(raw);

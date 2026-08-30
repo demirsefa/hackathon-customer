@@ -9,10 +9,10 @@ export function buildVerifyPrompt(draft: string): string {
   return `TASK: verify\n${FORMAT_VERIFY}\n\nDRAFT:\n${draft}`;
 }
 
-export type VerifyOutput = {
+export interface VerifyOutput {
   readonly ok: boolean;
   readonly confidence: number;
-};
+}
 
 export function parseVerifyOutput(raw: string): VerifyOutput | null {
   const parsed = parseObject(raw);

@@ -27,13 +27,13 @@ export const CACHE_LABEL = 'fixtures/llm-cache.json';
  * One recorded exchange. The four fields above `text` are exactly the object the key
  * was hashed over, so an entry states its own request and a reader can check it.
  */
-export type CacheEntry = {
+export interface CacheEntry {
   readonly effort: Effort;
   readonly maxTokens: number;
   readonly model: string;
   readonly prompt: string;
   readonly text: string;
-};
+}
 
 export type LlmCache = Readonly<Record<string, CacheEntry>>;
 

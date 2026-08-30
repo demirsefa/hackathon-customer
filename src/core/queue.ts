@@ -17,14 +17,14 @@
  */
 
 /** What ordering needs, and nothing else — so a test can build one in three fields. */
-export type QueueEntry = {
+export interface QueueEntry {
   /** Unique within a scenario, which is what makes the order total. */
   readonly messageId: string;
   /** Higher is read earlier. `Decision.priority`, on its 0-100 scale. */
   readonly priority: number;
   /** Arrival instant as epoch milliseconds: integers, and directly comparable. */
   readonly arrivedAtMs: number;
-};
+}
 
 /**
  * Priority descending, then arrival ascending, then `messageId` ascending.

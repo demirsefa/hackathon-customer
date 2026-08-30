@@ -24,16 +24,16 @@ export type MissReason =
   /** Held for her and opened — after the window had closed. */
   | 'opened_late';
 
-export type Miss = {
+export interface Miss {
   readonly messageId: string;
   readonly caseId: string;
   readonly arrivedAt: string;
   readonly reason: MissReason;
   /** Working minutes she took, or `null` when she never got there. */
   readonly waitedWorkingMinutes: number | null;
-};
+}
 
-export type Coverage = {
+export interface Coverage {
   readonly pipeline: string;
   readonly scenario: string;
   readonly arrivals: number;
@@ -52,7 +52,7 @@ export type Coverage = {
   readonly averageWaitMinutes: number | null;
   readonly interimSent: number;
   readonly llmCalls: number;
-};
+}
 
 const reached = (arrival: PlayedArrival, windowMinutes: number): boolean =>
   arrival.waitedWorkingMinutes !== null && arrival.waitedWorkingMinutes <= windowMinutes;

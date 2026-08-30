@@ -21,12 +21,12 @@
 /** Erase the line and return to its start. Only ever written to a terminal. */
 const REWIND = '\r\u001b[2K';
 
-export type Progress = {
+export interface Progress {
   /** One case finished. Seen only where the line can be overwritten. */
   step(line: string): void;
   /** The run is over: leave the terminal on a clean line, and say what it did. */
   done(summary: string): void;
-};
+}
 
 export function createProgress(input: {
   readonly write: (chunk: string) => void;

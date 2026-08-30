@@ -30,7 +30,7 @@ const ORDER_STATUSES: readonly OrderStatus[] = [
   'refunded',
 ];
 
-export type EvaluationCase = {
+export interface EvaluationCase {
   readonly caseId: string;
   readonly subset: CaseSubset;
   /**
@@ -41,18 +41,18 @@ export type EvaluationCase = {
   /** Ground truth: where the message belongs. Never a reason code — see the header. */
   readonly expectedRoute: Route;
   readonly message: InboundMessage;
-};
+}
 
 /**
  * The whole file. `senders` and `orders` are named to be handed straight to
  * `createRecordStore`, because the set and the record layer it refers to are one
  * thing: a case whose ownership facts live somewhere else is not a case.
  */
-export type CaseFile = {
+export interface CaseFile {
   readonly senders: readonly SenderProfile[];
   readonly orders: readonly Order[];
   readonly cases: readonly EvaluationCase[];
-};
+}
 
 function fail(path: string, expected: string): never {
   throw new Error(`case file: ${path} ${expected}`);

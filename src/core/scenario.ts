@@ -17,15 +17,15 @@ import { isInstant, type InboundMessage } from './message.ts';
 import { parseOperatorConfig, type OperatorConfig } from './operator.ts';
 
 /** One message landing in the inbox at a stated instant. */
-export type Arrival = {
+export interface Arrival {
   readonly messageId: string;
   /** Which case from `fixtures/cases.json` arrived. Many arrivals may name one case. */
   readonly caseId: string;
   /** ISO, with an explicit offset — `message.ts` owns the rule. */
   readonly at: string;
-};
+}
 
-export type Scenario = {
+export interface Scenario {
   readonly name: string;
   /**
    * Exactly one. The field is an array because the file writes it as one and a desk
@@ -35,7 +35,7 @@ export type Scenario = {
   readonly operator: OperatorConfig;
   /** Sorted by arrival, then by message id. Guaranteed by the parser. */
   readonly arrivals: readonly Arrival[];
-};
+}
 
 function fail(path: string, expected: string): never {
   throw new Error(`scenario file: ${path} ${expected}`);
@@ -145,7 +145,7 @@ export function parseScenario(value: unknown): Scenario {
  * One arrival with its case attached: the ground truth to score it against, and the
  * message as the pipeline will receive it.
  */
-export type ResolvedArrival = {
+export interface ResolvedArrival {
   readonly messageId: string;
   readonly caseId: string;
   readonly subset: CaseSubset;
@@ -153,7 +153,7 @@ export type ResolvedArrival = {
   readonly critical: boolean;
   readonly arrivedAt: string;
   readonly message: InboundMessage;
-};
+}
 
 /**
  * Joins a scenario to the case set it names.

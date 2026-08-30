@@ -39,7 +39,7 @@ export type Step =
       readonly found: string | null;
     };
 
-export type CaseRun = {
+export interface CaseRun {
   readonly caseId: string;
   readonly subset: CaseSubset;
   readonly critical: boolean;
@@ -47,9 +47,9 @@ export type CaseRun = {
   readonly message: InboundMessage;
   readonly decision: Decision;
   readonly steps: readonly Step[];
-};
+}
 
-export type PipelineRun = {
+export interface PipelineRun {
   readonly pipeline: string;
   readonly runs: readonly CaseRun[];
   /**
@@ -58,7 +58,7 @@ export type PipelineRun = {
    * at the first gap and being re-run once per case.
    */
   readonly unrecorded: readonly string[];
-};
+}
 
 function observeLlm(llm: LlmClient, steps: Step[]): LlmClient {
   return {
@@ -102,14 +102,14 @@ function observeRecords(records: RecordStore, steps: Step[]): RecordStore {
  * One case, the moment it is over. Handed out rather than printed: this file decides
  * nothing about a terminal, and the entry point that owns stderr does.
  */
-export type CaseProgress = {
+export interface CaseProgress {
   /** 1-based, so it reads as "7 of 28" rather than as an index into an array. */
   readonly done: number;
   readonly total: number;
   readonly caseId: string;
   /** What the case cost, or `null` when the cache could not answer it. */
   readonly llmCalls: number | null;
-};
+}
 
 export async function runPipeline(input: {
   readonly pipeline: Pipeline;

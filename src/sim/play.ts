@@ -39,7 +39,7 @@ const MS_PER_MINUTE = 60_000;
  * One arrival the walk has to place: when it landed, how urgent the line said it was,
  * and whether it reached her queue at all.
  */
-export type Pending = QueueEntry & {
+export interface Pending extends QueueEntry {
   readonly caseId: string;
   /**
    * `human_review` reaches her queue; `auto_send` never does. An automatic reply is
@@ -48,17 +48,17 @@ export type Pending = QueueEntry & {
    * product and, when a line holds back the wrong things, the whole cost of it.
    */
   readonly queued: boolean;
-};
+}
 
 /** One case she opened, at the instant she opened it. */
-export type Opening = {
+export interface Opening {
   readonly messageId: string;
   readonly openedAtMs: number;
   /** Arrival to opening, in working minutes. Weekends and evenings count for nothing. */
   readonly waitedWorkingMinutes: number;
-};
+}
 
-export type Walk = {
+export interface Walk {
   /** The first working minute at or after the earliest arrival. */
   readonly startedAtMs: number;
   /**
@@ -72,7 +72,7 @@ export type Walk = {
   readonly horizonMs: number;
   /** In the order she opened them, which is the order the queue put them in. */
   readonly openings: readonly Opening[];
-};
+}
 
 /**
  * The operator working her queue, top down, from the first arrival to the horizon.
@@ -191,7 +191,7 @@ function interimAt(input: {
 }
 
 /** One arrival, played: what the line decided, and what the operator then did. */
-export type PlayedArrival = {
+export interface PlayedArrival {
   readonly messageId: string;
   readonly caseId: string;
   readonly subset: CaseSubset;
@@ -202,9 +202,9 @@ export type PlayedArrival = {
   readonly openedAt: string | null;
   readonly waitedWorkingMinutes: number | null;
   readonly interimAt: string | null;
-};
+}
 
-export type Timeline = {
+export interface Timeline {
   readonly pipeline: string;
   readonly scenario: string;
   readonly operator: OperatorConfig;
@@ -214,17 +214,17 @@ export type Timeline = {
   readonly horizonAt: string;
   /** The window a critical case had to be opened inside. Stated, never inferred. */
   readonly windowMinutes: number;
-};
+}
 
 /** One arrival, the moment the line is done with it. Handed out rather than printed. */
-export type ArrivalProgress = {
+export interface ArrivalProgress {
   /** 1-based, so it reads as "7 of 90" rather than as an index. */
   readonly done: number;
   readonly total: number;
   readonly messageId: string;
   readonly caseId: string;
   readonly llmCalls: number;
-};
+}
 
 /**
  * Plays one scenario through one line.
