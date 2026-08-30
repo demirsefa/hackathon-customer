@@ -21,6 +21,22 @@ export type InboundMessage = {
   readonly threadSummary?: string;
 };
 
+/**
+ * An ISO instant carrying an explicit offset.
+ *
+ * It lives here rather than inside either parser that needs it. `receivedAt` above is
+ * declared here, and an arrival in `scenario.ts` is the same instant seen from the
+ * other side — two copies of the rule would become two rules the day one of them is
+ * relaxed. The offset is required rather than assumed because a queue is ordered by
+ * arrival time, and a timestamp without one means something different depending on
+ * which machine reads it.
+ */
+const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+export function isInstant(value: string): boolean {
+  return INSTANT.test(value);
+}
+
 const ORDER_REFERENCE = /\bORD-\d{4,}\b/gi;
 
 /**

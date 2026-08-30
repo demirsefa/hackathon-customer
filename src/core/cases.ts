@@ -13,7 +13,7 @@
  * it to the route scores it against what the operator actually gets.
  */
 import type { Route } from './decision.ts';
-import type { InboundMessage } from './message.ts';
+import { isInstant, type InboundMessage } from './message.ts';
 import type { Order, OrderStatus, SenderProfile } from './records.ts';
 
 /** The four groups of dev/CHALLENGE.md §10, in its order. */
@@ -53,12 +53,6 @@ export type CaseFile = {
   readonly orders: readonly Order[];
   readonly cases: readonly EvaluationCase[];
 };
-
-/**
- * An offset is required rather than assumed. A queue is ordered by arrival time, and
- * a timestamp without one means something different depending on where it is read.
- */
-const TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
 function fail(path: string, expected: string): never {
   throw new Error(`case file: ${path} ${expected}`);
@@ -122,7 +116,9 @@ function parseOrder(value: unknown, path: string): Order {
 function parseMessage(value: unknown, path: string): InboundMessage {
   const source = asRecord(value, path);
   const receivedAt = asText(source, 'receivedAt', path);
-  if (!TIMESTAMP.test(receivedAt)) {
+  // The shape of an instant is `message.ts`'s rule, not this parser's: a scenario
+  // arrival is the same instant, and one relaxed copy would be one relaxed rule.
+  if (!isInstant(receivedAt)) {
     fail(`${path}.receivedAt`, 'must be an ISO timestamp carrying an explicit offset');
   }
 
