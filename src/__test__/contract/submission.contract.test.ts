@@ -23,6 +23,7 @@
 import { execFile } from 'node:child_process';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
@@ -34,6 +35,17 @@ const repoRoot = new URL('../../../', import.meta.url);
 
 const read = (path: string): string => readFileSync(new URL(path, repoRoot), 'utf8');
 const list = (path: string): readonly string[] => readdirSync(new URL(path, repoRoot));
+
+/**
+ * Every `.md` under a directory, subdirectories included, as repository-relative
+ * paths. Walked rather than listed by hand: a hand-written list stops covering the
+ * file someone adds beside it, and says nothing when it does.
+ */
+const markdownUnder = (path: string): readonly string[] =>
+  readdirSync(new URL(path, repoRoot), { withFileTypes: true, recursive: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+    .map((entry) => relative(fileURLToPath(repoRoot), join(entry.parentPath, entry.name)))
+    .sort();
 
 const README = read('README.md');
 const CHALLENGE = read('dev/CHALLENGE.md');
@@ -182,14 +194,12 @@ describe('rule 2 · every command handed to a judge resolves', () => {
   /** Yarn's own verbs, which are not scripts in package.json. */
   const BUILTIN = new Set(['install', 'add', 'remove', 'dlx', 'why', 'run', 'set']);
 
-  const documents = [
-    ['README.md', README],
-    ['CLAUDE.md', read('CLAUDE.md')],
-    ['dev/CHALLENGE.md', CHALLENGE],
-    ['dev/contracts/README.md', read('dev/contracts/README.md')],
-    ['dev/contracts/SUBMISSION.md', read('dev/contracts/SUBMISSION.md')],
-    ['dev/contracts/FEATURE-PARITY.md', read('dev/contracts/FEATURE-PARITY.md')],
-  ] as const;
+  // The scope the contract names: README.md, CLAUDE.md and everything under `dev/`.
+  // Enumerating those files by hand is how a `--log` flag that no script accepted
+  // stayed documented in `dev/ADVANCED_PLAN.md` with nothing looking at it.
+  const documents = ['README.md', 'CLAUDE.md', ...markdownUnder('dev/')].map(
+    (file) => [file, read(file)] as const,
+  );
 
   const invocations = documents.flatMap(([file, markdown]) =>
     bashLines(markdown)
@@ -199,6 +209,9 @@ describe('rule 2 · every command handed to a judge resolves', () => {
   );
 
   it('the documents actually hand out commands', () => {
+    // A walk that came back empty would leave every assertion below unreached, and an
+    // empty `it.each` passes: the scope is asserted before what it contains.
+    expect(documents.length).toBeGreaterThan(0);
     expect(invocations.length).toBeGreaterThan(0);
   });
 
