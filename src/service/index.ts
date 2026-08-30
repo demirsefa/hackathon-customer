@@ -10,4 +10,7 @@ import { loadEnvFile } from '../cli/env.ts';
 const env = loadEnvFile();
 if (env.warning !== null) console.warn(env.warning);
 
-console.log('listening: no (HTTP surface not implemented yet)');
+// Nothing is listening, so the exit code does not say otherwise. A placeholder that
+// exits 0 is the one output a reader takes for a program that started.
+console.error('serve: the HTTP surface is not implemented yet — nothing is listening.');
+process.exit(1);

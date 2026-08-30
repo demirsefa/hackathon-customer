@@ -121,6 +121,13 @@ const session = ((): ReturnType<typeof openLlmSession> => {
 
 console.log(`scenario: ${chosen.scenario}`);
 console.log(`llm: ${session.label}`);
-console.log('steps: 0 (scenario player not implemented yet)');
 
 session.save();
+
+// No metric was produced, so the exit code does not claim one. `yarn eval` already
+// stops with 1 when its cache cannot answer the set, and this is the same state: a
+// placeholder that exits 0 is the one output a reader takes for a run that worked.
+console.error(
+  'sim: the scenario player is not implemented yet, so no coverage number was produced.',
+);
+process.exit(1);

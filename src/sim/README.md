@@ -7,6 +7,12 @@ queue top-down.
 This is where the primary metric is produced: how many of the messages that
 truly needed attention were actually reached before capacity ran out.
 
+**The player itself is not written yet.** Until it is, the command resolves its
+scenario and its mode, says that no coverage number was produced, and exits `1`. It
+does not exit `0`: a placeholder that reports success is the one output a reader takes
+for a run that worked, and the number this whole submission rests on would be the
+thing it was lying about.
+
 ```bash
 yarn sim overload --replay
 ```
@@ -34,6 +40,9 @@ Typed at a terminal with no scenario, this offers the two above and then the two
 modes, instead of printing a usage line and stopping. Piped or in CI it still prints
 the usage line and exits 1, because an unattended run must fail rather than wait for
 an answer — a missing scenario is the one thing here no default can invent.
+
+A scenario that is _named_ but does not exist stops the same way. `yarn sim overlaod`
+used to print `scenario: overlaod` and exit 0, which reads as a run that happened.
 
 The menu lives in [`src/cli/ask.ts`](../cli/ask.ts) rather than here: it is a question
 about the terminal, not about playing a scenario, and it is governed by one rule —
