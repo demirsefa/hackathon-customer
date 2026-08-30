@@ -20,7 +20,7 @@ shift, a lunch break and a weekend in the way.
 | ----- | ----- |
 | Line | `advanced` |
 | Scenario | `normal-day` |
-| Commit | `96929ce` |
+| Commit | `cf63b12` |
 | Model | `claude-sonnet-5`, max tokens 16000, effort medium |
 | Client | replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json |
 | Arrivals | 45 |
