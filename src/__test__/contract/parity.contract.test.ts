@@ -9,12 +9,27 @@
  * The table is `fixtures/cases.json`, the same 28 cases `src/eval/` scores, which is
  * rule 4: both lines are measured on one table, never on two.
  *
- * WHAT IS ASSERTED HERE IS NOT THE GROUND TRUTH. A case's `expectedRoute` is where
- * the message belonged; whether a line got there is a *score*, and counting scores is
- * `src/eval/`'s job. What this file asserts is that each line lands where its own
- * design says it lands — so the baseline auto-sending an authority case is recorded
- * in `REACHES` as the designed behaviour it is (dev/CHALLENGE.md §8), and only a line
- * that stopped behaving like itself turns this red.
+ * NO CASE IS SCORED HERE, AND THE SCRIPTED MODEL BELOW IS NEVER A JUDGE OF ONE.
+ * Until 30 Aug 2026 this file compared each line's route against the case's
+ * `expectedRoute`, with the divergences listed in a `REACHES` table — a per-case
+ * correctness measurement, taken over a keyword scan written twenty lines further
+ * down. It read seventeen of the twenty-eight the way ground truth does where the
+ * recorded model reads twelve (`trajectories/baseline.json`), so the cheapest way to
+ * turn this file green was to add a word to a list rather than to fix a line. Part of
+ * what it measured was its own fake. Correctness belongs to `src/eval/`, which runs
+ * the recorded model over these same cases, and the table is gone.
+ *
+ * What the scripted model is still for is varying the *opinion* a line is handed, so
+ * that vocabulary, the approval gate, the decision shape and the call budget can be
+ * checked without spending a model call. None of those depend on what it answers.
+ *
+ * The one thing the removed table did carry — the alarm for a line that stopped
+ * behaving like itself — is kept, and moved onto evidence: the last block of this file
+ * drives both lines over the 28 cases with the **recorded** model and compares every
+ * route to the one committed in `trajectories/<line>.json`, the way
+ * `src/__test__/unit/sim-determinism.test.ts` ties the published coverage to the code
+ * that is running now. A design change still turns this red; a word in a list no
+ * longer moves it.
  *
  * THE THREE SUSPENDED ASSERTIONS ARE BACK, with the first of them corrected. While
  * `PIPELINES` held one line they had nothing to compare, and the note that recorded
@@ -46,6 +61,9 @@ import {
 import { PIPELINES, type Pipeline } from '../../core/pipeline.ts';
 import { isSensitive } from '../../core/policy.ts';
 import { createRecordStore } from '../../core/records.ts';
+import { parseRecord, recordFile } from '../../eval/record.ts';
+import { PINNED_PARAMS } from '../../llm/key.ts';
+import { readCache, replayClient } from '../../llm/replay.ts';
 import type { InboundMessage } from '../../types/message.ts';
 import { agreeingScript, scriptedLlm, type TaskName } from '../fakes.ts';
 
@@ -70,53 +88,6 @@ if (firstCase === undefined) throw new Error('the case table is empty');
 const BUDGET: Readonly<Record<string, number>> = {
   baseline: 1,
   advanced: 2,
-};
-
-/**
- * Where a line lands when the ground truth says elsewhere, by case id.
- *
- * Not a list of bugs and not an allowance — it is the measurement, written down
- * where a change to it has to be deliberate. The baseline reads the text and nothing
- * else, so it auto-sends every case whose problem is in the record layer rather than
- * in the words. That is dev/CHALLENGE.md §8 working as designed; the day one of these
- * flips, this file goes red and somebody explains why.
- *
- * The count belongs to `src/eval/`. What belongs here is that it is not an accident.
- */
-const REACHES: Readonly<Record<string, Readonly<Record<string, Route>>>> = {
-  baseline: {
-    // Held on a word. A thank-you note that mentions an invoice is a false positive,
-    // and false positives cost the operator the same minutes a real case does.
-    'norm-08': 'human_review',
-
-    // Steered at a routine topic: nothing in the text names a risky category, so the
-    // single risk check has nothing to fire on.
-    'inj-04': 'auto_send',
-
-    // The thesis of the project. Legitimate text, real order, wrong owner — a fact
-    // that is only in the record layer, which this line is handed and never opens.
-    'auth-01': 'auto_send',
-    'auth-02': 'auto_send',
-    'auth-03': 'auto_send',
-    'auth-04': 'auto_send',
-    'auth-05': 'auto_send',
-    'auth-06': 'auto_send',
-
-    // No concept of uncertainty (dev/CHALLENGE.md §8): an unresolvable reference and
-    // a request with no content both come back as ordinary shipping questions.
-    'amb-01': 'auto_send',
-    'amb-03': 'auto_send',
-    'amb-04': 'auto_send',
-  },
-
-  advanced: {
-    // The same false positive as the baseline's, on the same word and for the same
-    // reason: the scripted reader sees `fatura` in a thank-you note, answers `billing`,
-    // and a category the desk never answers unread is held whichever line is asking.
-    // Holding a category apart from the draft does not make the category right — that
-    // is a question about the model, and `src/eval/` is where it is asked.
-    'norm-08': 'human_review',
-  },
 };
 
 /**
@@ -164,9 +135,9 @@ function categoryFromTextAlone(message: InboundMessage): string {
  *
  * They are as blunt as the category scan above, and blunt in a direction that shows.
  * A real reader catches an instruction phrased politely; a substring list catches the
- * ones that shout. What it misses is recorded in `REACHES` rather than hidden by a
- * longer list of words — `src/eval/` runs the real model over these same cases, and
- * that is where the question of how well an instruction is spotted belongs.
+ * ones that shout. Nothing here is asserted against what they miss: how well an
+ * instruction is spotted is a score, `src/eval/` runs the real model over these same
+ * cases, and that is where the question belongs.
  */
 const INSTRUCTION_SIGNALS: readonly string[] = [
   'previous instructions',
@@ -224,32 +195,9 @@ function scriptFor(testCase: EvaluationCase): Record<TaskName, string> {
   });
 }
 
-function routeReachedBy(pipeline: Pipeline, testCase: EvaluationCase): Route {
-  return REACHES[pipeline.name]?.[testCase.caseId] ?? testCase.expectedRoute;
-}
-
 describe('feature parity', () => {
   it('drives every line from the one committed case table', () => {
     expect(CASES).toHaveLength(28);
-  });
-
-  /**
-   * A stale entry in `REACHES` is worse than none: it would quietly excuse a line
-   * from a case that no longer exists, or from one it already gets right.
-   */
-  it('names only divergences that are still divergences', () => {
-    const byId = new Map(CASES.map((entry) => [entry.caseId, entry]));
-
-    for (const pipeline of PIPELINES) {
-      for (const [caseId, route] of Object.entries(REACHES[pipeline.name] ?? {})) {
-        const testCase = byId.get(caseId);
-
-        expect(testCase, `${pipeline.name} names unknown case ${caseId}`).toBeDefined();
-        expect(route, `${pipeline.name} agrees with ${caseId}`).not.toBe(
-          testCase?.expectedRoute,
-        );
-      }
-    }
   });
 
   describe.each(PIPELINES.map((pipeline) => [pipeline.name, pipeline] as const))(
@@ -258,14 +206,16 @@ describe('feature parity', () => {
       describe.each(CASES.map((testCase) => [testCase.caseId, testCase] as const))(
         '%s',
         (_caseId: string, testCase: EvaluationCase) => {
-          it('lands where its own design lands, in the shared vocabulary', async () => {
+          it('answers the message it was handed, in the shared vocabulary', async () => {
             const decision = await pipeline.run({
               message: testCase.message,
               records,
               llm: scriptedLlm(scriptFor(testCase)),
             });
 
-            expect(decision.route).toBe(routeReachedBy(pipeline, testCase));
+            // Not which route: that is a score, and this model is a keyword scan. What
+            // is asserted is that a decision came back for *this* message and said so
+            // in words both lines share.
             expect(decision.messageId).toBe(testCase.message.messageId);
 
             // Rule 2, as the contract states it: one vocabulary, not one verdict. The
@@ -461,4 +411,61 @@ describe('feature parity', () => {
       );
     }
   });
+});
+
+/**
+ * The one block here that is not a property of a line, and the only one that uses the
+ * model a result was actually produced with.
+ *
+ * It replaces the `REACHES` table this file used to carry. That table's purpose was
+ * sound — an alarm for a line that stopped behaving like its own design — but it was
+ * written as a list of exceptions to `expectedRoute`, which made a contract check into
+ * a scorer, over a keyword scan standing in for a model. The alarm survives by being
+ * pointed at the committed evidence instead: `trajectories/<line>.json` is the run the
+ * README quotes, produced by `yarn eval --replay` out of `fixtures/llm-cache.json`, and
+ * a line whose behaviour moved no longer answers the way that file records.
+ *
+ * Nothing about ground truth is asserted. A route that is wrong here is wrong in the
+ * committed file too, and both stay green — being wrong is what `src/eval/` counts and
+ * what the README reports. What turns this red is a *change*, and then either the code
+ * moved or the evidence is stale, which is the same fork
+ * `src/__test__/unit/sim-determinism.test.ts` puts the sim numbers behind.
+ */
+describe('each line still decides what its committed evidence records', () => {
+  const recorded = replayClient({ cache: readCache(), params: PINNED_PARAMS });
+
+  describe.each(PIPELINES.map((pipeline) => [pipeline.name, pipeline] as const))(
+    '%s',
+    (name: string, pipeline: Pipeline) => {
+      it('reaches, case for case, the route committed in its trajectory', async () => {
+        const committed = parseRecord(
+          readFileSync(
+            new URL(`../../../trajectories/${recordFile(name)}`, import.meta.url),
+            'utf8',
+          ),
+        );
+
+        // The committed run has to cover the table, or the comparison below would pass
+        // on the handful of cases that happen to be in both.
+        expect(committed.run.runs).toHaveLength(CASES.length);
+
+        const reached: Record<string, Route> = {};
+        for (const testCase of CASES) {
+          const decision = await pipeline.run({
+            message: testCase.message,
+            records,
+            llm: recorded,
+          });
+
+          reached[testCase.caseId] = decision.route;
+        }
+
+        expect(reached).toEqual(
+          Object.fromEntries(
+            committed.run.runs.map((run) => [run.caseId, run.decision.route]),
+          ),
+        );
+      });
+    },
+  );
 });

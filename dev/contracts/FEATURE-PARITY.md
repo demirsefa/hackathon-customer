@@ -103,12 +103,31 @@ spends more is a different claim from one that decides better.
 ## Enforcement
 
 - **Test:** `src/__test__/contract/parity.contract.test.ts` — runs one case table through
-  every line in `PIPELINES` and asserts, per case, that the decision's route and reason
-  come from the shared vocabulary (`ROUTES`, `REASON_CODES`), that it lands where that
-  line's own design lands, and `honoursApprovalGate`. Across lines it compares
-  `decisionFields` between them and holds each to the budget in rule 6. Rule 1's
-  capabilities are checked by four witness probes per line — see the table in that rule
-  — rather than by comparing two lists of names the lines write about themselves.
+  every line in `PIPELINES` and asserts, per case, that a decision comes back for that
+  message with its route and reason drawn from the shared vocabulary (`ROUTES`,
+  `REASON_CODES`), and `honoursApprovalGate`. Across lines it compares `decisionFields`
+  between them and holds each to the budget in rule 6. Rule 1's capabilities are checked
+  by four witness probes per line — see the table in that rule — rather than by comparing
+  two lists of names the lines write about themselves.
+- **No case is scored there, and the scripted model is never a judge of one.** Until
+  30 Aug 2026 the same file compared each line's route to the case's `expectedRoute`,
+  listing the divergences in a `REACHES` table — per-case correctness, measured over a
+  keyword scan written inside the test. That scan read seventeen of the twenty-eight the
+  way ground truth does where the recorded model reads twelve, so the cheapest way to
+  turn the file green was to add a word to a list rather than to fix a line: part of what
+  it measured was its own fake. Correctness is `src/eval/`'s, on the recorded model, over
+  these same cases; the table is gone and the scripted model now only varies the opinion
+  a line is handed, which is what the vocabulary, gate, shape and budget checks need from
+  it and all they need.
+- **A line that stopped behaving like itself is still caught, against the evidence.**
+  The alarm the `REACHES` table carried is kept as its own block in the same file: both
+  lines are driven over the 28 cases with the **recorded** model out of
+  `fixtures/llm-cache.json`, and every route is compared to the one committed in
+  `trajectories/<line>.json` — the run the README quotes. Nothing about ground truth is
+  asserted, so a route that is wrong stays green and is counted where it is reported; a
+  route that _moved_ turns this red, and then either the code changed or the evidence is
+  stale. It is the fork `src/__test__/unit/sim-determinism.test.ts` puts the published
+  coverage behind, applied to the case-level decisions.
 - Red here means the headline comparison has stopped measuring design and started
   measuring a missing feature.
 - Rules 5 and 7 are **judgment**: structure and code quality are checked by the audit

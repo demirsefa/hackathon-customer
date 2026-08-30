@@ -517,9 +517,40 @@ describe('rule 8 · a rule owned elsewhere is referenced, not copied', () => {
     expect(lefthook).toMatch(/yarn security/);
   });
 
+  /**
+   * The rule this file exists to keep is "referenced, never copied", and a check for
+   * the word `FEATURE-PARITY` did not keep it: the word is in this contract five
+   * times, so somebody pasting rule 3's text in whole — the one act the check was
+   * written to catch — left it green. What is asserted instead is the copying itself,
+   * against the live wording of the rule rather than against a sentence frozen here:
+   * rule 3 is read out of FEATURE-PARITY.md at run time and every eight-word run of it
+   * has to be absent from SUBMISSION.md. Rewriting rule 3 upstream re-aims the check
+   * rather than retiring it, and an extraction that came back empty would make every
+   * comparison vacuously true, so the extraction is asserted before it is used.
+   */
   it('the approval gate is left to FEATURE-PARITY rather than restated here', () => {
     const contract = read('dev/contracts/SUBMISSION.md');
-    expect(contract).toMatch(/FEATURE-PARITY/);
+    expect(contract).toMatch(/FEATURE-PARITY\.md/);
+
+    const words = (text: string): readonly string[] =>
+      text.toLowerCase().replace(/[`*_]/g, '').split(/\s+/).filter(Boolean);
+
+    const parity = read('dev/contracts/FEATURE-PARITY.md');
+    const rule3 = /^3\. ([\s\S]*?)(?=^\d+\. )/m.exec(parity)?.[1] ?? '';
+    const stated = words(rule3);
+
+    // Without this, an upstream renumbering would empty `stated` and every assertion
+    // below would pass by having nothing to compare.
+    expect(stated.length, 'FEATURE-PARITY rule 3 could not be read').toBeGreaterThan(12);
+
+    const here = words(contract).join(' ');
+    for (let start = 0; start + 8 <= stated.length; start += 1) {
+      const shingle = stated.slice(start, start + 8).join(' ');
+      expect(
+        here,
+        `SUBMISSION.md restates FEATURE-PARITY rule 3: "${shingle}"`,
+      ).not.toContain(shingle);
+    }
   });
 
   it('the contract is in the index', () => {
