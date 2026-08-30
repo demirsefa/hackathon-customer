@@ -213,14 +213,27 @@ morning brings 60–80. The queue therefore never empties: overload is not a sce
 we contrive, it is the normal condition, and what the metric measures is the _order_
 of the queue rather than its length.
 
-| Metric                             | Baseline | Advanced | Change  |
-| ---------------------------------- | -------- | -------- | ------- |
-| **Critical coverage (normal day)** | pending  | pending  | pending |
-| **Critical coverage (overload)**   | pending  | pending  | pending |
-| False positives (legitimate held)  | pending  | pending  | pending |
-| Reply quality (out of 5, by hand)  | pending  | pending  | pending |
-| Human time per case                | pending  | pending  | pending |
-| Cost per case                      | pending  | pending  | pending |
+| Metric                             | Baseline      | Advanced | Change  |
+| ---------------------------------- | ------------- | -------- | ------- |
+| **Critical coverage (normal day)** | 6 / 19 (32%)  | pending  | pending |
+| **Critical coverage (overload)**   | 13 / 42 (31%) | pending  | pending |
+| False positives (legitimate held)  | pending       | pending  | pending |
+| Reply quality (out of 5, by hand)  | pending       | pending  | pending |
+| Human time per case                | pending       | pending  | pending |
+| Cost per case                      | pending       | pending  | pending |
+
+The two coverage cells come from `yarn sim normal-day --replay` and
+`yarn sim overload --replay`; the runs behind them are committed as
+`trajectories/baseline-normal-day.md` and `trajectories/baseline-overload.md`.
+
+**What the first measurement changed about the paragraph above it.** Under `overload`
+the baseline holds 22 of 90 arrivals for the operator and auto-sends the other 68. Her
+capacity is 42 a day, so _its_ queue never outruns her day: she opens every case in it,
+and coverage is still 31% — because 29 of the 42 critical arrivals were answered
+automatically and she was never shown that they existed. "The queue never empties" is a
+claim about a line that holds the right things; the baseline's failure is one of
+holding, not of capacity, and the queue ordering is what the advanced line will be
+measured on.
 
 ### Evaluation set — 28 cases
 

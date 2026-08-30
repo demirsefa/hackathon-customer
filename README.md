@@ -3,15 +3,17 @@
 Single-person support desk triage: decide **what the operator reads first**, and
 hold back anything that must not be answered automatically.
 
-> Status: scaffolding. Baseline, evaluation set and results are being added.
-> This README will carry the user, the bottleneck, the Improvement Changelog
-> and the hot take before submission.
+> Status: the code produces numbers; the README does not yet report them. The baseline
+> line, the evaluation set, the recorded model responses and the scenario player are all
+> in, and both `yarn eval --replay` and `yarn sim overload --replay` run on a clean
+> machine with no API key. What is still missing is prose: the user and the bottleneck,
+> the Improvement Changelog, the results table and the hot take, all of which this file
+> will carry before submission.
 >
-> **The recorded model responses are not committed yet**, so `yarn eval --replay`
-> stops with the one command that records them instead of printing a scorecard,
-> and the scenario player behind `yarn sim` is still a placeholder. Both say so and
-> exit non-zero: a run that produced no number does not report itself as a run that
-> worked.
+> **The advanced line is still a placeholder** (`src/core/advanced/`), so every
+> comparison in this project currently has one column in it, and part of
+> [`dev/contracts/FEATURE-PARITY.md`](dev/contracts/FEATURE-PARITY.md) is suspended in
+> the open until it lands.
 
 ## Running it
 
