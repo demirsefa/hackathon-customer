@@ -14,11 +14,33 @@ authority.ts   the gate over that layer. Waiting for the advanced line.
 policy.ts      the law both lines are written against.
 operator.ts    the operator's calendar: her shift, her breaks, her working minutes.
 cases.ts       the evaluation set parsed and validated. The file read stays outside.
+scenario.ts    a scenario parsed the same way, and joined to the cases it names.
+queue.ts       the read-first order of the operator's queue, and why it is total.
 llm.ts         the client interface and the primitives a response is parsed with.
 pipeline.ts    what a line is, REQUIRED_FEATURES, and which lines exist.
 baseline/      one model call, then the risky-category check. CHALLENGE §8.
 advanced/      a placeholder plus its prompts. CHALLENGE §9.
 ```
+
+## What the metric needs from here
+
+Three of the files above exist for the primary metric rather than for a decision, and
+they are here for one reason: they are pure, and both lines are measured through them.
+
+- `operator.ts` is her calendar. `workingMinutesBetween` answers "how long did this wait"
+  and `advanceWorkingMinutes` answers "where do her ten minutes land" — the pair a
+  scenario is played on.
+- `queue.ts` is the order she works in. It is **total** down to the message id, because
+  a scenario replays one case many times and every copy carries the same priority;
+  leaning on `Array#sort` stability would settle a real tie by input order, which is not
+  something a scenario file states.
+- `policy.ts` holds the thresholds, `CRITICAL_COVERAGE_MINUTES` among them. Changing the
+  window the metric is measured over is one edit in one file, on purpose.
+
+`scenario.ts` sits beside `cases.ts` and follows it exactly: decoded JSON in, a
+validated value out, and the `readFile` left to the entry point that owns a disk.
+Playing the scenario is `src/sim/`'s job; saying what a scenario _is_ belongs here,
+where every other definition already lives.
 
 ## The two lines
 

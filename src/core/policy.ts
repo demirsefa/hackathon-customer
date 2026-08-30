@@ -35,6 +35,20 @@ export const CONFIDENCE_THRESHOLD = 0.7;
 export const INTERIM_AFTER_MINUTES = 30;
 
 /**
+ * The window the primary metric is measured over: a critical case counts as reached
+ * only if the operator opened it within this many **working** minutes of its arrival.
+ *
+ * Four working hours. Working, not wall-clock: a message that lands at 17:30 on Friday
+ * waits until Monday 09:00 because the desk is one person with a shift, and charging
+ * that weekend against her would measure the calendar rather than the queue.
+ *
+ * It lives here, beside the other two named thresholds, for one reason — changing the
+ * number has to be one edit in one file. A metric whose threshold is written down in
+ * two places is a metric that reports two different numbers the day one of them moves.
+ */
+export const CRITICAL_COVERAGE_MINUTES = 4 * 60;
+
+/**
  * Whether a queued case has waited long enough, unseen, to deserve an interim
  * message. The clock is an argument because `core/` never reads one, and
  * `operatorHasSeen` is what keeps this from talking over her: once she has opened
