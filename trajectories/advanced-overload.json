@@ -1,7 +1,7 @@
 {
   "schema": "support-triage/sim-run@1",
   "provenance": {
-    "commit": "ebb7c03",
+    "commit": "bb784b4",
     "llmLabel": "replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json",
     "params": {
       "model": "claude-sonnet-5",
@@ -21,98 +21,84 @@
     "arrivals": 90,
     "windowMinutes": 240,
     "critical": 42,
-    "criticalReached": 30,
+    "criticalReached": 32,
     "missed": [
       {
         "messageId": "M-0001",
         "caseId": "auth-05",
         "arrivedAt": "2026-09-04T17:00:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 460
+        "waitedWorkingMinutes": 480
       },
       {
         "messageId": "M-0037",
         "caseId": "amb-02",
         "arrivedAt": "2026-09-06T13:57:00+03:00",
-        "reason": "auto_sent",
-        "waitedWorkingMinutes": null
+        "reason": "opened_late",
+        "waitedWorkingMinutes": 510
       },
       {
         "messageId": "M-0039",
         "caseId": "norm-05",
         "arrivedAt": "2026-09-06T15:48:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 490
+        "waitedWorkingMinutes": 520
       },
       {
         "messageId": "M-0043",
         "caseId": "auth-06",
         "arrivedAt": "2026-09-06T19:05:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 520
+        "waitedWorkingMinutes": 550
       },
       {
         "messageId": "M-0047",
         "caseId": "auth-06",
         "arrivedAt": "2026-09-07T07:10:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 530
+        "waitedWorkingMinutes": 560
       },
       {
         "messageId": "M-0048",
         "caseId": "norm-09",
         "arrivedAt": "2026-09-07T07:19:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 630
+        "reason": "not_reached",
+        "waitedWorkingMinutes": null
       },
       {
         "messageId": "M-0054",
         "caseId": "inj-01",
         "arrivedAt": "2026-09-07T08:13:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 470
+        "waitedWorkingMinutes": 490
       },
       {
         "messageId": "M-0057",
         "caseId": "norm-05",
         "arrivedAt": "2026-09-07T08:49:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 500
+        "waitedWorkingMinutes": 530
       },
       {
         "messageId": "M-0063",
         "caseId": "auth-06",
         "arrivedAt": "2026-09-07T09:42:00+03:00",
         "reason": "opened_late",
-        "waitedWorkingMinutes": 498
+        "waitedWorkingMinutes": 528
       },
       {
         "messageId": "M-0064",
         "caseId": "norm-09",
         "arrivedAt": "2026-09-07T09:50:00+03:00",
-        "reason": "opened_late",
-        "waitedWorkingMinutes": 590
-      },
-      {
-        "messageId": "M-0078",
-        "caseId": "amb-02",
-        "arrivedAt": "2026-09-07T12:24:00+03:00",
-        "reason": "auto_sent",
-        "waitedWorkingMinutes": null
-      },
-      {
-        "messageId": "M-0085",
-        "caseId": "amb-02",
-        "arrivedAt": "2026-09-07T14:57:00+03:00",
-        "reason": "auto_sent",
+        "reason": "not_reached",
         "waitedWorkingMinutes": null
       }
     ],
-    "queued": 65,
-    "opened": 65,
-    "stillQueued": 0,
-    "averageWaitMinutes": 257,
-    "interimSent": 65,
+    "queued": 68,
+    "opened": 66,
+    "stillQueued": 2,
+    "averageWaitMinutes": 256,
+    "interimSent": 68,
     "llmCalls": 90
   },
   "timeline": {
@@ -156,8 +142,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T06:40:00.000Z",
-        "waitedWorkingMinutes": 460,
+        "openedAt": "2026-09-08T07:00:00.000Z",
+        "waitedWorkingMinutes": 480,
         "interimAt": "2026-09-04T14:30:00.000Z"
       },
       {
@@ -289,8 +275,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:10:00.000Z",
-        "waitedWorkingMinutes": 550,
+        "openedAt": "2026-09-08T08:40:00.000Z",
+        "waitedWorkingMinutes": 580,
         "interimAt": "2026-09-04T18:21:00.000Z"
       },
       {
@@ -327,8 +313,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:00:00.000Z",
-        "waitedWorkingMinutes": 600,
+        "openedAt": "2026-09-08T10:30:00.000Z",
+        "waitedWorkingMinutes": 630,
         "interimAt": "2026-09-04T19:32:00.000Z"
       },
       {
@@ -479,8 +465,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:10:00.000Z",
-        "waitedWorkingMinutes": 610,
+        "openedAt": "2026-09-08T10:40:00.000Z",
+        "waitedWorkingMinutes": 640,
         "interimAt": "2026-09-05T09:56:00.000Z"
       },
       {
@@ -498,8 +484,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:20:00.000Z",
-        "waitedWorkingMinutes": 560,
+        "openedAt": "2026-09-08T08:50:00.000Z",
+        "waitedWorkingMinutes": 590,
         "interimAt": "2026-09-05T10:10:00.000Z"
       },
       {
@@ -536,8 +522,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:20:00.000Z",
-        "waitedWorkingMinutes": 620,
+        "openedAt": "2026-09-08T10:50:00.000Z",
+        "waitedWorkingMinutes": 650,
         "interimAt": "2026-09-05T12:05:00.000Z"
       },
       {
@@ -574,8 +560,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:30:00.000Z",
-        "waitedWorkingMinutes": 570,
+        "openedAt": "2026-09-08T10:00:00.000Z",
+        "waitedWorkingMinutes": 600,
         "interimAt": "2026-09-05T13:17:00.000Z"
       },
       {
@@ -650,8 +636,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T07:00:00.000Z",
-        "waitedWorkingMinutes": 480,
+        "openedAt": "2026-09-08T07:20:00.000Z",
+        "waitedWorkingMinutes": 500,
         "interimAt": "2026-09-05T16:42:00.000Z"
       },
       {
@@ -833,16 +819,16 @@
         "arrivedAt": "2026-09-06T13:57:00+03:00",
         "decision": {
           "messageId": "M-0037",
-          "route": "auto_send",
-          "reason": "routine_reply",
-          "priority": 10,
+          "route": "human_review",
+          "reason": "sensitive_category",
+          "priority": 80,
           "draft": "Merhaba, ORD-1081 siparişinizde yanlış renk ürün gönderildiği için üzgünüz. Size doğru rengi ücretsiz olarak gönderebiliriz veya tam iade yapabiliriz, hangisini tercih edersiniz? Ayrıca faturanızı da düzeltip güncel halini tarafınıza ileteceğiz. Yanlış gelen ürünü nasıl iade edebileceğinize dair kargo bilgilerini de en kısa sürede paylaşacağız. Yaşanan aksaklık için tekrar özür dileriz.",
-          "requiresApproval": false,
+          "requiresApproval": true,
           "llmCalls": 2
         },
-        "openedAt": null,
-        "waitedWorkingMinutes": null,
-        "interimAt": null
+        "openedAt": "2026-09-08T07:30:00.000Z",
+        "waitedWorkingMinutes": 510,
+        "interimAt": "2026-09-06T11:27:00.000Z"
       },
       {
         "messageId": "M-0038",
@@ -878,8 +864,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T07:10:00.000Z",
-        "waitedWorkingMinutes": 490,
+        "openedAt": "2026-09-08T07:40:00.000Z",
+        "waitedWorkingMinutes": 520,
         "interimAt": "2026-09-06T13:18:00.000Z"
       },
       {
@@ -935,8 +921,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:40:00.000Z",
-        "waitedWorkingMinutes": 580,
+        "openedAt": "2026-09-08T10:10:00.000Z",
+        "waitedWorkingMinutes": 610,
         "interimAt": "2026-09-06T15:59:00.000Z"
       },
       {
@@ -954,8 +940,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T07:40:00.000Z",
-        "waitedWorkingMinutes": 520,
+        "openedAt": "2026-09-08T08:10:00.000Z",
+        "waitedWorkingMinutes": 550,
         "interimAt": "2026-09-06T16:35:00.000Z"
       },
       {
@@ -1030,8 +1016,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T07:50:00.000Z",
-        "waitedWorkingMinutes": 530,
+        "openedAt": "2026-09-08T08:20:00.000Z",
+        "waitedWorkingMinutes": 560,
         "interimAt": "2026-09-07T04:40:00.000Z"
       },
       {
@@ -1049,8 +1035,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:30:00.000Z",
-        "waitedWorkingMinutes": 630,
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
         "interimAt": "2026-09-07T04:49:00.000Z"
       },
       {
@@ -1163,8 +1149,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:50:00.000Z",
-        "waitedWorkingMinutes": 470,
+        "openedAt": "2026-09-08T07:10:00.000Z",
+        "waitedWorkingMinutes": 490,
         "interimAt": "2026-09-07T05:43:00.000Z"
       },
       {
@@ -1182,8 +1168,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:50:00.000Z",
-        "waitedWorkingMinutes": 590,
+        "openedAt": "2026-09-08T10:20:00.000Z",
+        "waitedWorkingMinutes": 620,
         "interimAt": "2026-09-07T05:57:00.000Z"
       },
       {
@@ -1220,8 +1206,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T07:20:00.000Z",
-        "waitedWorkingMinutes": 500,
+        "openedAt": "2026-09-08T07:50:00.000Z",
+        "waitedWorkingMinutes": 530,
         "interimAt": "2026-09-07T06:19:00.000Z"
       },
       {
@@ -1258,8 +1244,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T07:30:00.000Z",
-        "waitedWorkingMinutes": 501,
+        "openedAt": "2026-09-08T08:00:00.000Z",
+        "waitedWorkingMinutes": 531,
         "interimAt": "2026-09-07T06:39:00.000Z"
       },
       {
@@ -1334,8 +1320,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-08T08:00:00.000Z",
-        "waitedWorkingMinutes": 498,
+        "openedAt": "2026-09-08T08:30:00.000Z",
+        "waitedWorkingMinutes": 528,
         "interimAt": "2026-09-07T07:12:00.000Z"
       },
       {
@@ -1353,8 +1339,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T10:40:00.000Z",
-        "waitedWorkingMinutes": 590,
+        "openedAt": null,
+        "waitedWorkingMinutes": null,
         "interimAt": "2026-09-07T07:20:00.000Z"
       },
       {
@@ -1505,8 +1491,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T12:40:00.000Z",
-        "waitedWorkingMinutes": 204,
+        "openedAt": "2026-09-07T12:50:00.000Z",
+        "waitedWorkingMinutes": 214,
         "interimAt": "2026-09-07T08:46:00.000Z"
       },
       {
@@ -1543,8 +1529,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T12:30:00.000Z",
-        "waitedWorkingMinutes": 171,
+        "openedAt": "2026-09-07T12:40:00.000Z",
+        "waitedWorkingMinutes": 181,
         "interimAt": "2026-09-07T09:09:00.000Z"
       },
       {
@@ -1562,8 +1548,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:10:00.000Z",
-        "waitedWorkingMinutes": 206,
+        "openedAt": "2026-09-07T13:20:00.000Z",
+        "waitedWorkingMinutes": 216,
         "interimAt": "2026-09-07T09:14:00.000Z"
       },
       {
@@ -1581,8 +1567,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T12:50:00.000Z",
-        "waitedWorkingMinutes": 178,
+        "openedAt": "2026-09-07T13:00:00.000Z",
+        "waitedWorkingMinutes": 188,
         "interimAt": "2026-09-07T09:22:00.000Z"
       },
       {
@@ -1600,8 +1586,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:20:00.000Z",
-        "waitedWorkingMinutes": 200,
+        "openedAt": "2026-09-07T13:30:00.000Z",
+        "waitedWorkingMinutes": 210,
         "interimAt": "2026-09-07T09:31:00.000Z"
       },
       {
@@ -1612,16 +1598,16 @@
         "arrivedAt": "2026-09-07T12:24:00+03:00",
         "decision": {
           "messageId": "M-0078",
-          "route": "auto_send",
-          "reason": "routine_reply",
-          "priority": 10,
+          "route": "human_review",
+          "reason": "sensitive_category",
+          "priority": 80,
           "draft": "Merhaba, ORD-1081 siparişinizde yanlış renk ürün gönderildiği için üzgünüz. Size doğru rengi ücretsiz olarak gönderebiliriz veya tam iade yapabiliriz, hangisini tercih edersiniz? Ayrıca faturanızı da düzeltip güncel halini tarafınıza ileteceğiz. Yanlış gelen ürünü nasıl iade edebileceğinize dair kargo bilgilerini de en kısa sürede paylaşacağız. Yaşanan aksaklık için tekrar özür dileriz.",
-          "requiresApproval": false,
+          "requiresApproval": true,
           "llmCalls": 2
         },
-        "openedAt": null,
-        "waitedWorkingMinutes": null,
-        "interimAt": null
+        "openedAt": "2026-09-07T12:30:00.000Z",
+        "waitedWorkingMinutes": 150,
+        "interimAt": "2026-09-07T09:54:00.000Z"
       },
       {
         "messageId": "M-0079",
@@ -1657,8 +1643,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T13:00:00.000Z",
-        "waitedWorkingMinutes": 162,
+        "openedAt": "2026-09-07T13:10:00.000Z",
+        "waitedWorkingMinutes": 172,
         "interimAt": "2026-09-07T10:48:00.000Z"
       },
       {
@@ -1676,8 +1662,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:30:00.000Z",
-        "waitedWorkingMinutes": 182,
+        "openedAt": "2026-09-07T13:40:00.000Z",
+        "waitedWorkingMinutes": 192,
         "interimAt": "2026-09-07T10:58:00.000Z"
       },
       {
@@ -1695,8 +1681,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:40:00.000Z",
-        "waitedWorkingMinutes": 158,
+        "openedAt": "2026-09-07T13:50:00.000Z",
+        "waitedWorkingMinutes": 168,
         "interimAt": "2026-09-07T11:32:00.000Z"
       },
       {
@@ -1733,8 +1719,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T13:50:00.000Z",
-        "waitedWorkingMinutes": 119,
+        "openedAt": "2026-09-08T06:00:00.000Z",
+        "waitedWorkingMinutes": 129,
         "interimAt": "2026-09-07T12:21:00.000Z"
       },
       {
@@ -1745,16 +1731,16 @@
         "arrivedAt": "2026-09-07T14:57:00+03:00",
         "decision": {
           "messageId": "M-0085",
-          "route": "auto_send",
-          "reason": "routine_reply",
-          "priority": 10,
+          "route": "human_review",
+          "reason": "sensitive_category",
+          "priority": 80,
           "draft": "Merhaba, ORD-1081 siparişinizde yanlış renk ürün gönderildiği için üzgünüz. Size doğru rengi ücretsiz olarak gönderebiliriz veya tam iade yapabiliriz, hangisini tercih edersiniz? Ayrıca faturanızı da düzeltip güncel halini tarafınıza ileteceğiz. Yanlış gelen ürünü nasıl iade edebileceğinize dair kargo bilgilerini de en kısa sürede paylaşacağız. Yaşanan aksaklık için tekrar özür dileriz.",
-          "requiresApproval": false,
+          "requiresApproval": true,
           "llmCalls": 2
         },
-        "openedAt": null,
-        "waitedWorkingMinutes": null,
-        "interimAt": null
+        "openedAt": "2026-09-08T06:40:00.000Z",
+        "waitedWorkingMinutes": 163,
+        "interimAt": "2026-09-07T12:27:00.000Z"
       },
       {
         "messageId": "M-0086",
@@ -1771,8 +1757,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:00:00.000Z",
-        "waitedWorkingMinutes": 98,
+        "openedAt": "2026-09-08T06:10:00.000Z",
+        "waitedWorkingMinutes": 108,
         "interimAt": "2026-09-07T12:52:00.000Z"
       },
       {
@@ -1790,8 +1776,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:10:00.000Z",
-        "waitedWorkingMinutes": 90,
+        "openedAt": "2026-09-08T06:20:00.000Z",
+        "waitedWorkingMinutes": 100,
         "interimAt": "2026-09-07T13:10:00.000Z"
       },
       {
@@ -1828,8 +1814,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:20:00.000Z",
-        "waitedWorkingMinutes": 53,
+        "openedAt": "2026-09-08T06:30:00.000Z",
+        "waitedWorkingMinutes": 63,
         "interimAt": "2026-09-07T13:57:00.000Z"
       },
       {
@@ -1847,8 +1833,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-08T06:30:00.000Z",
-        "waitedWorkingMinutes": 31,
+        "openedAt": "2026-09-08T06:50:00.000Z",
+        "waitedWorkingMinutes": 51,
         "interimAt": "2026-09-07T14:29:00.000Z"
       }
     ],

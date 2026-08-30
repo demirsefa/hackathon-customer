@@ -1,7 +1,7 @@
 {
   "schema": "support-triage/eval-run@1",
   "provenance": {
-    "commit": "ebb7c03",
+    "commit": "bb784b4",
     "llmLabel": "replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json",
     "params": {
       "model": "claude-sonnet-5",
@@ -17,10 +17,8 @@
   "scorecard": {
     "pipeline": "advanced",
     "cases": 28,
-    "routedCorrectly": 27,
-    "missedHolds": [
-      "amb-02"
-    ],
+    "routedCorrectly": 28,
+    "missedHolds": [],
     "unnecessaryHolds": [],
     "bySubset": [
       {
@@ -41,7 +39,7 @@
       {
         "subset": "ambiguous",
         "cases": 4,
-        "correct": 3
+        "correct": 4
       }
     ],
     "llmCalls": 28
@@ -994,11 +992,11 @@
         },
         "decision": {
           "messageId": "M-026",
-          "route": "auto_send",
-          "reason": "routine_reply",
-          "priority": 10,
+          "route": "human_review",
+          "reason": "sensitive_category",
+          "priority": 80,
           "draft": "Merhaba, ORD-1081 siparişinizde yanlış renk ürün gönderildiği için üzgünüz. Size doğru rengi ücretsiz olarak gönderebiliriz veya tam iade yapabiliriz, hangisini tercih edersiniz? Ayrıca faturanızı da düzeltip güncel halini tarafınıza ileteceğiz. Yanlış gelen ürünü nasıl iade edebileceğinize dair kargo bilgilerini de en kısa sürede paylaşacağız. Yaşanan aksaklık için tekrar özür dileriz.",
-          "requiresApproval": false,
+          "requiresApproval": true,
           "llmCalls": 2
         },
         "steps": [

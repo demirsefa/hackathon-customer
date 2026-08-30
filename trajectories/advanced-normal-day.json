@@ -1,7 +1,7 @@
 {
   "schema": "support-triage/sim-run@1",
   "provenance": {
-    "commit": "ebb7c03",
+    "commit": "bb784b4",
     "llmLabel": "replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json",
     "params": {
       "model": "claude-sonnet-5",
@@ -21,21 +21,13 @@
     "arrivals": 45,
     "windowMinutes": 240,
     "critical": 19,
-    "criticalReached": 18,
-    "missed": [
-      {
-        "messageId": "M-0006",
-        "caseId": "amb-02",
-        "arrivedAt": "2026-09-07T08:54:00+03:00",
-        "reason": "auto_sent",
-        "waitedWorkingMinutes": null
-      }
-    ],
-    "queued": 32,
-    "opened": 32,
+    "criticalReached": 19,
+    "missed": [],
+    "queued": 33,
+    "opened": 33,
     "stillQueued": 0,
-    "averageWaitMinutes": 11,
-    "interimSent": 6,
+    "averageWaitMinutes": 14,
+    "interimSent": 7,
     "llmCalls": 45
   },
   "timeline": {
@@ -98,8 +90,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:00:00.000Z",
-        "waitedWorkingMinutes": 60,
+        "openedAt": "2026-09-07T07:20:00.000Z",
+        "waitedWorkingMinutes": 80,
         "interimAt": "2026-09-07T04:59:00.000Z"
       },
       {
@@ -117,8 +109,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T07:20:00.000Z",
-        "waitedWorkingMinutes": 80,
+        "openedAt": "2026-09-07T07:30:00.000Z",
+        "waitedWorkingMinutes": 90,
         "interimAt": "2026-09-07T05:28:00.000Z"
       },
       {
@@ -167,15 +159,15 @@
         "arrivedAt": "2026-09-07T08:54:00+03:00",
         "decision": {
           "messageId": "M-0006",
-          "route": "auto_send",
-          "reason": "routine_reply",
-          "priority": 10,
+          "route": "human_review",
+          "reason": "sensitive_category",
+          "priority": 80,
           "draft": "Merhaba, ORD-1081 siparişinizde yanlış renk ürün gönderildiği için üzgünüz. Size doğru rengi ücretsiz olarak gönderebiliriz veya tam iade yapabiliriz, hangisini tercih edersiniz? Ayrıca faturanızı da düzeltip güncel halini tarafınıza ileteceğiz. Yanlış gelen ürünü nasıl iade edebileceğinize dair kargo bilgilerini de en kısa sürede paylaşacağız. Yaşanan aksaklık için tekrar özür dileriz.",
-          "requiresApproval": false,
+          "requiresApproval": true,
           "llmCalls": 2
         },
-        "openedAt": null,
-        "waitedWorkingMinutes": null,
+        "openedAt": "2026-09-07T06:10:00.000Z",
+        "waitedWorkingMinutes": 10,
         "interimAt": null
       },
       {
@@ -193,9 +185,9 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T06:10:00.000Z",
-        "waitedWorkingMinutes": 5,
-        "interimAt": null
+        "openedAt": "2026-09-07T06:40:00.000Z",
+        "waitedWorkingMinutes": 35,
+        "interimAt": "2026-09-07T06:35:00.000Z"
       },
       {
         "messageId": "M-0008",
@@ -250,8 +242,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T06:40:00.000Z",
-        "waitedWorkingMinutes": 5,
+        "openedAt": "2026-09-07T07:00:00.000Z",
+        "waitedWorkingMinutes": 25,
         "interimAt": null
       },
       {
@@ -345,8 +337,8 @@
           "requiresApproval": true,
           "llmCalls": 1
         },
-        "openedAt": "2026-09-07T07:35:00.000Z",
-        "waitedWorkingMinutes": 0,
+        "openedAt": "2026-09-07T07:40:00.000Z",
+        "waitedWorkingMinutes": 5,
         "interimAt": null
       },
       {
@@ -364,8 +356,8 @@
           "requiresApproval": true,
           "llmCalls": 0
         },
-        "openedAt": "2026-09-07T07:48:00.000Z",
-        "waitedWorkingMinutes": 0,
+        "openedAt": "2026-09-07T07:50:00.000Z",
+        "waitedWorkingMinutes": 2,
         "interimAt": null
       },
       {

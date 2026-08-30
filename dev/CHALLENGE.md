@@ -194,6 +194,10 @@ message in
    a reply may name only what the sender was shown to own
    fails → human queue (draft_policy_violation)
   ↓
+5. COMMITMENT — draftCommitsToSensitiveAction() on the finished text · NO model call
+   the draft promises what the category never named → human queue (sensitive_category)
+   last on purpose: from here it can add a hold and can never lift one
+  ↓
 auto-send (routine_reply)
 ```
 
@@ -262,14 +266,14 @@ morning brings 60–80. The queue therefore never empties: overload is not a sce
 we contrive, it is the normal condition, and what the metric measures is the _order_
 of the queue rather than its length.
 
-| Metric                                  | Baseline      | Advanced      | Change         |
-| --------------------------------------- | ------------- | ------------- | -------------- |
-| **Critical coverage (normal day)**      | 4 / 19 (21%)  | 18 / 19 (95%) | **+74 points** |
-| **Critical coverage (overload)**        | 9 / 42 (21%)  | 30 / 42 (71%) | **+50 points** |
-| Routing accuracy (28 cases)             | 12 / 28 (43%) | 27 / 28 (96%) | +53 points     |
-| False positives (legitimate held)       | 0             | 0             | unchanged      |
-| Missed holds (auto-sent, should not be) | 16            | 1             | −15            |
-| Cost per case (model calls)             | 1.00          | 1.00          | **unchanged**  |
+| Metric                                  | Baseline      | Advanced       | Change         |
+| --------------------------------------- | ------------- | -------------- | -------------- |
+| **Critical coverage (normal day)**      | 4 / 19 (21%)  | 19 / 19 (100%) | **+79 points** |
+| **Critical coverage (overload)**        | 9 / 42 (21%)  | 32 / 42 (76%)  | **+55 points** |
+| Routing accuracy (28 cases)             | 12 / 28 (43%) | 28 / 28 (100%) | +57 points     |
+| False positives (legitimate held)       | 0             | 0              | unchanged      |
+| Missed holds (auto-sent, should not be) | 16            | 0              | −16            |
+| Cost per case (model calls)             | 1.00          | 1.00           | **unchanged**  |
 
 The two coverage rows come from `yarn sim normal-day --replay` and
 `yarn sim overload --replay`, each of which plays both lines in one run; the four records
@@ -284,9 +288,11 @@ jq '.coverage | {critical, criticalReached}' trajectories/baseline-overload.json
 
 Two figures are reported here rather than in the table, because neither is such a field.
 **Human minutes spent under overload** is printed by `yarn sim overload --replay` — "She
-spent 150 of the 659 working minutes the run gave her", against 650 of 659 for the
-advanced line — but the sim derives it from `coverage.opened` (15 and 65) times the
-operator's 10 minutes a case instead of recording it. **Reply quality** is 4 out of 5 for
+spent 150 of the 659 working minutes the run gave her", against 660 of 659 for the
+advanced line — but the sim derives it from `coverage.opened` (15 and 66) times the
+operator's 10 minutes a case instead of recording it. The advanced line's overrun is
+real rather than arithmetic: she starts her last case with minutes left in the shift
+and finishes it one minute past the horizon. **Reply quality** is 4 out of 5 for
 both lines, scored by the author by hand on the three cases both lines answer; no command
 produces it, and the sameness is the point — the same model writes both drafts.
 
@@ -299,22 +305,25 @@ empties" is a claim about a line that holds the right things; the baseline's fai
 one of holding, not of capacity, and the queue ordering is what the advanced line will be
 measured on.
 
-**What the advanced line changed, and what it cost.** On a normal day it reaches 18 of
-the 19 messages the operator had to see, against the baseline's 4. Under `overload` the
-same design reaches 30 of 42 rather than 9 — and the reason it is 71% and not 95% is the
+**What the advanced line changed, and what it cost.** On a normal day it reaches all 19
+of the messages the operator had to see, against the baseline's 4. Under `overload` the
+same design reaches 32 of 42 rather than 9 — and the reason it is 76% and not 100% is the
 one the paragraph above predicted. The baseline's desk was _bypassed_: it held 15 of 90
 arrivals and she opened every one of them with most of her day unspent. The advanced line
-holds 65 — every one of which genuinely had to be held, with no false positives left in
-the queue at all. But 65 correct holds against a 42-case day is a queue the ordering
-decides, and nine critical arrivals were opened after their four-hour window had
-closed. The failure moved: from a desk nobody reached to a desk that cannot be emptied
-inside a day.
+holds 68 — every one of which genuinely had to be held, with no false positives left in
+the queue at all. But 68 correct holds against a 42-case day is a queue the ordering
+decides: she opens 66 of them, 2 are still waiting when the run ends, the average wait is
+256 working minutes, and eight critical arrivals were opened after their four-hour window
+had closed. The failure moved: from a desk nobody reached to a desk that cannot be
+emptied inside a day.
 
-One error is left, and it is a single case. `amb-02` is auto-sent when it should not be:
-the classification came back as an ordinary order issue, and the draft the next call then
-wrote offered a full refund in as many words.
+No routing error is left. `amb-02` was the last one — the classification came back as an
+ordinary order issue and the draft the next call wrote offered a full refund in as many
+words — and it is now held, by a shared rule that reads the finished draft after every
+stronger check has passed. All 28 cases route as the labels expect, with no unnecessary
+hold introduced anywhere. What is left is entirely the queue.
 
-**Eight things were tried against this run and three were kept.** All were measured on
+**Nine things were tried against this run and four were kept.** All were measured on
 `--replay`, so none of them cost a model call.
 
 | Tried                                                                                 | Overload coverage | Kept                              |
@@ -327,6 +336,7 @@ wrote offered a full refund in as many words.
 | The reachable ones then ordered by deadline instead of priority                       | 27 / 42 (64%)     | no — priority earns its place     |
 | Rescuing a case with under 30 / 60 / 120 minutes of window left                       | 30 / 42 (71%)     | no — 90 minutes scored 29         |
 | Rescuing the case that would not survive its own place in the queue                   | 30 / 42 (71%)     | **yes** — no threshold to defend  |
+| Holding a draft that promises a refund the classification never named                 | 32 / 42 (76%)     | **yes** — 0 unnecessary holds     |
 
 The first two are one story told twice, and the third ended it. Reporting a refused
 second opinion as a policy breach put thank-you notes at priority 90, ahead of every
