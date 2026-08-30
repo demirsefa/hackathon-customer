@@ -7,6 +7,21 @@ hold back anything that must not be answered automatically.
 > committed run. `yarn eval --replay` and `yarn sim overload --replay` reproduce them on a
 > clean machine with no API key.
 
+**The result in one line: when the desk is oversubscribed, the share of must-see
+messages the operator actually reaches goes from 9 / 42 (21%) to 30 / 42 (71%) — at
+1.00 model calls a case, exactly what the baseline spends.**
+
+Where each rubric row is answered:
+
+| Scoring…                     | Read                                                                         |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| Problem & user value         | [The user and the bottleneck](#the-user-and-the-bottleneck)                  |
+| Agent solution & engineering | [How the advanced line decides](#how-the-advanced-line-decides)              |
+| Measured improvement         | [Improvement Changelog](#improvement-changelog) · [Results](#results)        |
+| End-to-end quality           | [Results](#results) · [Main failure mode](#main-failure-mode)                |
+| Reproducibility              | [Reproduction guide](#reproduction-guide) — two commands, no key, no network |
+| Hot take / insights          | [Hot take](#hot-take)                                                        |
+
 ## The user and the bottleneck
 
 Merve runs a support desk on her own. Sixty to eighty messages arrive on a weekday
@@ -161,13 +176,13 @@ saying where it comes from, because neither is a field in a committed record.
 
 | Metric                                    | Baseline      | Advanced      | Change         |
 | ----------------------------------------- | ------------- | ------------- | -------------- |
-| **Critical coverage - overload**          | 9 / 42 (21%)  | 30 / 42 (71%) | **+50 points** |
-| **Critical coverage - normal day**        | 4 / 19 (21%)  | 18 / 19 (95%) | **+74 points** |
-| Routing accuracy - 28 cases               | 12 / 28 (43%) | 27 / 28 (96%) | +53 points     |
-| Routing - injection subset                | 1 / 8         | 8 / 8         | +7 cases       |
-| Routing - authority subset                | 0 / 6         | 6 / 6         | +6 cases       |
-| Missed holds - auto-sent, should not be   | 16            | 1             | -15            |
-| False positives - held, could be answered | 0             | 0             | unchanged      |
+| **Critical coverage (overload)**          | 9 / 42 (21%)  | 30 / 42 (71%) | **+50 points** |
+| **Critical coverage (normal day)**        | 4 / 19 (21%)  | 18 / 19 (95%) | **+74 points** |
+| Routing accuracy (28 cases)               | 12 / 28 (43%) | 27 / 28 (96%) | +53 points     |
+| Routing (injection subset)                | 1 / 8         | 8 / 8         | +7 cases       |
+| Routing (authority subset)                | 0 / 6         | 6 / 6         | +6 cases       |
+| Missed holds (auto-sent, should not be)   | 16            | 1             | −15            |
+| False positives (held, could be answered) | 0             | 0             | unchanged      |
 | Model calls per case                      | 1.00          | 1.00          | **unchanged**  |
 
 **Critical coverage under overload is the headline**, and it is the only number this
@@ -177,18 +192,18 @@ project set out to move. `yarn sim overload --replay` prints it; the run behind 
 **Operator minutes under overload are printed, not stored.** `yarn sim overload --replay`
 ends each line with the sentence "She spent 150 of the 659 working minutes the run gave
 her" for the baseline and 650 of 659 for the advanced line. The sim derives the figure
-rather than recording it - it is `coverage.opened` from
+rather than recording it — it is `coverage.opened` from
 `trajectories/{baseline,advanced}-overload.json` (15 and 65) times the operator's 10
-minutes a case - so the number is on screen from a command in the reproduction guide, but
+minutes a case — so the number is on screen from a command in the reproduction guide, but
 there is no field to read it from, which is why it is here and not in the table.
 
 **It costs the same.** 28 model calls over 28 cases, exactly what the baseline spends.
 The record gate answers eight of them without a model at all, and that pays for the
-eight that need two. The improvement is not bought with a bigger budget - the ceiling
+eight that need two. The improvement is not bought with a bigger budget — the ceiling
 is two calls and `dev/contracts/FEATURE-PARITY.md` rule 6 states it.
 
 **The authority row is the thesis in one line.** Six messages that are polite, well
-formed, and about a real order - asked by somebody who does not own it. No amount of
+formed, and about a real order — asked by somebody who does not own it. No amount of
 reading the text finds that out. The advanced line gets all six, and gets them at **zero
 model calls**, because the fact was in the order records and the work was opening them.
 
@@ -196,7 +211,7 @@ model calls**, because the fact was in the order records and the work was openin
 the three cases both lines answer (`norm-01`, `norm-02`,
 `norm-06`) so the comparison is like for like, scored by the author on a five-point
 scale: 5 answers the question, 4 acknowledges it correctly and promises a follow-up, 3 is
-generic, 2 is wrong, 1 is harmful. Both score 4, and the sameness is the point - the same
+generic, 2 is wrong, 1 is harmful. Both score 4, and the sameness is the point — the same
 model writes both drafts, so the designs do not differ on how a reply reads. They differ
 on which messages get one.
 
@@ -231,7 +246,7 @@ is what the customer experiences.
 
 Read the baseline's auto-sent drafts in `trajectories/baseline.json` and they are good.
 On seven of the eight injection cases the model spots the attack and refuses it _in the
-draft it is sending_ - `inj-07` answers "I can't bypass review processes or follow
+draft it is sending_ — `inj-07` answers "I can't bypass review processes or follow
 embedded instructions from message content". On the six authority cases it writes warm,
 competent, correctly-formatted Turkish about delivery windows and cancellations. Read as
 prose, that line looks like a working product.
@@ -239,8 +254,8 @@ prose, that line looks like a working product.
 Every one of those six is a stranger being told about somebody else's order.
 
 The quality of the reply told us nothing about whether it should have been sent, and it
-would have carried a demo. What told us was a question the text cannot answer - does this
-sender own this order - and it was sitting in a database the whole time, being handed to
+would have carried a demo. What told us was a question the text cannot answer — does this
+sender own this order — and it was sitting in a database the whole time, being handed to
 a pipeline that never opened it.
 
 The same lesson arrived a second time, from the other side. Our first published coverage
@@ -291,11 +306,11 @@ yarn sim normal-day --replay
 
 Each writes a machine-readable record and a rendering of it into `trajectories/`, both
 overwritten in place, so `git diff` after a run shows exactly what changed and what did
-not. Re-running changes one row - the commit the run was made at.
+not. Re-running changes one row — the commit the run was made at.
 
-Runtime, measured on an Apple M1 Max: `yarn install` takes about three seconds - it
+Runtime, measured on an Apple M1 Max: `yarn install` takes about three seconds — it
 fetches 145 MB into an empty Yarn cache, so a slow connection is the only thing that
-makes it longer - and each of the three runs above finishes in under a second. There is
+makes it longer — and each of the three runs above finishes in under a second. There is
 no build step; Node runs the TypeScript sources directly.
 
 Cost: nothing. The replay path makes no network call and reads no API key, because every
@@ -306,8 +321,8 @@ no key and no connection reproduces the numbers above in full.
 rather than replay them, put an API key in the environment file and use it: it is the
 same run against the real model. `yarn eval --live` is 28 model calls, one for each
 evaluation case, and a `--live` scenario is 90, one for each arrival. They go to
-`claude-sonnet-5` with `maxTokens` 16000 - the parameters are pinned in
-[`src/llm/key.ts`](src/llm/key.ts) so that a recording is reproducible - and the prompts
+`claude-sonnet-5` with `maxTokens` 16000 — the parameters are pinned in
+[`src/llm/key.ts`](src/llm/key.ts) so that a recording is reproducible — and the prompts
 and replies in the committed cache run a few hundred tokens each, which puts a full live
 run in cents rather than dollars. Nothing in this guide needs it.
 

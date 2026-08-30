@@ -1,5 +1,12 @@
 # ADVANCED_PLAN.md — the last five hours
 
+> **Status: superseded.** This is the planning snapshot from Saturday afternoon,
+> kept as it was written. The advanced line it plans was then built and measured;
+> what happened to each decision below is recorded in the README's
+> [Improvement Changelog](../README.md#improvement-changelog) (stages 5–12), and
+> every number in this file is the afternoon's, not the final one — the final
+> numbers are in [README § Results](../README.md#results).
+
 Written 2026-08-30, revised 15:10 Istanbul. Code freeze is 20:00 today
 ([`CHALLENGE.md`](CHALLENGE.md) §2), so this file has five hours of life in it. It
 exists because at 18:00 nobody decides well, and because the measurement taken this

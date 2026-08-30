@@ -283,12 +283,12 @@ jq '.coverage | {critical, criticalReached}' trajectories/baseline-overload.json
 ```
 
 Two figures are reported here rather than in the table, because neither is such a field.
-**Human minutes spent under overload** is printed by `yarn sim overload --replay` - "She
+**Human minutes spent under overload** is printed by `yarn sim overload --replay` — "She
 spent 150 of the 659 working minutes the run gave her", against 650 of 659 for the
-advanced line - but the sim derives it from `coverage.opened` (15 and 65) times the
+advanced line — but the sim derives it from `coverage.opened` (15 and 65) times the
 operator's 10 minutes a case instead of recording it. **Reply quality** is 4 out of 5 for
 both lines, scored by the author by hand on the three cases both lines answer; no command
-produces it, and the sameness is the point - the same model writes both drafts.
+produces it, and the sameness is the point — the same model writes both drafts.
 
 **What measuring changed about the paragraph above it.** Under `overload` the baseline
 holds 15 of 90 arrivals for the operator and auto-sends the other 75. Her capacity is 42
