@@ -40,10 +40,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * digging a object out of the sentence would be exactly the guessing this boundary
  * exists to refuse.
  *
- * Found the hard way. Six of the twenty-eight responses in `fixtures/llm-cache.json`
- * are fenced, every one of them carrying valid JSON, and every one of them was being
- * discarded — which sent correctly-classified messages to the operator under
- * `model_output_unusable` and inflated the coverage number the submission is scored on.
+ * Found the hard way. A steady fraction of the responses recorded in
+ * `fixtures/llm-cache.json` arrive fenced, every one of them carrying valid JSON, and
+ * every one of them was being discarded — which sent correctly-classified messages to
+ * the operator under `model_output_unusable` and inflated the coverage number the
+ * submission is scored on.
  */
 function stripFence(raw: string): string {
   const trimmed = raw.trim();

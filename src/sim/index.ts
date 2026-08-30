@@ -223,7 +223,7 @@ try {
       onArrival: (arrival) => {
         // What this arrival added to the cache. Zero on a live run means the answer was
         // already there — the same case arriving again costs nothing, which is exactly
-        // why twenty-eight recordings cover a ninety-arrival run.
+        // why a run replays from far fewer recordings than it has arrivals.
         const fresh = session.recorded() - held;
         held += fresh;
 
