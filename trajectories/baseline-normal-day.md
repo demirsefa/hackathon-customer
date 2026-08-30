@@ -20,9 +20,9 @@ shift, a lunch break and a weekend in the way.
 | ----- | ----- |
 | Line | `baseline` |
 | Scenario | `normal-day` |
-| Commit | `87b70c1` |
+| Commit | `444041f` |
 | Model | `claude-sonnet-5`, max tokens 16000, effort medium |
-| Client | replay (claude-sonnet-5) — 28 recorded response(s) in fixtures/llm-cache.json |
+| Client | replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json |
 | Arrivals | 45 |
 | First opened | Mon 07 Sept 09:00 |
 | Run ends | Tue 08 Sept 14:00 — 4 working hour(s) after the last arrival, past which no queued case could still be reached in time |

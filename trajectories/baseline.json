@@ -1,8 +1,8 @@
 {
   "schema": "support-triage/eval-run@1",
   "provenance": {
-    "commit": "87b70c1",
-    "llmLabel": "replay (claude-sonnet-5) — 28 recorded response(s) in fixtures/llm-cache.json",
+    "commit": "444041f",
+    "llmLabel": "replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json",
     "params": {
       "model": "claude-sonnet-5",
       "maxTokens": 16000,

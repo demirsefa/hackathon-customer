@@ -254,14 +254,16 @@ morning brings 60–80. The queue therefore never empties: overload is not a sce
 we contrive, it is the normal condition, and what the metric measures is the _order_
 of the queue rather than its length.
 
-| Metric                             | Baseline     | Advanced | Change  |
-| ---------------------------------- | ------------ | -------- | ------- |
-| **Critical coverage (normal day)** | 4 / 19 (21%) | pending  | pending |
-| **Critical coverage (overload)**   | 9 / 42 (21%) | pending  | pending |
-| False positives (legitimate held)  | 0            | pending  | pending |
-| Reply quality (out of 5, by hand)  | pending      | pending  | pending |
-| Human time per case                | pending      | pending  | pending |
-| Cost per case                      | pending      | pending  | pending |
+| Metric                                  | Baseline      | Advanced      | Change         |
+| --------------------------------------- | ------------- | ------------- | -------------- |
+| **Critical coverage (normal day)**      | 4 / 19 (21%)  | 18 / 19 (95%) | **+74 points** |
+| **Critical coverage (overload)**        | 9 / 42 (21%)  | 24 / 42 (57%) | **+36 points** |
+| Routing accuracy (28 cases)             | 12 / 28 (43%) | 23 / 28 (82%) | +39 points     |
+| False positives (legitimate held)       | 0             | 4             | +4             |
+| Missed holds (auto-sent, should not be) | 16            | 1             | −15            |
+| Human minutes spent (overload, of 660)  | 150           | 660           | +510           |
+| Cost per case (model calls)             | 1.00          | 1.29          | +29%           |
+| Reply quality (out of 5, by hand)       | pending       | pending       | pending        |
 
 The two coverage cells come from `yarn sim normal-day --replay` and
 `yarn sim overload --replay`; the runs behind them are committed as
@@ -281,6 +283,38 @@ were answered automatically and she was never shown that they existed. "The queu
 empties" is a claim about a line that holds the right things; the baseline's failure is
 one of holding, not of capacity, and the queue ordering is what the advanced line will be
 measured on.
+
+**What the advanced line changed, and what it cost.** On a normal day it reaches 18 of
+the 19 messages the operator had to see, against the baseline's 4. Under `overload` the
+same design reaches 24 of 42 rather than 9 — and the reason it is 57% and not 95% is the
+one the paragraph above predicted. The baseline's desk was _bypassed_: it held 15 of 90
+arrivals and she opened every one of them with most of her day unspent. The advanced line
+holds 78, and 68 of those 90 arrivals genuinely had to be held — the inbox is hostile, not
+the line timid. But 68 correct holds against a 42-case day is a queue that cannot empty,
+so 12 cases were still waiting when the run ended and the ordering decided everything.
+The failure moved: from a desk nobody reached to a desk that cannot be emptied.
+
+Its remaining errors are small and named. One message is auto-sent that should not be —
+`amb-02`, where the classification came back ordinary and the draft it then wrote offered
+a full refund in as many words. Four are held that could have been answered
+(`norm-03`, `norm-07`, `norm-08`, `norm-10`), which costs the operator ten minutes each
+and costs the customer nothing.
+
+**Two things were tried against this run and only one kept.** Both were measured on
+`--replay`, so neither cost a model call.
+
+| Tried                                                                                 | Overload coverage | Kept           |
+| ------------------------------------------------------------------------------------- | ----------------- | -------------- |
+| A refused second opinion reported as `draft_policy_violation`                         | 20 / 42 (48%)     | no — see below |
+| The same refusal reported as `low_confidence`                                         | 24 / 42 (57%)     | **yes**        |
+| `instruction_in_message` dropped below `sensitive_category` and `unknown_sender` (65) | 22 / 42 (52%)     | no             |
+
+The first is a correctness fix that happened to pay: the deterministic permitted-order
+check had already passed, so a model's refusal after it is doubt about a draft, not a
+policy breach, and reporting it as one put thank-you notes at priority 90 — ahead of every
+refund demand in the queue. The second was a deliberate attempt to read a blocked attack
+later than a waiting customer, and the measurement refused it: 17 of the 27 injection
+arrivals are critical, and pushing them back loses more than the reordering wins.
 
 **Two earlier numbers were published and both were wrong.** They are recorded here rather
 than quietly replaced, because a measurement nobody can audit is not a measurement.

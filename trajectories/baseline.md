@@ -14,9 +14,9 @@ be recomputed from it without running anything.
 | Field | Value |
 | ----- | ----- |
 | Line | `baseline` |
-| Commit | `87b70c1` |
+| Commit | `444041f` |
 | Model | `claude-sonnet-5`, max tokens 16000, effort medium |
-| Client | replay (claude-sonnet-5) — 28 recorded response(s) in fixtures/llm-cache.json |
+| Client | replay (claude-sonnet-5) — 64 recorded response(s) in fixtures/llm-cache.json |
 | Cases | 28 |
 
 ## Scores
