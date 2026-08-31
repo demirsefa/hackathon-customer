@@ -34,10 +34,21 @@ Istanbul time.
 | Office hours (optional) | Sat 29 Aug, 17:00, 24:00 |
 | Final-day checkpoint    | Sun 30 Aug, 18:00        |
 | **Code freeze**         | **Sun 30 Aug, 20:00**    |
-| **Submission closes**   | **Mon 31 Aug, 02:59**    |
+| **Submission closes**   | **Mon 31 Aug, 21:00**    |
 | Winners announced       | Sun 7 Sep, 20:00         |
 
 Do not build up to the submission time. The last hour is buffer, not working time.
+
+**This table carried the wrong close time until 31 August.** It said `Mon 31 Aug, 02:59`,
+and the whole final night was planned and worked against that figure. The challenge page
+says otherwise, in its own words: "The Hackathon ends on Aug 31 at 18:00 UTC", and its
+header band renders the run as `Aug 28 - Aug 31, 2026 - 6:00 PM - 9:00 PM - Europe/Istanbul`.
+18:00 UTC is 21:00 Istanbul. Kickoff (Fri 28 Aug, 18:00) was right; the close was eighteen
+hours early. The source is the page, not a memory of it:
+<https://www.hackerearth.com/community/challenges/hackathon/micro1-frontier-engineering-challenge-2026>
+
+The **code freeze stays where it is** — Sun 30 Aug, 20:00. It is ours, not the
+competition's, and moving it because more time turned up is the thing it exists to stop.
 
 ## 3. How it is judged
 
@@ -444,9 +455,15 @@ at night.
 
 ## 13. The last seven hours
 
-Code freeze is Sunday 20:00. Submission closes Monday 02:59. The seven hours between
-them are not extra build time — they are assembly time, and they are planned here
-because at 23:00 on the last night nobody plans well.
+Code freeze is Sunday 20:00. The hours between the freeze and the form are not extra
+build time — they are assembly time, and they are planned here because at 23:00 on the
+last night nobody plans well.
+
+**The plan below was written against a close time that was wrong** — see §2. It assumed
+Monday 02:59 and was executed against it; the real close is Monday 21:00. The plan is
+left as it was run rather than back-dated, because the schedule it produced is what the
+commit history actually shows. Only the two places that state the close time as a fact
+are corrected.
 
 ### What the freeze freezes
 
@@ -472,7 +489,7 @@ last-minute change to frozen code costs.
 | 22:50–00:20     | Record, two or three takes                                                    |
 | 00:20–01:20     | Edit, upload unlisted, put the link in `## Video`                             |
 | 01:20–01:50     | Submit                                                                        |
-| 01:50–02:59     | Buffer. No work.                                                              |
+| 01:50 onward    | Buffer. No work. (Planned against the wrong 02:59 close — see §2.)            |
 
 ### The clean-clone rehearsal
 
@@ -517,9 +534,10 @@ Two things to settle **before** Sunday evening, because both take longer than th
 - **Access.** Ground rule 10 asks that judges can run the project. A private repository
   has to be made public or shared before the form is filled, and that is a deliberate
   decision — the security scanners run on every commit precisely so this one is safe.
-- **Whether the platform allows editing a submission.** If it does, submit early and
-  revise. If it does not, one submission at 01:20 with a hard stop. This is not
-  documented on the public page; it needs a login or a question to the organisers.
+- **Whether the platform allows editing a submission.** It does, and the public page
+  says so under Eligibility Criteria: "Revisions are allowed until the deadline; only
+  the latest complete submission is evaluated." So: submit early and revise, and the
+  last complete revision before Mon 31 Aug 21:00 is the one that is judged.
 
 ## Goal order
 
