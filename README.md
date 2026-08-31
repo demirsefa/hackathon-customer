@@ -380,17 +380,17 @@ run in cents rather than dollars. Nothing in this guide needs it.
 
 ## Video
 
-Four minutes fifty seconds, walking through the bottleneck, the two lines and the overload run.
+Four minutes fifty-six seconds, walking through the bottleneck, the two lines and the
+overload run. English narration with burned-in English subtitles; the Turkish reply the
+baseline sends is subtitled in English above it, so the one case the whole thing turns on
+reads without knowing Turkish.
 
-**One correction, stated rather than edited out.** The recording was made in a single
-take. At one point the command on screen is `yarn sim normal-day --replay` while the
-narration quotes the overload figures (9 / 42 and 32 / 42). Both runs are committed and
-both reproduce: the overload numbers are in `trajectories/baseline-overload.json` and
-`trajectories/advanced-overload.json`, and the normal-day numbers visible on screen
-(4 / 19 and 19 / 19) are in the `-normal-day` records beside them. The Results table
-above is the authority for every figure.
+Every command on screen is in the reproduction guide, and every number it quotes is a
+field in a committed record under `trajectories/` — the Results table above is the
+authority for all of them. The shooting script, scene by scene with the exact output each
+command produces, is [`dev/VIDEO-SCRIPT.md`](dev/VIDEO-SCRIPT.md).
 
-https://www.youtube.com/watch?v=WUZ-WFf7CnY
+https://www.youtube.com/watch?v=InGw5U-_Zio
 
 ## Branches
 
