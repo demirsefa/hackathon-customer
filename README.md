@@ -399,6 +399,42 @@ top to bottom in the order the work actually happened, one commit per step. A
 reviewer checking a claim against the code can walk `git log` from the bottom
 without reconstructing a graph first.
 
+## Tools used
+
+The challenge page requires coding-agent use to be disclosed alongside the trajectories.
+Two different things are called an agent in this submission, and they are kept apart
+here on purpose.
+
+**The coding agent that wrote the repository.** [Claude Code](https://claude.com/claude-code),
+Anthropic's CLI, running `claude-opus-5`. No other coding agent, autocomplete assistant or
+code-generation service was used. Its footprint is in the history rather than in prose:
+`git log` carries `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>` on 47 of the 116
+commits.
+
+```bash
+git log --format='%(trailers:key=Co-Authored-By,valueonly=true)' | sort -u
+```
+
+The trailer is added by a commit convention rather than by the tool, so a commit without
+it is not a commit written without the agent: 47 is a floor on agent involvement, not a
+count of it. What actually constrained the agent is committed and readable:
+[`CLAUDE.md`](CLAUDE.md) is the instruction file it reads at the start of every session,
+[`dev/contracts/`](dev/contracts/) is the law it may not break, and
+[`dev/GUIDES.md`](dev/GUIDES.md) is the code guidance it follows.
+
+**The agents the product itself runs.** The triage pipeline calls `claude-sonnet-5`
+through `@anthropic-ai/sdk` — one classification call and one drafting call at most, with
+parameters pinned in [`src/llm/key.ts`](src/llm/key.ts) so a recording is reproducible.
+Every prompt it sends and every raw response it got back are committed, in
+[`fixtures/llm-cache.json`](fixtures/llm-cache.json) and in the `steps` array of each
+`trajectories/*.json`. That is deliverable 4, and it is the pipeline's trace, not the
+coding agent's.
+
+**No agent framework.** There is no LangGraph, no orchestration library and no starter
+repository. `package.json` has two runtime dependencies — the Anthropic SDK and
+`@inquirer/prompts` for the terminal menu — and the pipeline in `src/core/` is written
+out by hand, because the arrangement of the calls _is_ the claim this project measures.
+
 ## Sources
 
 Everything below existed before this competition, in

@@ -444,6 +444,7 @@ at night.
 | Hot take and main failure mode                 | `README.md`                                                  |
 | Reproduction guide                             | `README.md`                                                  |
 | Prior work declared                            | `README.md` Sources, enforced by a contract check            |
+| Coding agent disclosed                         | `README.md` Tools used — required by the challenge page      |
 | Decision logic                                 | `src/core/` — pure, no I/O, no clock, no network             |
 | Human approval gate                            | `src/core/decision.ts`, visible in the `eval` and `sim` runs |
 | Per-case scoring, 28 cases                     | `src/eval/`, against `src/core/` directly                    |
