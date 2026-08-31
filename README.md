@@ -380,7 +380,7 @@ run in cents rather than dollars. Nothing in this guide needs it.
 
 ## Video
 
-Four minutes fifty-six seconds, walking through the bottleneck, the two lines and the
+Four minutes fifty-seven seconds, walking through the bottleneck, the two lines and the
 overload run. English narration with burned-in English subtitles; the Turkish reply the
 baseline sends is subtitled in English above it, so the one case the whole thing turns on
 reads without knowing Turkish.
@@ -390,7 +390,7 @@ field in a committed record under `trajectories/` — the Results table above is
 authority for all of them. The shooting script, scene by scene with the exact output each
 command produces, is [`dev/VIDEO-SCRIPT.md`](dev/VIDEO-SCRIPT.md).
 
-https://www.youtube.com/watch?v=InGw5U-_Zio
+https://www.youtube.com/watch?v=T2vYopr8US8
 
 ## Branches
 
