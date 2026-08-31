@@ -55,8 +55,8 @@ Türkçe okunuşla yazıldı. Büyük harfli hece **vurgulu** olan.
 | --- | -------------------- | ---- | ------------- | ---------------------------- |
 | 1   | Problem              | 0:35 | `0:00 – 0:35` | Boş terminal                 |
 | 2   | Koşu                 | 0:20 | `0:35 – 0:55` | `yarn sim overload --replay` |
-| 3   | Baseline             | 0:35 | `0:55 – 1:30` | `9 / 42 (21%)`               |
-| 4   | Advanced             | 0:30 | `1:30 – 2:00` | `32 / 42 (76%)`              |
+| 3   | Baseline             | 0:35 | `0:55 – 1:30` | özet ekranı, üst blok        |
+| 4   | Advanced             | 0:30 | `1:30 – 2:00` | aynı ekran, alt blok         |
 | 5   | ⭐ Kayıt kapısı      | 0:55 | `2:00 – 2:55` | `auth-01` + `ORD-1060`       |
 | 6   | Kaldırılan deney     | 0:40 | `2:55 – 3:35` | `8`                          |
 | 7   | Kalan sorun, kapanış | 0:45 | `3:35 – 4:20` | `68`, `256`, repro komutu    |
@@ -93,8 +93,9 @@ _Vurgu: 420, 10, 42, 90. Problemin tamamı bu dört sayıda._
 yarn sim overload --replay
 ```
 
-**EKRANDA** — Önce uzun bir gün dökümü akar, sonra iki özet bloğu gelir. Konuşurken
-akmasını bekleme; komut bir saniyeden kısa sürer.
+**EKRANDA** — Uzun bir gün dökümü akar, sonunda özet gelir. Akmasını bekleme, konuşmaya
+devam et; komut bir saniyeden kısa sürer. **Bu sahnenin amacı gerçek koşuyu göstermek**
+— sayıları okumayacaksın, onlar 3. sahnede temiz ekranda.
 
 **SÖYLE**
 
@@ -105,7 +106,15 @@ akmasını bekleme; komut bir saniyeden kısa sürer.
 
 # 3 · Baseline — `0:55`
 
-**EKRANDA** — Çıktının ilk özet bloğu. `CRITICAL COVERAGE` satırını imleçle göster.
+**YAZ** — Aynı koşu, ama sadece iki özet bloğu. **3. ve 4. sahne bu tek ekrandan
+okunur** — scroll yok, komutu tekrar tekrar çalıştırmak yok.
+
+```bash
+clear && yarn sim overload --replay | awk '/— overload ·/,/^trajectory:/'
+```
+
+**EKRANDA** — 24 satır, ikisi birden. Üstteki baseline (bu sahne), alttaki advanced
+(sonraki sahne). `CRITICAL COVERAGE` satırını imleçle göster.
 
 ```text
 baseline — overload · 90 arrival(s)
@@ -138,7 +147,7 @@ _"nine" ve "twenty-one percent" yavaş. Sonra bir saniye dur._
 
 # 4 · Advanced — `1:30`
 
-**EKRANDA** — Aynı çıktının ikinci özet bloğu.
+**EKRANDA** — **Aynı ekranın alt yarısı.** Komut yok, sadece imleci aşağı kaydır.
 
 ```text
 advanced — overload · 90 arrival(s)
