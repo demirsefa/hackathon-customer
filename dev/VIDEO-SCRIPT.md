@@ -124,9 +124,9 @@ baseline — overload · 90 arrival(s)
 
 **SÖYLE**
 
-> First, the baseline. // This is what a good engineer builds on day one. // **One**
-> model call gives the category, the urgency and the draft together. // Then one check:
-> is this category sensitive? //
+> First, the baseline. // The simple version — and a fair one, not built to lose. //
+> **One** model call gives the category, the urgency and the draft together. // Then one
+> check: is this category sensitive? //
 >
 > **42** messages needed her eyes. She reached **9**. // **21 percent**. //
 >
