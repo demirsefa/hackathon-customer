@@ -406,10 +406,12 @@ Two different things are called an agent in this submission, and they are kept a
 here on purpose.
 
 **The coding agent that wrote the repository.** [Claude Code](https://claude.com/claude-code),
-Anthropic's CLI, running `claude-opus-5`. No other coding agent, autocomplete assistant or
-code-generation service was used. Its footprint is in the history rather than in prose:
-`git log` carries `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>` on 47 of the 116
-commits.
+Anthropic's CLI. `claude-opus-5` did the work; `claude-fable-5` was used sparingly, for a
+few validation passes over work Opus had already written. Nothing else — no second coding
+agent, no autocomplete assistant, no code-generation service from another vendor. The
+footprint is in the history rather than in prose: `git log` carries
+`Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>` on 47 of the 116 commits, Opus
+because Opus is the model that made them.
 
 ```bash
 git log --format='%(trailers:key=Co-Authored-By,valueonly=true)' | sort -u
