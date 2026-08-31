@@ -93,10 +93,17 @@ _"9" ve "21 percent" yavaş. Sonra bir saniye dur — sonraki sahne bunu üçe k
 
 **EKRAN** — Aynı çıktının `advanced — overload` bloğu.
 
-**YAZ**
+**YAZ** — çıktı iki satır: hangisinin hangisi olduğu ve nasıl dağıldığı yazılı.
 
 ```bash
-jq -c '.scorecard | {llmCalls, cases}' trajectories/baseline.json trajectories/advanced.json
+jq -r '"\(.scorecard.pipeline): \(.scorecard.llmCalls) calls / \(.scorecard.cases) cases  ·  per case " + ([.run.runs[].decision.llmCalls] | group_by(.) | map("\(length)×\(.[0])") | join(", "))' trajectories/baseline.json trajectories/advanced.json
+```
+
+Ekranda görünecek olan:
+
+```text
+baseline: 28 calls / 28 cases  ·  per case 28×1
+advanced: 28 calls / 28 cases  ·  per case 8×0, 12×1, 8×2
 ```
 
 **SÖYLE**
@@ -104,12 +111,17 @@ jq -c '.scorecard | {llmCalls, cases}' trajectories/baseline.json trajectories/a
 > Same command, same **90** messages, same recorded model — new design. // **32** out
 > of **42**. **76 percent**, up from **21**. //
 >
-> And the cost: **28** model calls for **28** cases. **One** call per case — **exactly
-> what the baseline spends**. //
+> Now the cost. // Both lines: **28** calls for **28** cases. **Exactly the same
+> budget**. //
+>
+> But look at the shape. // The baseline spends one call on every case. // The advanced
+> line spends **nothing** on eight of them — the records already decided those — and
+> **two** on eight others. // It averages to the same number. //
 >
 > This is not a bigger budget. It is a better order.
 
-_"Exactly what the baseline spends" cümlenin en güçlü yeri. Yavaş söyle._
+_İki satırı imleçle sırayla göster: üstteki baseline, alttaki advanced. "Exactly the
+same budget" ve "a better order" cümleleri yavaş._
 
 ---
 
