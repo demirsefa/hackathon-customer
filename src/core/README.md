@@ -71,6 +71,7 @@ between deciding from the text and deciding from the record is the number this w
 project reports. `src/__test__/unit/baseline.test.ts` hands it a record store that
 throws on any read, so the claim is checked rather than described.
 
-The advanced line is not written yet. Until it is, `PIPELINES` holds the baseline
-alone and part of `dev/contracts/FEATURE-PARITY.md` is suspended — see that file's
-Enforcement section for exactly which assertions, and when they return.
+Both lines are built. `PIPELINES` holds `[baseline, advanced]`, and the suspension that
+was in force while `src/core/advanced/` was a placeholder is over — every assertion in
+`dev/contracts/FEATURE-PARITY.md` runs. That file's Enforcement section records which
+three were suspended and which one of them turned out to have been misdescribed.
