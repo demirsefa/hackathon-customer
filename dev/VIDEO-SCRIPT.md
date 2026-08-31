@@ -55,8 +55,8 @@ Türkçe okunuşla yazıldı. Büyük harfli hece **vurgulu** olan.
 | --- | -------------------- | ---- | ------------- | ---------------------------- |
 | 1   | Problem              | 0:35 | `0:00 – 0:35` | Boş terminal                 |
 | 2   | Koşu                 | 0:20 | `0:35 – 0:55` | `yarn sim overload --replay` |
-| 3   | Baseline             | 0:35 | `0:55 – 1:30` | özet ekranı, üst blok        |
-| 4   | Advanced             | 0:30 | `1:30 – 2:00` | aynı ekran, alt blok         |
+| 3   | Baseline             | 0:35 | `0:55 – 1:30` | `9 / 42 (21%)`               |
+| 4   | Advanced             | 0:30 | `1:30 – 2:00` | `32 / 42 (76%)` + maliyet    |
 | 5   | ⭐ Kayıt kapısı      | 0:55 | `2:00 – 2:55` | `auth-01` + `ORD-1060`       |
 | 6   | Kaldırılan deney     | 0:40 | `2:55 – 3:35` | `8`                          |
 | 7   | Kalan sorun, kapanış | 0:45 | `3:35 – 4:20` | `68`, `256`, repro komutu    |
@@ -106,29 +106,22 @@ devam et; komut bir saniyeden kısa sürer. **Bu sahnenin amacı gerçek koşuyu
 
 # 3 · Baseline — `0:55`
 
-**YAZ** — Aynı koşu, ama sadece iki özet bloğu. **3. ve 4. sahne bu tek ekrandan
-okunur** — scroll yok, komutu tekrar tekrar çalıştırmak yok.
+**YAZ** — 2. sahnedeki koşunun baseline sonucu, altı satırda.
 
 ```bash
-clear && yarn sim overload --replay | awk '/— overload ·/,/^trajectory:/'
+jq -r '.coverage | "\(.pipeline) — \(.scenario)\n\n  critical coverage   \(.criticalReached) / \(.critical)   (\(.criticalReached*100/.critical|round)%)\n  held for her        \(.queued) of \(.arrivals)\n  she opened          \(.opened)\n  average wait        \(.averageWaitMinutes) min\n  model calls         \(.llmCalls) for \(.arrivals) messages"' trajectories/baseline-overload.json
 ```
 
-**EKRANDA** — 24 satır, ikisi birden. Üstteki baseline (bu sahne), alttaki advanced
-(sonraki sahne). `CRITICAL COVERAGE` satırını imleçle göster.
+**EKRANDA**
 
 ```text
-baseline — overload · 90 arrival(s)
+baseline — overload
 
-  CRITICAL COVERAGE         9 / 42  (21%)  opened within 4 working hour(s)
-  never reached in time     33 arrival(s), 10 case(s)
-    auth-01, auth-02, auth-03, auth-05, auth-06, inj-01, inj-02, inj-03, inj-05, inj-07
-
-  held for the operator     15 of 90  (the rest were answered automatically)
-  opened                    15 of 15  (100%)
-  still queued              0  at the horizon
-  average wait              15 working minute(s)
-  interim messages sent     7
-  model calls               90 total, 1.00 per arrival
+  critical coverage   9 / 42   (21%)
+  held for her        15 of 90
+  she opened          15
+  average wait        15 min
+  model calls         90 for 90 messages
 ```
 
 **SÖYLE**
@@ -147,24 +140,31 @@ _"nine" ve "twenty-one percent" yavaş. Sonra bir saniye dur._
 
 # 4 · Advanced — `1:30`
 
-**EKRANDA** — **Aynı ekranın alt yarısı.** Komut yok, sadece imleci aşağı kaydır.
+**YAZ** — Aynı komut, tek fark dosya adı: `baseline` yerine `advanced`.
 
-```text
-advanced — overload · 90 arrival(s)
-
-  CRITICAL COVERAGE         32 / 42  (76%)  opened within 4 working hour(s)
-  never reached in time     10 arrival(s), 6 case(s)
-    amb-02, auth-05, auth-06, inj-01, norm-05, norm-09
-
-  held for the operator     68 of 90  (the rest were answered automatically)
-  opened                    66 of 68  (97%)
-  still queued              2  at the horizon
-  average wait              256 working minute(s)
-  interim messages sent     68
-  model calls               90 total, 1.00 per arrival
+```bash
+jq -r '.coverage | "\(.pipeline) — \(.scenario)\n\n  critical coverage   \(.criticalReached) / \(.critical)   (\(.criticalReached*100/.critical|round)%)\n  held for her        \(.queued) of \(.arrivals)\n  she opened          \(.opened)\n  average wait        \(.averageWaitMinutes) min\n  model calls         \(.llmCalls) for \(.arrivals) messages"' trajectories/advanced-overload.json
 ```
 
-**YAZ** — maliyeti göstermek için. Çıktı hat adını ve vaka başına dağılımı yazar.
+**EKRANDA**
+
+```text
+advanced — overload
+
+  critical coverage   32 / 42   (76%)
+  held for her        68 of 90
+  she opened          66
+  average wait        256 min
+  model calls         90 for 90 messages
+```
+
+**SÖYLE**
+
+> Same run, new design. // **32** out of **42**. **76 percent**, up from **21**. //
+>
+> And the same **90** model calls for the same **90** messages.
+
+**YAZ** — maliyetin nereden geldiği. Vaka başına dağılımı yazar.
 
 ```bash
 jq -r '"\(.scorecard.pipeline): \(.scorecard.llmCalls) calls / \(.scorecard.cases) cases  ·  per case " + ([.run.runs[].decision.llmCalls] | group_by(.) | map("\(length)×\(.[0])") | join(", "))' trajectories/baseline.json trajectories/advanced.json
@@ -179,20 +179,13 @@ advanced: 28 calls / 28 cases  ·  per case 8×0, 12×1, 8×2
 
 **SÖYLE**
 
-> Same command, same **90** messages, same recorded model — new design. // **32** out
-> of **42**. **76 percent**, up from **21**. //
->
-> Now the cost. // Both lines: **28** calls for **28** cases. **Exactly the same
-> budget**. //
->
-> But look at the shape. // The baseline spends one call on every case. // The advanced
-> line spends **nothing** on eight of them — the records already decided those — and
-> **two** on eight others. // It comes out the same. //
+> **Exactly the same budget.** // But look at the shape. // The baseline spends one call
+> on every case. // The advanced line spends **nothing** on eight of them — the records
+> already decided those — and **two** on eight others. // It comes out the same. //
 >
 > This is not a bigger budget. It is a better order.
 
-_İki satırı imleçle sırayla göster: üstteki baseline, alttaki advanced. "Exactly the
-same budget" ve "a better order" yavaş._
+_"Exactly the same budget" ve "a better order" yavaş._
 
 ---
 
